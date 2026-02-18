@@ -1,0 +1,63 @@
+{
+  "Home": {
+    "metaTitle": "منصة محو الأمية في الذكاء الاصطناعي — تعلّم البناء بالذكاء الاصطناعي",
+    "metaDescription": "تعلّم البناء بالذكاء الاصطناعي. للعقول الفضولية من عمر 8 إلى 16 سنة.",
+    "title": "تعلّم البناء بالذكاء الاصطناعي",
+    "subtitle": "انضم إلى آلاف البنّائين الشباب الذين يتقنون مهارات الغد — اليوم."
+  },
+  "Common": {
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ ما. حاول مرة أخرى!",
+    "retry": "حاول مجدداً",
+    "back": "رجوع",
+    "next": "التالي",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "aiGenerated": "✨ مُولَّد بالذكاء الاصطناعي"
+  },
+  "Nav": {
+    "learn": "تعلّم",
+    "profile": "ملفي الشخصي",
+    "parent": "لوحة تحكم الوالد",
+    "logout": "تسجيل الخروج",
+    "logoAlt": "شعار منصة محو الأمية في الذكاء الاصطناعي"
+  },
+  "Auth": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "ابدأ الآن",
+    "signOut": "تسجيل الخروج",
+    "emailLabel": "عنوان البريد الإلكتروني",
+    "passwordLabel": "كلمة المرور",
+    "displayNameLabel": "اسمك",
+    "continueWithGoogle": "المتابعة مع Google",
+    "orDivider": "أو",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟",
+    "parentSignupTitle": "أنشئ حساب الوالد",
+    "parentSignupSubtitle": "ستضيف حساب طفلك في الخطوة التالية.",
+    "errors": {
+      "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
+      "weakPassword": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل مع حرف كبير ورقم",
+      "emailInUse": "هذا البريد الإلكتروني مسجّل بالفعل. جرّب تسجيل الدخول.",
+      "generic": "حدث خطأ ما. حاول مرة أخرى!"
+    }
+  },
+  "Learn": {
+    "level": "المستوى {level}",
+    "moduleCount": "{count} وحدات",
+    "startModule": "ابدأ",
+    "continueModule": "تابع",
+    "completedModule": "مكتمل",
+    "lockedModule": "مقفل",
+    "xpReward": "{xp} نقطة خبرة",
+    "submitPrompt": "إرسال",
+    "promptPlaceholder": "اكتب طلبك هنا...",
+    "promptCharCount": "{current}/{max} حرف",
+    "aiResponseTitle": "رد الذكاء الاصطناعي",
+    "promptScoreLabel": "نقاط الطلب",
+    "tokenBudgetWarning": "اقتربت من حدّك اليومي من رسائل الذكاء الاصطناعي!"
+  }
+}

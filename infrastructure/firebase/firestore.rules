@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    function isParentOf(childUid) {
+      return exists(/databases/$(database)/documents/parent_links/$(request.auth.uid))
+        && get(/databases/$(database)/documents/parent_links/$(request.auth.uid)).data.childUids.hasAny([childUid]);
+    }
+
+    function hasRole(role) {
+      return request.auth.token.role == role;
+    }
+
+    function hasAdminRole() {
+      return hasRole('admin');
+    }
+
+    // Users collection
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isParentOf(uid) || hasAdminRole();
+      allow create: if isAuthenticated() && isOwner(uid);
+      allow update: if isOwner(uid) || hasAdminRole();
+      allow delete: if hasAdminRole();
+    }
+
+    // Progress collection
+    match /progress/{docId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid
+        || isParentOf(resource.data.userId)
+        || hasAdminRole()
+      );
+      allow write: if isAuthenticated() && resource == null
+        ? request.resource.data.userId == request.auth.uid
+        : resource.data.userId == request.auth.uid;
+    }
+
+    // Moderation logs — backend write only, parent/admin read
+    match /moderation_logs/{logId} {
+      allow read: if hasAdminRole() || isParentOf(resource.data.userId);
+      allow write: if false;  // Backend only via Admin SDK
+    }
+  }
+}

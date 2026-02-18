@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "eureka-lab-dev",
+    "staging": "eureka-lab-staging",
+    "production": "eureka-lab-prod"
+  }
+}

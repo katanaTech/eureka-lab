@@ -1,0 +1,63 @@
+{
+  "Home": {
+    "metaTitle": "Eureka Lab Platform — Learn to Build with AI",
+    "metaDescription": "Learn to build with AI. For curious minds aged 8–16.",
+    "title": "Learn to Build with AI",
+    "subtitle": "Join thousands of young builders mastering the skills of tomorrow — today."
+  },
+  "Common": {
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again!",
+    "retry": "Try again",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "aiGenerated": "✨ AI-generated"
+  },
+  "Nav": {
+    "learn": "Learn",
+    "profile": "My Profile",
+    "parent": "Parent Dashboard",
+    "logout": "Sign Out",
+    "logoAlt": "Eureka Lab Platform logo"
+  },
+  "Auth": {
+    "signIn": "Sign In",
+    "signUp": "Get Started",
+    "signOut": "Sign Out",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "displayNameLabel": "Your name",
+    "continueWithGoogle": "Continue with Google",
+    "orDivider": "or",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "parentSignupTitle": "Create your parent account",
+    "parentSignupSubtitle": "You'll add your child's account in the next step.",
+    "errors": {
+      "invalidEmail": "Please enter a valid email address",
+      "weakPassword": "Password must be at least 8 characters with one uppercase letter and one number",
+      "emailInUse": "This email is already registered. Try signing in instead.",
+      "generic": "Something went wrong. Please try again!"
+    }
+  },
+  "Learn": {
+    "level": "Level {level}",
+    "moduleCount": "{count} modules",
+    "startModule": "Start",
+    "continueModule": "Continue",
+    "completedModule": "Completed",
+    "lockedModule": "Locked",
+    "xpReward": "{xp} XP",
+    "submitPrompt": "Submit Prompt",
+    "promptPlaceholder": "Type your prompt here...",
+    "promptCharCount": "{current}/{max} characters",
+    "aiResponseTitle": "AI Response",
+    "promptScoreLabel": "Prompt score",
+    "tokenBudgetWarning": "You're running low on your daily AI messages!"
+  }
+}

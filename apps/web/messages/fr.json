@@ -1,0 +1,63 @@
+{
+  "Home": {
+    "metaTitle": "Plateforme Eureka-Lab  — Apprendre à construire avec l'IA",
+    "metaDescription": "Apprends à construire avec l'IA. Pour les esprits curieux de 8 à 16 ans.",
+    "title": "Apprendre à construire avec l'IA",
+    "subtitle": "Rejoins des milliers de jeunes bâtisseurs qui maîtrisent les compétences de demain — aujourd'hui."
+  },
+  "Common": {
+    "loading": "Chargement...",
+    "error": "Quelque chose s'est mal passé. Réessaie !",
+    "retry": "Réessayer",
+    "back": "Retour",
+    "next": "Suivant",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "aiGenerated": "✨ Généré par l'IA"
+  },
+  "Nav": {
+    "learn": "Apprendre",
+    "profile": "Mon profil",
+    "parent": "Tableau de bord parent",
+    "logout": "Se déconnecter",
+    "logoAlt": "Logo de la plateforme Eureka-Lab"
+  },
+  "Auth": {
+    "signIn": "Se connecter",
+    "signUp": "Commencer",
+    "signOut": "Se déconnecter",
+    "emailLabel": "Adresse e-mail",
+    "passwordLabel": "Mot de passe",
+    "displayNameLabel": "Votre nom",
+    "continueWithGoogle": "Continuer avec Google",
+    "orDivider": "ou",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "alreadyHaveAccount": "Déjà un compte ?",
+    "parentSignupTitle": "Créer votre compte parent",
+    "parentSignupSubtitle": "Vous ajouterez le compte de votre enfant à l'étape suivante.",
+    "errors": {
+      "invalidEmail": "Veuillez entrer une adresse e-mail valide",
+      "weakPassword": "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre",
+      "emailInUse": "Cet e-mail est déjà enregistré. Essayez de vous connecter.",
+      "generic": "Quelque chose s'est mal passé. Réessaie !"
+    }
+  },
+  "Learn": {
+    "level": "Niveau {level}",
+    "moduleCount": "{count} modules",
+    "startModule": "Commencer",
+    "continueModule": "Continuer",
+    "completedModule": "Terminé",
+    "lockedModule": "Verrouillé",
+    "xpReward": "{xp} XP",
+    "submitPrompt": "Soumettre",
+    "promptPlaceholder": "Écris ton invite ici...",
+    "promptCharCount": "{current}/{max} caractères",
+    "aiResponseTitle": "Réponse de l'IA",
+    "promptScoreLabel": "Score de l'invite",
+    "tokenBudgetWarning": "Tu approches de ta limite quotidienne de messages IA !"
+  }
+}
