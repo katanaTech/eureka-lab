@@ -24,11 +24,11 @@ export default function HomePage(): React.ReactElement {
   const t = useTranslations('Home');
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6">
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
       <h1 className="text-4xl font-bold text-primary">{t('title')}</h1>
       <p className="mt-4 max-w-md text-center text-muted-foreground text-child-body">
         {t('subtitle')}
       </p>
-    </main>
+    </div>
   );
 }

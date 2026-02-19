@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { locales, isRtlLocale, type Locale } from '@/lib/i18n-config';
 import { Providers } from '@/components/shared/Providers';
+import { AppShell } from '@/components/layout';
 
 interface LocaleLayoutProps {
   children: ReactNode;
@@ -46,7 +47,9 @@ export default async function LocaleLayout({
     <html lang={locale} dir={isRtlLocale(locale) ? 'rtl' : 'ltr'}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <Providers>{children}</Providers>
+          <Providers>
+            <AppShell locale={locale}>{children}</AppShell>
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>
