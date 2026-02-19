@@ -41,6 +41,9 @@ NEXT_PUBLIC_FEATURE_LEVEL4_ENABLED=false
 NODE_ENV=development
 PORT=3001
 
+# ── CORS ─────────────────────────────────────────────────────────
+ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
+
 # ── Anthropic AI ────────────────────────────────────────────────
 # ⚠️  NEVER expose this to frontend under any circumstances
 ANTHROPIC_API_KEY=sk-ant-...
@@ -56,9 +59,10 @@ FIREBASE_PRIVATE_KEY_BASE64=LS0tLS1CRUdJTi...
 
 # ── Redis (Upstash) ──────────────────────────────────────────────
 REDIS_URL=redis://default:password@us1-xxx.upstash.io:32654
-REDIS_TOKEN=your-upstash-rest-token
+REDIS_TOKEN=your-upstash-rest-token   # REST API token for HTTP client (optional)
 
-# ── Stripe ───────────────────────────────────────────────────────
+# ── Stripe (Sprint 5 — Freemium & Payments) ──────────────────────
+# Not yet validated at startup. Add to env.validation.ts in Sprint 5 (BE-040).
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 
@@ -68,7 +72,9 @@ STRIPE_PRICE_EXPLORER_ANNUAL=price_xxx
 STRIPE_PRICE_CREATOR_MONTHLY=price_xxx
 STRIPE_PRICE_CREATOR_ANNUAL=price_xxx
 
-# ── AWS (for content moderation) ─────────────────────────────────
+# ── AWS Comprehend (Sprint 3 — Content Moderation Layer 2) ───────
+# Required when BE-022 (post-generation output screen) is implemented.
+# Add to env.validation.ts and apps/api/.env.example in Sprint 3.
 AWS_ACCESS_KEY_ID=AKIA...
 AWS_SECRET_ACCESS_KEY=...
 AWS_REGION=us-east-1
@@ -79,10 +85,35 @@ EMAIL_FROM=noreply@yourdomain.com
 
 # ── Monitoring ───────────────────────────────────────────────────
 SENTRY_DSN=https://xxx@sentry.io/xxx
-
-# ── CORS ─────────────────────────────────────────────────────────
-ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
 ```
+
+### Backend Validation Status
+
+Enforced in `apps/api/src/config/env.validation.ts`. The app **refuses to start** if required vars are missing.
+
+| Variable | Required? | Startup-validated? | Sprint wired |
+|---|---|---|---|
+| `NODE_ENV` | No (defaults to `development`) | Yes | Sprint 1 |
+| `PORT` | No (defaults to `3001`) | Yes | Sprint 1 |
+| `ALLOWED_ORIGINS` | No (defaults to `http://localhost:3000`) | Yes | Sprint 1 |
+| `ANTHROPIC_API_KEY` | **Yes** (optional in `test` env) | Yes | Sprint 1 |
+| `FIREBASE_PROJECT_ID` | **Yes** | Yes | Sprint 1 (BE-002) |
+| `FIREBASE_CLIENT_EMAIL` | **Yes** | Yes | Sprint 1 (BE-002) |
+| `FIREBASE_PRIVATE_KEY_BASE64` | **Yes** | Yes | Sprint 1 (BE-002) |
+| `REDIS_URL` | **Yes** | Yes | Sprint 3 (BE-020) |
+| `REDIS_TOKEN` | No | No | Sprint 3 (BE-020) |
+| `RESEND_API_KEY` | No | Yes | Sprint 1 (BE-003) |
+| `EMAIL_FROM` | No | Yes | Sprint 1 (BE-003) |
+| `SENTRY_DSN` | No | Yes | Sprint 1 (BE-003) |
+| `STRIPE_SECRET_KEY` | **Yes** (when Sprint 5) | No — add in Sprint 5 | Sprint 5 (BE-040) |
+| `STRIPE_WEBHOOK_SECRET` | **Yes** (when Sprint 5) | No — add in Sprint 5 | Sprint 5 (BE-041) |
+| `STRIPE_PRICE_*` | **Yes** (when Sprint 5) | No — add in Sprint 5 | Sprint 5 (BE-040) |
+| `AWS_ACCESS_KEY_ID` | **Yes** (when Sprint 3) | No — add in Sprint 3 | Sprint 3 (BE-022) |
+| `AWS_SECRET_ACCESS_KEY` | **Yes** (when Sprint 3) | No — add in Sprint 3 | Sprint 3 (BE-022) |
+| `AWS_REGION` | **Yes** (when Sprint 3) | No — add in Sprint 3 | Sprint 3 (BE-022) |
+
+> **DEVOPS action required:** When Sprint 3 starts, add AWS vars to `apps/api/.env.example` and `env.validation.ts`.
+> When Sprint 5 starts, add all Stripe vars to `env.validation.ts`.
 
 ---
 
@@ -157,4 +188,4 @@ cd apps/api && pnpm run firebase:test
 
 ---
 
-*Version: 1.0 | Maintained by: ARCH + DEVOPS | Last updated: Sprint 1*
+*Version: 1.1 (ARCH-006 complete) | Maintained by: ARCH + DEVOPS | Last updated: Sprint 1*

@@ -16,7 +16,7 @@
 | ARCH-003 | Create ADR-001: Frontend state management decision | TODO | ARCH | |
 | ARCH-004 | Create ADR-002: AI gateway abstraction pattern | TODO | ARCH | |
 | ARCH-005 | Define feature flag schema and initial flags | TODO | ARCH | Needed by FE/BE Sprint 3 |
-| ARCH-006 | Document environment variables spec | TODO | ARCH | Needed by DEVOPS Sprint 1 |
+| ARCH-006 | Document environment variables spec | DONE | ARCH | Full var spec written to context/env-variables.md. Validation status table added. AWS + Stripe vars flagged for Sprint 3/5 wiring. Unblocks DEVOPS. |
 
 ### DEVOPS Tasks
 
