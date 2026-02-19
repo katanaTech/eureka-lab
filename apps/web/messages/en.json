@@ -18,11 +18,17 @@
     "aiGenerated": "✨ AI-generated"
   },
   "Nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
     "learn": "Learn",
     "profile": "My Profile",
     "parent": "Parent Dashboard",
     "logout": "Sign Out",
-    "logoAlt": "Eureka Lab Platform logo"
+    "logoAlt": "Eureka Lab Platform logo",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "authActions": "Authentication actions",
+    "sidebarNav": "Main navigation"
   },
   "Auth": {
     "signIn": "Sign In",

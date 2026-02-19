@@ -18,11 +18,17 @@
     "aiGenerated": "✨ Généré par l'IA"
   },
   "Nav": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
     "learn": "Apprendre",
     "profile": "Mon profil",
     "parent": "Tableau de bord parent",
     "logout": "Se déconnecter",
-    "logoAlt": "Logo de la plateforme Eureka-Lab"
+    "logoAlt": "Logo de la plateforme Eureka-Lab",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "authActions": "Actions d'authentification",
+    "sidebarNav": "Navigation principale"
   },
   "Auth": {
     "signIn": "Se connecter",

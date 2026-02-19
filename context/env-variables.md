@@ -188,4 +188,16 @@ cd apps/api && pnpm run firebase:test
 
 ---
 
-*Version: 1.1 (ARCH-006 complete) | Maintained by: ARCH + DEVOPS | Last updated: Sprint 1*
+---
+
+## Security Rules
+
+- All variables prefixed `NEXT_PUBLIC_` are safe to embed in the browser bundle. They are visible to any user who inspects the page source or network requests.
+- **Never** prefix secret variables with `NEXT_PUBLIC_`. This includes: `ANTHROPIC_API_KEY`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_CLIENT_EMAIL`, `UPSTASH_REDIS_TOKEN`, `STRIPE_SECRET_KEY`, `RESEND_API_KEY`, and `AWS_SECRET_ACCESS_KEY`.
+- Firebase client config values (`NEXT_PUBLIC_FIREBASE_*`) are intentionally public — they identify the Firebase project but do not grant administrative access. Security is enforced via Firestore security rules and Firebase Auth, not by keeping the project config secret.
+- `NEXT_PUBLIC_SENTRY_DSN` is safe to expose. Sentry DSNs are designed to be public — they only allow sending error reports, not reading them.
+- Backend secrets are stored in Railway environment variables only. They are never committed to git in any form (not in `.env`, not in `.env.example` with real values, not in comments).
+
+---
+
+*Version: 1.1 | Maintained by: ARCH + DEVOPS | Last updated: Sprint 2 (ARCH-006)*

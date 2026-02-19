@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "build": "nest build",
+    "dev": "nest start --watch",
     "start": "node dist/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -30,7 +32,7 @@
     "class-transformer": "^0.5.1",
     "firebase-admin": "^12.0.0",
     "@anthropic-ai/sdk": "^0.20.0",
-    "@sentry/nestjs": "^7.110.0",
+    "@sentry/nestjs": "^8.0.0",
     "@nestjs/bull": "^10.1.1",
     "bull": "^4.12.0",
     "@eureka-lab/shared-types": "workspace:*",
@@ -67,7 +69,7 @@
       "global": {
         "lines": 80,
         "functions": 80,
-        "branches": 75
+        "branches": 80
       }
     }
   }

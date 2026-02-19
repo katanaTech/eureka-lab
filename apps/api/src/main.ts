@@ -1,3 +1,15 @@
+import * as Sentry from '@sentry/nestjs';
+
+// Initialise Sentry before any other imports so it can instrument the full request lifecycle.
+// Only initialised when SENTRY_DSN is present — safe to omit in local dev.
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+    environment: process.env.NODE_ENV,
+  });
+}
+
 import {
   FastifyAdapter,
   type NestFastifyApplication,

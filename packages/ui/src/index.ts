@@ -1,9 +1,10 @@
 /**
  * Shared UI component library — shadcn/ui extensions.
- * Components will be added here as they are built by the FE agent.
+ * All components follow the shadcn/ui convention: CVA variants + Radix primitives.
  *
  * @module @eureka-lab/ui
  */
 
-// Components will be exported here as they are developed.
-// Example: export { Button } from './components/button';
+export { Button, buttonVariants } from './components/button';
+export type { ButtonProps } from './components/button';
+export { cn } from './utils';

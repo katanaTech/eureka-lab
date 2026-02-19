@@ -4,8 +4,7 @@
   "version": "0.0.1",
   "description": "Eureka Lab SaaS platform for children aged 8–16",
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "build": "turbo run build",
