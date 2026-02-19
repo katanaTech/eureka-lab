@@ -25,10 +25,10 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.2.0",
+    "tailwindcss-animate": "^1.0.7",
     "lucide-react": "^0.363.0",
     "firebase": "^10.9.0",
     "@sentry/nextjs": "^7.110.0",
-    "@eureka-systems/arco-design-web-vue": "workspace:*",
     "@eureka-lab/ui": "workspace:*"
   },
   "devDependencies": {

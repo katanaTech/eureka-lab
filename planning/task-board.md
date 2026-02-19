@@ -12,54 +12,54 @@
 | ID | Task | Status | Agent | Notes |
 |----|------|--------|-------|-------|
 | ARCH-001 | Create API contract spec (OpenAPI 3.0) for auth endpoints | DONE | ARCH | OpenAPI 3.0 spec written to planning/api-contracts.md. Unblocks FE-010, FE-011, BE-010, BE-011 |
-| ARCH-002 | Define Firestore security rules schema | TODO | ARCH | Needed by BE Sprint 2 |
-| ARCH-003 | Create ADR-001: Frontend state management decision | TODO | ARCH | |
-| ARCH-004 | Create ADR-002: AI gateway abstraction pattern | TODO | ARCH | |
+| ARCH-002 | Define Firestore security rules schema | DONE | ARCH | Written to context/firestore-schema.md. Documents 4 collections (users, progress, sessions, moderationLogs) with field types, access rules, security principles, and indexing notes. Unblocks BE-014. |
+| ARCH-003 | Create ADR-001: Frontend state management decision | DONE | ARCH | Written to context/ADR-001-frontend-state.md. Decision: Zustand (client state, ≤5 stores) + TanStack Query (server state). Redux, Context for data, and SWR explicitly rejected. |
+| ARCH-004 | Create ADR-002: AI gateway abstraction pattern | DONE | ARCH | Written to context/ADR-002-ai-gateway.md. AiGatewayService interface with sendMessage method documented. Safety preamble injection, token budget enforcement, audit logging all mandated in implementation rules. |
 | ARCH-005 | Define feature flag schema and initial flags | TODO | ARCH | Needed by FE/BE Sprint 3 |
-| ARCH-006 | Document environment variables spec | TODO | ARCH | Needed by DEVOPS Sprint 1 |
+| ARCH-006 | Document environment variables spec | DONE | ARCH | context/env-variables.md updated with Security Rules section: NEXT_PUBLIC_ safety explanation, prohibition on prefixing secrets, per-var security classification. |
 
 ### DEVOPS Tasks
 
 | ID | Task | Status | Agent | Notes |
 |----|------|--------|-------|-------|
 | DEV-001 | Create GitHub organisation and monorepo scaffold | DONE | DEVOPS | Scaffold complete. Unblocks DEV-002, FE-001, BE-001 |
-| DEV-002 | Set up Turborepo with apps/web + apps/api workspaces | TODO | DEVOPS | Depends: DEV-001 |
+| DEV-002 | Set up Turborepo with apps/web + apps/api workspaces | DONE | DEVOPS | turbo.json (pipeline→tasks), pnpm-lock.yaml generated, tsconfig.json added to packages/ui + packages/ai-prompts, spurious Vue dep removed from apps/web, dev script added to apps/api. All 5 workspaces resolve; packages typecheck clean. Unblocks DEV-005 |
 | DEV-003 | Configure Vercel deployment for apps/web | TODO | DEVOPS | Depends: DEV-001 |
 | DEV-004 | Configure Railway deployment for apps/api | TODO | DEVOPS | Depends: DEV-001 |
-| DEV-005 | GitHub Actions: CI pipeline (lint + test + build) | TODO | DEVOPS | Depends: DEV-002 |
+| DEV-005 | GitHub Actions: CI pipeline (lint + test + build) | DONE | DEVOPS | .github/workflows/ci.yml created. Triggers on push (all branches) + PR to main. Node 20, pnpm 9, pnpm store cache keyed on pnpm-lock.yaml hash. Steps: install, lint, typecheck, test, build via turbo. |
 | DEV-006 | GitHub Actions: CD pipeline (auto-deploy on main merge) | TODO | DEVOPS | Depends: DEV-003, DEV-004 |
 | DEV-007 | Set up Upstash Redis instance + env vars | TODO | DEVOPS | Needed by BE Sprint 3 |
-| DEV-008 | Configure Sentry for both apps | TODO | DEVOPS | |
+| DEV-008 | Configure Sentry for both apps | DONE | DEVOPS | apps/web/sentry.client.config.ts and apps/web/sentry.server.config.ts created (@sentry/nextjs, NEXT_PUBLIC_SENTRY_DSN guard). apps/api/src/main.ts updated: Sentry.init() from @sentry/nestjs added at top, guarded by SENTRY_DSN env var. No DSN values hardcoded. |
 
 ### BE Tasks
 
 | ID | Task | Status | Agent | Notes |
 |----|------|--------|-------|-------|
 | BE-001 | NestJS + Fastify project scaffold with health endpoint | DONE | BE | Scaffold + GET /health complete. Unblocks BE-002, BE-003, BE-004, BE-005, QA-002, QA-004 |
-| BE-002 | Firebase Admin SDK setup + service account config | TODO | BE | Depends: BE-001 |
-| BE-003 | Pino logger service (structured JSON) | TODO | BE | Depends: BE-001 |
-| BE-004 | Global exception filter + error response DTOs | TODO | BE | Depends: BE-001 |
-| BE-005 | Request validation pipe (class-validator + class-transformer) | TODO | BE | Depends: BE-001 |
+| BE-002 | Firebase Admin SDK setup + service account config | DONE | BE | FirebaseModule (@Global) + FirebaseService created at apps/api/src/infrastructure/firebase/. Exposes getFirestore(), getAuth(), getStorage() with JSDoc. Initialises once via admin.apps.length guard. Registered in AppModule. .env.example updated with FIREBASE_PRIVATE_KEY_BASE64 (primary/Railway) and FIREBASE_PRIVATE_KEY (alternative/local) options. |
+| BE-003 | Pino logger service (structured JSON) | DONE | BE | LoggerService verified complete — Pino-based, JSDoc on all methods (log/error/warn/debug/verbose), no `any`, Global LoggerModule exported and registered in AppModule. Redacts sensitive fields. |
+| BE-004 | Global exception filter + error response DTOs | DONE | BE | AllExceptionsFilter verified complete; registered via app.useGlobalFilters() in main.ts. ErrorResponseDto updated with class-validator decorators (@IsInt, @IsString, @IsISO8601, etc.). `path` field added to ErrorResponse interface, ErrorResponseDto, and filter response body: { statusCode, error, message, code?, errors?, timestamp, path }. |
+| BE-005 | Request validation pipe (class-validator + class-transformer) | DONE | BE | ValidationPipe registered in main.ts with whitelist: true, forbidNonWhitelisted: true, transform: true, transformOptions.enableImplicitConversion: true. Inline comment explains each option. class-validator and class-transformer already in package.json dependencies. |
 
 ### FE Tasks
 
 | ID | Task | Status | Agent | Notes |
 |----|------|--------|-------|-------|
 | FE-001 | Next.js 14 project scaffold (App Router) | DONE | FE | Scaffold complete. Unblocks FE-002, FE-003, FE-004, FE-006, QA-001 |
-| FE-002 | Tailwind + shadcn/ui setup + base theme tokens | TODO | FE | Depends: FE-001 |
-| FE-003 | next-intl setup: en/fr/ar locale files + RTL support | TODO | FE | Depends: FE-001 |
-| FE-004 | next-pwa setup + manifest.json | TODO | FE | Depends: FE-001 |
-| FE-005 | Base layout: navbar, sidebar skeleton, responsive grid | TODO | FE | Depends: FE-002 |
-| FE-006 | Zustand store scaffold + TanStack Query provider | TODO | FE | Depends: FE-001 |
+| FE-002 | Tailwind + shadcn/ui setup + base theme tokens | DONE | FE | All shadcn CSS variables (light + dark) confirmed in globals.css; tailwind.config.ts has correct content paths, full theme extension with shadcn tokens, and tailwindcss-animate plugin; cn() utility confirmed in lib/utils.ts using clsx + tailwind-merge |
+| FE-003 | next-intl setup: en/fr/ar locale files + RTL support | DONE | FE | Middleware configured for en/fr/ar with localePrefix always; isRtlLocale() helper in lib/i18n-config.ts; [locale]/layout.tsx sets dir="rtl" for Arabic via isRtlLocale(); all 3 locale files verified with matching keys (Common.loading, Common.error, Nav.home, Nav.dashboard, Auth.signIn, Auth.signOut) |
+| FE-004 | next-pwa setup + manifest.json | DONE | FE | next.config.js wrapped with withPWA (dest: public, register: true, skipWaiting: true, disabled in development); public/manifest.json present with name "Eureka Lab", short_name "Eureka", theme_color "#6366f1", background_color "#ffffff", display standalone, icons at /icon-192.png + /icon-512.png; manifest linked via metadata.manifest in root layout |
+| FE-005 | Base layout: navbar, sidebar skeleton, responsive grid | DONE | FE | Navbar (h-16, logo + hamburger), Sidebar (w-60, Home + Dashboard nav, active-route highlight, mobile overlay), AppShell (composes both, owns open/close state, main pt-16 md:ps-60). 'use client' on all 3. Wired into [locale]/layout.tsx wrapping children. Barrel export at components/layout/index.ts. i18n keys openMenu/closeMenu/authActions/sidebarNav added to en/fr/ar. RTL-safe (start-0, border-e, ps-60). |
+| FE-006 | Zustand store scaffold + TanStack Query provider | DONE | FE | stores/auth-store.ts: typed AuthState with user (UserProfile|null), isLoading boolean, setUser and clearUser actions — zero any types, full JSDoc; Providers.tsx: QueryClientProvider wrapping children, QueryClient created via useState to prevent re-creation on re-render |
 
 ### QA Tasks
 
 | ID | Task | Status | Agent | Notes |
 |----|------|--------|-------|-------|
-| QA-001 | Set up Vitest config for apps/web | TODO | QA | Depends: FE-001 |
-| QA-002 | Set up Jest config for apps/api | TODO | QA | Depends: BE-001 |
+| QA-001 | Set up Vitest config for apps/web | DONE | QA | Config verified: @vitejs/plugin-react, jsdom env, vitest.setup.ts, v8 coverage provider, 80% thresholds (lines/functions/branches). Fixed branches threshold from 75→80. |
+| QA-002 | Set up Jest config for apps/api | DONE | QA | Jest config in package.json verified: moduleFileExtensions, rootDir src, .spec.ts testRegex, ts-jest, 80% thresholds. Fixed branches threshold from 75→80. Spec files valid TS with no `any`. |
 | QA-003 | Set up Playwright E2E config | TODO | QA | Depends: DEV-003 |
-| QA-004 | Write smoke test: health endpoint returns 200 | TODO | QA | Depends: BE-001 |
+| QA-004 | Write smoke test: health endpoint returns 200 | DONE | QA | E2E spec at test/e2e/health.e2e-spec.ts complete: NestJS+Fastify test app via app.inject(), asserts 200+{status:'ok'}+ISO timestamp, JSON content-type, and 404 for unknown routes. JSDoc added to all describe/it blocks. jest-e2e.json verified correct. |
 
 ---
 
@@ -168,4 +168,4 @@
 
 ---
 
-*Last updated: Sprint 1 kickoff | Maintained by: PM agent*
+*Last updated: Sprint 1 — FE-002, FE-003, FE-004, FE-005, FE-006 completed by FE agent | Maintained by: PM agent*

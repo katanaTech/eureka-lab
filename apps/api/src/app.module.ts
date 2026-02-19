@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './infrastructure/logger/logger.module';
+import { FirebaseModule } from './infrastructure/firebase/firebase.module';
 import { HealthModule } from './modules/health/health.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -12,11 +13,11 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
  * Module loading order:
  * 1. ConfigModule — validates env vars; must be first
  * 2. LoggerModule — global Pino logger; available everywhere
- * 3. ThrottlerModule — rate limiting (devops-rules.md §9)
- * 4. Feature modules (Health, Auth, Users, etc.)
+ * 3. FirebaseModule — global Firebase Admin SDK; available everywhere
+ * 4. ThrottlerModule — rate limiting (devops-rules.md §9)
+ * 5. Feature modules (Health, Auth, Users, etc.)
  *
  * Modules added as sprints progress:
- * - FirebaseModule (BE-002)
  * - AuthModule (BE-010)
  * - UsersModule (BE-015)
  * - AiGatewayModule (BE-020)
@@ -26,6 +27,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     // Infrastructure
     ConfigModule,
     LoggerModule,
+    FirebaseModule,
 
     // Rate limiting — short: 10 req/s, medium: 100 req/min (devops-rules.md §9)
     ThrottlerModule.forRoot([

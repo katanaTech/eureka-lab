@@ -19,6 +19,7 @@ interface ErrorResponse {
   code?: string;
   errors?: Array<{ field: string; message: string }>;
   timestamp: string;
+  path: string;
 }
 
 /**
@@ -83,6 +84,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       ...(code ? { code } : {}),
       ...(errors ? { errors } : {}),
       timestamp: new Date().toISOString(),
+      path: request.url,
     };
 
     void reply.status(statusCode).send(responseBody);

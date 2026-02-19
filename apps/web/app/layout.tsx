@@ -14,7 +14,12 @@ export const metadata: Metadata = {
     template: '%s | Eureka Lab Platform',
   },
   description: 'Learn to build with AI. For curious minds aged 8–16.',
-  // PWA manifest wired in FE-004
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Eureka Lab',
+  },
 };
 
 export const viewport: Viewport = {
