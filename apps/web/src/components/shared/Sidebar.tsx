@@ -72,6 +72,17 @@ export const Sidebar: FC<SidebarProps> = ({ className }) => {
               {t(key)}
             </a>
           ))}
+
+          {/* Game mode entry */}
+          <div className="mt-2 border-t border-border pt-2">
+            <a
+              href="/g"
+              className="flex items-center gap-3 rounded-md bg-indigo-600/10 px-3 py-2 text-sm font-bold text-indigo-400 hover:bg-indigo-600/20 hover:text-indigo-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+            >
+              <span className="text-base" aria-hidden="true">⚔️</span>
+              Play Game Mode
+            </a>
+          </div>
         </nav>
       </aside>
     </>

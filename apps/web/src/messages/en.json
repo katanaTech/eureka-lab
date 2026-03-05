@@ -116,7 +116,8 @@
     "moduleNotFound": "Module not found.",
     "goBack": "Go Back",
     "errorGeneric": "Something went wrong. Please try again.",
-    "title": "Learn"
+    "title": "Learn",
+    "back": "Back to Modules"
   },
   "Auth": {
     "loginTitle": "Welcome Back",

@@ -144,6 +144,7 @@ export interface FeatureFlags {
   enableTeacherDashboard: boolean;
   enableGamification: boolean;
   enableMobileExperience: boolean;
+  enableGameMode: boolean;
 }
 
 /** Default feature flag values for MVP */
@@ -156,7 +157,85 @@ export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
   enableTeacherDashboard: true,
   enableGamification: true,
   enableMobileExperience: true,
+  enableGameMode: true,
 };
+
+// ── Game Types (Phase 15) ─────────────────────────────────────────────────────
+
+/**
+ * Career archetypes available in the character creator.
+ * Determines starter equipment, zone affinity, and NPC dialogue.
+ */
+export type CareerArchetype =
+  | 'astronaut'
+  | 'doctor'
+  | 'artist'
+  | 'engineer'
+  | 'scientist'
+  | 'teacher'
+  | 'gamer'
+  | 'chef';
+
+/** Top-level scene states in the game */
+export type GameScene =
+  | 'character_creator'
+  | 'world_map'
+  | 'zone'
+  | 'mission_room';
+
+/** Zone IDs mapping to the 4 learning levels */
+export type ZoneId = 'library' | 'forge' | 'citadel' | 'academy';
+
+/** Rarity tiers for equipment items */
+export type ItemRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
+/** Equipment slot types on the character */
+export type EquipmentSlotKey = 'head' | 'body' | 'weapon' | 'shield' | 'accessory';
+
+/** Character visual customization options */
+export interface CharacterCustomization {
+  /** Hair style index (0–4) */
+  hairStyle: number;
+  /** Skin tone index (0–5) */
+  skinTone: number;
+  /** Outfit accent color as hex string */
+  outfitColor: string;
+  /** Display name chosen by the player */
+  name: string;
+}
+
+/** A single equippable game item */
+export interface GameItem {
+  /** Unique item identifier */
+  id: string;
+  /** Display name */
+  name: string;
+  /** Which slot this item occupies */
+  slot: EquipmentSlotKey;
+  /** Item rarity tier */
+  rarity: ItemRarity;
+  /** Path to the GLB model in /public/models/equipment/ */
+  glbPath: string;
+  /** Career archetype this item belongs to (or 'all' for universal) */
+  career: CareerArchetype | 'all';
+  /** Learning level this item is rewarded at (1–4) */
+  level: number;
+  /** Flavour stat boost label (display only) */
+  statBoost?: string;
+}
+
+/** Equipment currently worn by the character */
+export type EquipmentSlots = Partial<Record<EquipmentSlotKey, GameItem>>;
+
+/** Rewards granted upon mission completion */
+export interface MissionReward {
+  /** XP points awarded */
+  xp: number;
+  /** Badge ID unlocked (if any) */
+  badgeId?: string;
+  /** Equipment item rewarded (if any) */
+  item?: GameItem;
+}
 
 // ── Pricing Plans ────────────────────────────────────────────────────────────
 
