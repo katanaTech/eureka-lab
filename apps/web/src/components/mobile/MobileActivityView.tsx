@@ -57,10 +57,6 @@ export const MobileActivityView: FC<MobileActivityViewProps> = ({
   const [score, setScore] = useState<number | null>(null);
 
   const activity = activities[activeIndex];
-  if (!activity) return null;
-
-  const isCompleted = completedActivities.includes(activeIndex);
-  const isPromptActivity = activity.type === 'prompt_exercise';
 
   /**
    * Submit a prompt and stream the response.
@@ -95,6 +91,11 @@ export const MobileActivityView: FC<MobileActivityViewProps> = ({
       setIsStreaming(false);
     }
   }, [prompt, isStreaming, moduleId, t]);
+
+  if (!activity) return null;
+
+  const isCompleted = completedActivities.includes(activeIndex);
+  const isPromptActivity = activity.type === 'prompt_exercise';
 
   return (
     <div className="flex flex-col gap-4">

@@ -180,7 +180,7 @@ export const WorkflowBuilder: FC<WorkflowBuilderProps> = ({
         description: '',
       },
     ]);
-  }, [steps.length]);
+  }, [steps]);
 
   /**
    * Remove a step by index (cannot remove last step).
