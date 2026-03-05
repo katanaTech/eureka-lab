@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
+import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
 
 /**
  * Dynamic import of GameProvider with SSR disabled.
@@ -27,15 +28,14 @@ interface GameLayoutProps {
 
 /**
  * Layout for the (game) route group.
- * Wraps all /g/* routes with the GameProvider (client-only, GPU detection).
- * No server-side navigation shell — the 3D HUD handles all in-game navigation.
+ * Wraps all /g/* routes with ProtectedRoute (redirects to /login if unauthenticated)
+ * and GameProvider (client-only GPU detection + game context).
+ * Does NOT include <html>/<body> — those are provided by the root layout.
  */
 export default function GameLayout({ children }: GameLayoutProps) {
   return (
-    <html lang="en">
-      <body className="bg-gray-950 overflow-hidden">
-        <GameProvider>{children}</GameProvider>
-      </body>
-    </html>
+    <ProtectedRoute>
+      <GameProvider>{children}</GameProvider>
+    </ProtectedRoute>
   );
 }

@@ -13,6 +13,12 @@ import { cn } from '@/lib/utils';
 interface ModuleDetailProps {
   /** Full module data from the API */
   module: ModuleDetailResponse;
+  /**
+   * Called when every activity in this module has been completed.
+   * Receives total XP earned during this session so the game layer
+   * can show the MissionCompleteScreen with the correct reward.
+   */
+  onModuleComplete?: (totalXpEarned: number) => void;
 }
 
 /**
@@ -21,7 +27,7 @@ interface ModuleDetailProps {
  *
  * @param module - Full module data
  */
-export const ModuleDetail: FC<ModuleDetailProps> = ({ module: mod }) => {
+export const ModuleDetail: FC<ModuleDetailProps> = ({ module: mod, onModuleComplete }) => {
   const t = useTranslations('Learn');
 
   const [currentActivity, setCurrentActivity] = useState(
@@ -38,7 +44,7 @@ export const ModuleDetail: FC<ModuleDetailProps> = ({ module: mod }) => {
   const activity = mod.activities[currentActivity] as ModuleActivity | undefined;
 
   /**
-   * Handle completing the current activity.
+   * Handle completing the current activity (lesson, reflection, quiz).
    */
   const handleCompleteActivity = useCallback(async () => {
     try {
@@ -47,42 +53,53 @@ export const ModuleDetail: FC<ModuleDetailProps> = ({ module: mod }) => {
       });
 
       setCompletedActivities((prev) => [...prev, currentActivity]);
-      setXpEarned((prev) => prev + result.xpAwarded);
+      const newXp = xpEarned + result.xpAwarded;
+      setXpEarned(newXp);
 
       if (result.moduleCompleted) {
         setModuleCompleted(true);
+        onModuleComplete?.(newXp);
       } else if (currentActivity < mod.activities.length - 1) {
         setCurrentActivity((prev) => prev + 1);
       }
     } catch {
       /* Error handling — show notification in future sprint */
     }
-  }, [currentActivity, mod.id, mod.activities.length]);
+  }, [currentActivity, mod.id, mod.activities.length, xpEarned, onModuleComplete]);
 
   /**
    * Handle AI response completion (from PromptEditor).
+   * Records the score, awards XP, and advances to the next activity or
+   * triggers module completion when all activities are done.
    */
   const handlePromptComplete = useCallback(
     async (score: number, _tokensUsed: number) => {
-      if (activity?.type === 'prompt_exercise') {
-        try {
-          await progressApi.completeActivity(mod.id, {
-            activityIndex: currentActivity,
-            score,
-          });
-          setCompletedActivities((prev) => [...prev, currentActivity]);
-          setXpEarned((prev) => prev + (activity?.xpReward ?? 0));
-        } catch {
-          /* Error handling */
+      if (activity?.type !== 'prompt_exercise') return;
+      try {
+        const result = await progressApi.completeActivity(mod.id, {
+          activityIndex: currentActivity,
+          score,
+        });
+        setCompletedActivities((prev) => [...prev, currentActivity]);
+        const newXp = xpEarned + result.xpAwarded;
+        setXpEarned(newXp);
+
+        if (result.moduleCompleted) {
+          setModuleCompleted(true);
+          onModuleComplete?.(newXp);
+        } else if (currentActivity < mod.activities.length - 1) {
+          setCurrentActivity((prev) => prev + 1);
         }
+      } catch {
+        /* Error handling */
       }
     },
-    [activity, currentActivity, mod.id],
+    [activity, currentActivity, mod.id, mod.activities.length, xpEarned, onModuleComplete],
   );
 
   /**
    * Shared handler for exercise completion (workflow, code, agent).
-   * Marks the activity as complete and awards XP.
+   * Marks the activity as complete, awards XP, and advances or completes the module.
    */
   const handleExerciseComplete = useCallback(async () => {
     try {
@@ -91,17 +108,19 @@ export const ModuleDetail: FC<ModuleDetailProps> = ({ module: mod }) => {
       });
 
       setCompletedActivities((prev) => [...prev, currentActivity]);
-      setXpEarned((prev) => prev + result.xpAwarded);
+      const newXp = xpEarned + result.xpAwarded;
+      setXpEarned(newXp);
 
       if (result.moduleCompleted) {
         setModuleCompleted(true);
+        onModuleComplete?.(newXp);
       } else if (currentActivity < mod.activities.length - 1) {
         setCurrentActivity((prev) => prev + 1);
       }
     } catch {
       /* Error handling — show notification in future sprint */
     }
-  }, [currentActivity, mod.id, mod.activities.length]);
+  }, [currentActivity, mod.id, mod.activities.length, xpEarned, onModuleComplete]);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">

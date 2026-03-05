@@ -23,6 +23,7 @@ for (const envPath of envPaths) {
 
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -46,21 +47,38 @@ async function bootstrap(): Promise<void> {
   app.setGlobalPrefix('api/v1');
 
   /**
-   * CORS — register @fastify/cors directly on the raw Fastify instance.
-   * NestJS enableCors() can fail silently with Fastify version mismatches,
-   * so we bypass it and register on the underlying Fastify server.
+   * CORS — applied via onRequest hook on the raw Fastify instance.
+   * Using addHook() instead of @fastify/cors plugin avoids plugin-scope issues
+   * that occur when the plugin is registered after NestJS initialises its routes.
+   * addHook() on the root Fastify instance applies to every route unconditionally.
    */
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const fastifyInstance = app.getHttpAdapter().getInstance();
-  await fastifyInstance.register(require('@fastify/cors'), {
-    origin: [
-      'http://localhost:3010',
-      'http://localhost:3000',
-      process.env['FRONTEND_URL'] ?? 'http://localhost:3010',
-    ],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
+  const fastifyInstance = app.getHttpAdapter().getInstance() as FastifyInstance;
+  const corsOrigins: string[] = [
+    'http://localhost:3010',
+    'http://localhost:3000',
+    process.env['FRONTEND_URL'] ?? 'http://localhost:3010',
+  ];
+
+  fastifyInstance.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
+    const origin = request.headers['origin'];
+    if (origin && corsOrigins.includes(origin)) {
+      /**
+       * Use reply.raw.setHeader() instead of reply.header() so that CORS headers
+       * are written directly onto the Node.js ServerResponse object.
+       * When SSE controllers call reply.raw.writeHead(), Node.js merges any previously
+       * set setHeader() values with the writeHead() headers — so CORS headers survive
+       * the streaming response. reply.header() stores in Fastify's internal layer
+       * which is bypassed when writeHead() is called directly.
+       */
+      reply.raw.setHeader('Access-Control-Allow-Origin', origin);
+      reply.raw.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    reply.raw.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    reply.raw.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+
+    if (request.method === 'OPTIONS') {
+      return reply.status(204).send();
+    }
   });
 
   const port = process.env['PORT'] ?? 3011;

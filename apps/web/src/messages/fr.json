@@ -116,7 +116,8 @@
     "moduleNotFound": "Module introuvable.",
     "goBack": "Retour",
     "errorGeneric": "Une erreur est survenue. R\u00e9essayez.",
-    "title": "Apprendre"
+    "title": "Apprendre",
+    "back": "Retour aux modules"
   },
   "Auth": {
     "loginTitle": "Bienvenue",

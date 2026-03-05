@@ -3,12 +3,21 @@
 import { useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { useQueryClient } from '@tanstack/react-query';
 import { useGameStore } from '@/stores/game-store';
 import { LearningOverlay } from '@/components/game/LearningOverlay';
 import { MissionCompleteScreen } from '@/components/game/MissionCompleteScreen';
 import { GameHUD } from '@/components/game/GameHUD';
 import { ZONE_CONFIGS } from '@/components/game/ZoneIsland';
 import type { ZoneId, MissionReward } from '@eureka-lab/shared-types';
+
+/** Map zone ID to learning level (mirrors ZonePage) */
+const ZONE_LEVEL: Record<ZoneId, number> = {
+  library: 1,
+  forge: 2,
+  citadel: 3,
+  academy: 4,
+};
 
 const MissionRoom = dynamic(
   () => import('@/components/game/MissionRoom').then((m) => m.MissionRoom),
@@ -34,10 +43,12 @@ export default function MissionPage({ params }: MissionPageProps) {
   const router = useRouter();
 
   const { completeMission, clearPendingReward, pendingReward, activeZoneId } = useGameStore();
+  const queryClient = useQueryClient();
 
   // Derive zone from the missionId prefix (format: "library-module-1")
   const zoneId: ZoneId = (activeZoneId as ZoneId) ?? 'library';
   const zone = ZONE_CONFIGS.find((z) => z.id === zoneId);
+  const level = ZONE_LEVEL[zoneId] ?? 1;
 
   const [showComplete, setShowComplete] = useState(false);
 
@@ -49,8 +60,11 @@ export default function MissionPage({ params }: MissionPageProps) {
   const handleDismissReward = useCallback(() => {
     clearPendingReward();
     setShowComplete(false);
+    // Invalidate the modules cache so ZonePage re-fetches from Firestore,
+    // reflecting the newly completed mission status immediately.
+    void queryClient.invalidateQueries({ queryKey: ['modules', level] });
     router.push(`/g/zone/${zoneId}`);
-  }, [clearPendingReward, router, zoneId]);
+  }, [clearPendingReward, queryClient, level, router, zoneId]);
 
   const handleClose = useCallback(() => {
     router.push(`/g/zone/${zoneId}`);
@@ -103,7 +117,7 @@ export default function MissionPage({ params }: MissionPageProps) {
         <GameHUD
           xp={0}
           streak={0}
-          level={1}
+          level={level}
           showBackButton
           onBack={handleClose}
         />

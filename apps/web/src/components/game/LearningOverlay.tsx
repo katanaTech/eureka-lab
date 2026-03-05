@@ -1,10 +1,8 @@
 'use client';
 
-import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { modulesApi, type ModuleDetailResponse } from '@/lib/api-client';
+import { modulesApi } from '@/lib/api-client';
 import { ModuleDetail } from '@/components/features/learn/ModuleDetail';
-import { useGameStore } from '@/stores/game-store';
 import type { MissionReward } from '@eureka-lab/shared-types';
 
 interface LearningOverlayProps {
@@ -64,8 +62,11 @@ export function LearningOverlay({ moduleId, onComplete, onClose }: LearningOverl
         ✕
       </button>
 
-      {/* Existing learning UI — completely unchanged */}
-      <ModuleDetail module={data} />
+      {/* Existing learning UI — rendered inside the mission room panel */}
+      <ModuleDetail
+        module={data}
+        onModuleComplete={(xp) => onComplete({ xp })}
+      />
     </div>
   );
 }

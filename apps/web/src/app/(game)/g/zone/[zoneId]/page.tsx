@@ -34,7 +34,7 @@ interface ZonePageProps {
 export default function ZonePage({ params }: ZonePageProps) {
   const zoneId = params.zoneId as ZoneId;
   const router = useRouter();
-  const { completedMissionIds, startMission, exitZone } = useGameStore();
+  const { startMission, exitZone } = useGameStore();
 
   const zone = ZONE_CONFIGS.find((z) => z.id === zoneId);
   const level = ZONE_LEVEL[zoneId] ?? 1;
@@ -45,12 +45,14 @@ export default function ZonePage({ params }: ZonePageProps) {
     queryFn: () => modulesApi.list(level),
   });
 
-  // Map ModuleSummary → MissionData for the 3D scene
-  const missions: MissionData[] = (modulesData?.modules ?? []).map((mod, i) => ({
+  // Map ModuleSummary → MissionData for the 3D scene.
+  // isCompleted and isLocked are both derived from mod.status, which is resolved
+  // by the backend from Firestore progress records — authoritative per user.
+  const missions: MissionData[] = (modulesData?.modules ?? []).map((mod) => ({
     id: `${zoneId}-${mod.id}`,
     title: mod.title,
     xpReward: mod.xpReward,
-    isCompleted: completedMissionIds.includes(`${zoneId}-${mod.id}`),
+    isCompleted: mod.status === 'completed',
     isLocked: mod.status === 'locked',
     estimatedMinutes: mod.estimatedMinutes,
   }));
