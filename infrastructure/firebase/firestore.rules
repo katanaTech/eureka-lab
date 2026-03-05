@@ -1,0 +1,212 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper Functions ────────────────────────────────────────────────
+
+    /** Check if the request is from an authenticated user */
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /** Check if the authenticated user owns this document */
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    /** Check if the authenticated user is a parent of this child */
+    function isParentOf(childUid) {
+      return isAuthenticated()
+        && exists(/databases/$(database)/documents/users/$(childUid))
+        && get(/databases/$(database)/documents/users/$(childUid)).data.parentUid == request.auth.uid;
+    }
+
+    /** Check if the authenticated user has a specific role */
+    function hasRole(role) {
+      return isAuthenticated() && request.auth.token.role == role;
+    }
+
+    // ── Users Collection ────────────────────────────────────────────────
+
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isOwner(userId);
+
+      // Parents can read their children's profiles
+      allow read: if isParentOf(userId);
+
+      // Teachers read student profiles via backend (Admin SDK)
+      // No direct teacher → user reads needed in client-side rules
+
+      // Admins can read any profile
+      allow read: if hasRole('admin');
+
+      // Only the backend (admin SDK) creates and updates user docs
+      // No client-side writes allowed
+      allow write: if false;
+    }
+
+    // ── Classrooms Collection ────────────────────────────────────────────
+
+    match /classrooms/{classroomId} {
+      // Teachers can read classrooms they own
+      allow read: if isAuthenticated()
+        && resource.data.teacherId == request.auth.uid;
+
+      // Children can read classrooms they belong to
+      allow read: if isAuthenticated()
+        && request.auth.uid in resource.data.studentIds;
+
+      // Admins can read any classroom
+      allow read: if hasRole('admin');
+
+      // Only backend writes classrooms
+      allow write: if false;
+    }
+
+    // ── Progress Collection ─────────────────────────────────────────────
+
+    match /progress/{progressId} {
+      // Users can read their own progress
+      allow read: if isAuthenticated()
+        && resource.data.userId == request.auth.uid;
+
+      // Parents can read their children's progress
+      allow read: if isAuthenticated()
+        && isParentOf(resource.data.userId);
+
+      // Teachers read student progress via backend (Admin SDK)
+
+      // Only backend writes progress
+      allow write: if false;
+    }
+
+    // ── Moderation Logs ─────────────────────────────────────────────────
+
+    match /moderation-logs/{logId} {
+      // Only admins can read moderation logs
+      allow read: if hasRole('admin');
+
+      // Parents can read their children's moderation flags
+      allow read: if isAuthenticated()
+        && isParentOf(resource.data.userId);
+
+      // Only backend writes moderation logs
+      allow write: if false;
+    }
+
+    // ── Gamification: User Badges (subcollection) ──────────────────────
+
+    match /users/{userId}/badges/{badgeId} {
+      // Users can read their own badges
+      allow read: if isOwner(userId);
+
+      // Parents can read their children's badges
+      allow read: if isParentOf(userId);
+
+      // Admins can read any badges
+      allow read: if hasRole('admin');
+
+      // Only backend writes badges
+      allow write: if false;
+    }
+
+    // ── Gamification: Daily Activity (subcollection) ─────────────────
+
+    match /users/{userId}/daily-activity/{dateId} {
+      // Users can read their own activity
+      allow read: if isOwner(userId);
+
+      // Parents can read their children's activity
+      allow read: if isParentOf(userId);
+
+      // Admins can read any activity
+      allow read: if hasRole('admin');
+
+      // Only backend writes activity
+      allow write: if false;
+    }
+
+    // ── Gamification: Prompt Stats (subcollection) ───────────────────
+
+    match /users/{userId}/stats/{statsId} {
+      // Users can read their own stats
+      allow read: if isOwner(userId);
+
+      // Parents can read their children's stats
+      allow read: if isParentOf(userId);
+
+      // Only backend writes stats
+      allow write: if false;
+    }
+
+    // ── Workflows (subcollection) ────────────────────────────────────
+
+    match /users/{userId}/workflows/{workflowId} {
+      // Users can read their own workflows
+      allow read: if isOwner(userId);
+
+      // Parents can read their children's workflows
+      allow read: if isParentOf(userId);
+
+      // Admins can read any workflows
+      allow read: if hasRole('admin');
+
+      // Only backend writes workflows
+      allow write: if false;
+    }
+
+    // ── Code Projects (subcollection) ────────────────────────────────
+
+    match /users/{userId}/projects/{projectId} {
+      // Users can read their own projects
+      allow read: if isOwner(userId);
+
+      // Parents can read their children's projects
+      allow read: if isParentOf(userId);
+
+      // Admins can read any projects
+      allow read: if hasRole('admin');
+
+      // Only backend writes projects
+      allow write: if false;
+    }
+
+    // ── Buddy Agents (subcollection) ─────────────────────────────────
+
+    match /users/{userId}/agents/{agentId} {
+      // Users can read their own agents
+      allow read: if isOwner(userId);
+
+      // Parents can read their children's agents
+      allow read: if isParentOf(userId);
+
+      // Admins can read any agents
+      allow read: if hasRole('admin');
+
+      // Only backend writes agents
+      allow write: if false;
+    }
+
+    // ── AI Interactions ─────────────────────────────────────────────────
+
+    match /ai-interactions/{interactionId} {
+      // Users can read their own interactions
+      allow read: if isAuthenticated()
+        && resource.data.userId == request.auth.uid;
+
+      // Parents can read their children's interactions
+      allow read: if isAuthenticated()
+        && isParentOf(resource.data.userId);
+
+      // Only backend writes interactions
+      allow write: if false;
+    }
+
+    // ── Default: deny all ───────────────────────────────────────────────
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "eureka-lab",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AI literacy platform for children aged 8-16",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "clean": "turbo clean"
+  },
+  "packageManager": "pnpm@10.30.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@nestjs/core", "@parcel/watcher", "@swc/core", "protobufjs", "@firebase/util", "esbuild"]
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "turbo": "^2.8.10"
+  }
+}

@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10'
+
+jobs:
+  # ── Lint & Type Check ─────────────────────────────────────────
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm turbo build --filter=@eureka-lab/shared-types --filter=@eureka-lab/ai-prompts --filter=@eureka-lab/ui
+
+      - name: Lint (TypeScript type check)
+        run: pnpm turbo lint
+
+  # ── Backend Tests ──────────────────────────────────────────────
+  test-api:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm turbo build --filter=@eureka-lab/shared-types --filter=@eureka-lab/ai-prompts --filter=@eureka-lab/ui
+
+      - name: Run backend tests
+        run: pnpm --filter @eureka-lab/api test
+        env:
+          NODE_ENV: test
+
+      - name: Run backend tests with coverage
+        run: pnpm --filter @eureka-lab/api test:cov
+        env:
+          NODE_ENV: test
+
+  # ── Frontend Tests ─────────────────────────────────────────────
+  test-web:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm turbo build --filter=@eureka-lab/shared-types --filter=@eureka-lab/ai-prompts --filter=@eureka-lab/ui
+
+      - name: Run frontend tests
+        run: pnpm --filter @eureka-lab/web test
+        env:
+          NODE_ENV: test
+
+  # ── Build ──────────────────────────────────────────────────────
+  build:
+    name: Production Build
+    runs-on: ubuntu-latest
+    needs: [test-api, test-web]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: placeholder
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: placeholder.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: placeholder
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: placeholder.appspot.com
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '000000000000'
+          NEXT_PUBLIC_FIREBASE_APP_ID: '1:000000000000:web:placeholder'
+          NEXT_PUBLIC_API_URL: http://localhost:3011/api/v1
+
+      - name: Verify build outputs
+        run: |
+          test -d apps/api/dist && echo "✓ API build OK" || exit 1
+          test -d apps/web/.next && echo "✓ Web build OK" || exit 1
