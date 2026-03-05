@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useGameStore } from '@/stores/game-store';
@@ -16,7 +16,7 @@ const MissionRoom = dynamic(
 );
 
 interface MissionPageProps {
-  params: Promise<{ missionId: string }>;
+  params: { missionId: string };
 }
 
 /**
@@ -28,7 +28,7 @@ interface MissionPageProps {
  * - MissionCompleteScreen appears after completion
  */
 export default function MissionPage({ params }: MissionPageProps) {
-  const { missionId } = use(params);
+  const { missionId } = params;
   const searchParams = useSearchParams();
   const moduleId = searchParams.get('moduleId') ?? missionId;
   const router = useRouter();

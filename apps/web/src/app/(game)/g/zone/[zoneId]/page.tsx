@@ -1,6 +1,5 @@
 'use client';
 
-import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useQuery } from '@tanstack/react-query';
@@ -25,7 +24,7 @@ const ZONE_LEVEL: Record<ZoneId, number> = {
 };
 
 interface ZonePageProps {
-  params: Promise<{ zoneId: string }>;
+  params: { zoneId: string };
 }
 
 /**
@@ -33,8 +32,7 @@ interface ZonePageProps {
  * Fetches real module data from the API and maps them to MissionData for the 3D scene.
  */
 export default function ZonePage({ params }: ZonePageProps) {
-  const { zoneId: rawZoneId } = use(params);
-  const zoneId = rawZoneId as ZoneId;
+  const zoneId = params.zoneId as ZoneId;
   const router = useRouter();
   const { completedMissionIds, startMission, exitZone } = useGameStore();
 
