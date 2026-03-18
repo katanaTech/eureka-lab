@@ -67,7 +67,7 @@ export function MobileCombatView({
         <p className="text-7xl">🧟</p>
         <div className="text-center">
           <h1 className="text-3xl font-black text-red-400">{zombieName}</h1>
-          <p className="mt-1 text-sm italic text-gray-300">"{zombieDialogue}"</p>
+          <p className="mt-1 text-sm italic text-gray-300">&ldquo;{zombieDialogue}&rdquo;</p>
         </div>
         <div className="flex gap-8 text-center">
           <div>

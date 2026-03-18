@@ -50,7 +50,7 @@ export function IntroScreen({
       <div className="text-center">
         <p className="mb-4 text-8xl">🧟</p>
         <h1 className="mb-2 text-4xl font-black text-red-400">{zombieName}</h1>
-        <p className="text-lg italic text-gray-300">"{zombieDialogue}"</p>
+        <p className="text-lg italic text-gray-300">&ldquo;{zombieDialogue}&rdquo;</p>
       </div>
       <div className="flex gap-10 text-center">
         <div>
