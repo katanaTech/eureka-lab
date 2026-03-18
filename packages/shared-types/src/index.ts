@@ -822,3 +822,84 @@ export interface PushNotificationPayload {
   /** Additional data for the client */
   data?: Record<string, string>;
 }
+
+// ── Combat System (Phase 15) ─────────────────────────────────────────────────
+
+/** The three types of zombie battles */
+export type BattleType = 'minion' | 'guardian' | 'overlord';
+
+/** Zombie character types — one per zone plus the final boss */
+export type ZombieType =
+  | 'misinformation_mole' // Library (L1)
+  | 'lazy_bot'            // Forge (L2)
+  | 'bug_monster'         // Citadel (L3)
+  | 'memory_eraser'       // Academy (L4)
+  | 'overlord';           // Final boss (all 4 zones)
+
+/** Phase states in the combat turn-based state machine */
+export type CombatPhase =
+  | 'idle'          // No battle active
+  | 'intro'         // Zombie entrance animation
+  | 'player_turn'   // Question shown, awaiting player answer
+  | 'player_attack' // Correct answer — player attack animation playing
+  | 'zombie_attack' // Wrong answer or timeout — zombie attack animation playing
+  | 'victory'       // Zombie HP reached 0
+  | 'defeat';       // Player HP reached 0
+
+/** A single quiz question from the pre-written combat question bank */
+export interface QuizQuestion {
+  /** Unique question identifier */
+  id: string;
+  /** Zone this question belongs to (determines which zombie battle uses it) */
+  zoneId: ZoneId;
+  /** Question text displayed to the player */
+  text: string;
+  /** Exactly 4 answer options (A, B, C, D) */
+  options: [string, string, string, string];
+  /** Index of the correct option (0–3) */
+  correctIndex: 0 | 1 | 2 | 3;
+  /** Short explanation shown after the player answers */
+  explanation: string;
+  /** Difficulty tier: 1 = minion battles, 2 = guardian battles, 3 = overlord battles */
+  difficultyTier: 1 | 2 | 3;
+}
+
+/** Battle configuration returned from POST /api/v1/combat/init */
+export interface BattleConfig {
+  /** Unique battle session ID (Firestore document ID) */
+  battleId: string;
+  /** Type of battle (drives HP values and question count) */
+  battleType: BattleType;
+  /** Which zombie character to render in the arena */
+  zombieType: ZombieType;
+  /** Display name shown above the zombie */
+  zombieName: string;
+  /** Intro dialogue spoken by the zombie before combat starts */
+  zombieDialogue: string;
+  /** Player's maximum HP for this battle */
+  playerMaxHp: number;
+  /** Zombie's maximum HP for this battle */
+  zombieMaxHp: number;
+  /**
+   * Shuffled question set for this battle session.
+   * Count: 5 (minion) | 10 (guardian) | 20 (overlord)
+   */
+  questions: QuizQuestion[];
+}
+
+/** Outcome reported when a battle ends */
+export type BattleOutcome = 'victory' | 'defeat';
+
+/** XP awarded to the player on a battle victory */
+export const COMBAT_XP_REWARDS: Record<BattleType, number> = {
+  minion: 25,
+  guardian: 100,
+  overlord: 500,
+};
+
+/** Starting HP values for player and zombie per battle type */
+export const COMBAT_HP_CONFIG: Record<BattleType, { playerHp: number; zombieHp: number }> = {
+  minion:   { playerHp: 100, zombieHp: 30  },
+  guardian: { playerHp: 100, zombieHp: 80  },
+  overlord: { playerHp: 100, zombieHp: 200 },
+};

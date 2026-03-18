@@ -32,6 +32,10 @@ export interface GameState {
   activeMissionId: string | null;
   /** Set of completed mission IDs */
   completedMissionIds: string[];
+  /** Zones whose guardian zombie has been defeated in battle */
+  defeatedGuardianZones: ZoneId[];
+  /** True once the Anti-AI Overlord has been defeated */
+  overlordDefeated: boolean;
 
   // ── UI overlay ───────────────────────────────────────────────────────────
   /** True when the learning content panel is open over the 3D world */
@@ -62,6 +66,13 @@ export interface GameState {
   openMissionOverlay: () => void;
   /** Close the learning content overlay */
   closeMissionOverlay: () => void;
+  /**
+   * Record that the guardian for a zone has been defeated.
+   * @param zoneId - The zone whose guardian was beaten
+   */
+  defeatGuardian: (zoneId: ZoneId) => void;
+  /** Record that the Anti-AI Overlord has been defeated. */
+  defeatOverlord: () => void;
   /** Reset all game state (used when starting over) */
   resetGame: () => void;
 }
@@ -82,6 +93,8 @@ const initialState = {
   activeZoneId: null,
   activeMissionId: null,
   completedMissionIds: [],
+  defeatedGuardianZones: [],
+  overlordDefeated: false,
   missionOverlayOpen: false,
   pendingReward: null,
 };
@@ -143,6 +156,15 @@ export const useGameStore = create<GameState>()(
 
       closeMissionOverlay: () => set({ missionOverlayOpen: false }),
 
+      defeatGuardian: (zoneId) =>
+        set((s) => ({
+          defeatedGuardianZones: s.defeatedGuardianZones.includes(zoneId)
+            ? s.defeatedGuardianZones
+            : [...s.defeatedGuardianZones, zoneId],
+        })),
+
+      defeatOverlord: () => set({ overlordDefeated: true }),
+
       resetGame: () => set(initialState),
     }),
     {
@@ -154,6 +176,8 @@ export const useGameStore = create<GameState>()(
         equippedItems: s.equippedItems,
         ownedItems: s.ownedItems,
         completedMissionIds: s.completedMissionIds,
+        defeatedGuardianZones: s.defeatedGuardianZones,
+        overlordDefeated: s.overlordDefeated,
       }),
     },
   ),
