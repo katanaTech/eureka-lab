@@ -6,6 +6,7 @@ import { OrbitControls, Stars, ContactShadows } from '@react-three/drei';
 import type { ZoneId } from '@eureka-lab/shared-types';
 import { MissionDoor, type MissionData } from './MissionDoor';
 import { ZoneNPC } from './ZoneNPC';
+import { ZoneDecorations } from './ZoneDecorations';
 import { useGameContext } from './GameProvider';
 
 const ZONE_COLORS: Record<ZoneId, { bg: string; floor: string; accent: string }> = {
@@ -68,6 +69,11 @@ export function ZoneInterior({ zoneId, missions, onEnterMission }: ZoneInteriorP
       {/* NPC guide at center */}
       <Suspense fallback={null}>
         <ZoneNPC zoneId={zoneId} />
+      </Suspense>
+
+      {/* Zone-themed floating decorations */}
+      <Suspense fallback={null}>
+        <ZoneDecorations zoneId={zoneId} />
       </Suspense>
 
       {/* Mission doors in a ring */}

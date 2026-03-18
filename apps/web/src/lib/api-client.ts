@@ -28,6 +28,10 @@ import type {
   NotificationPreferences,
   DevicePlatform,
   PushSubscriptionKeys,
+  BattleConfig,
+  BattleOutcome,
+  BattleType,
+  ZoneId,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -721,6 +725,48 @@ export const classroomsApi = {
     }),
 };
 
+/* ── Combat API ────────────────────────────────────────────────── */
+
+/** Combat API endpoints — battle init, completion, and certificate generation */
+export const combatApi = {
+  /**
+   * Initialise a new battle session and return the battle configuration.
+   * @param data - Battle type and optional zone/mission identifiers
+   * @returns BattleConfig consumed by the frontend combat store
+   */
+  initBattle: (data: { battleType: BattleType; zoneId?: ZoneId; missionId?: string }) =>
+    request<BattleConfig>('/combat/init', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  /**
+   * Record a battle outcome and award XP on victory.
+   * @param battleId - Firestore battle session ID
+   * @param data - Outcome and performance metrics
+   * @returns XP awarded and badge IDs unlocked
+   */
+  completeBattle: (
+    battleId: string,
+    data: { outcome: BattleOutcome; correctAnswers: number; totalQuestions: number },
+  ) =>
+    request<{ xpAwarded: number; badgesUnlocked: string[] }>(`/combat/${battleId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  /**
+   * Generate a personalised victory certificate for an overlord win.
+   * @param displayName - Child's display name to embed in the SVG
+   * @returns Signed Firebase Storage URL valid for 24 hours
+   */
+  generateCertificate: (displayName: string) =>
+    request<{ certificateUrl: string }>('/combat/certificate', {
+      method: 'POST',
+      body: JSON.stringify({ displayName }),
+    }),
+};
+
 /* ── Notifications API ─────────────────────────────────────────── */
 
 /** Notifications API endpoints (push subscription + preferences) */
@@ -859,4 +905,8 @@ export type {
   NotificationPreferences,
   DevicePlatform,
   PushSubscriptionKeys,
+  BattleConfig,
+  BattleOutcome,
+  BattleType,
+  ZoneId,
 };

@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGameStore } from '@/stores/game-store';
+import { useCombatStore } from '@/stores/combat-store';
+import { combatApi } from '@/lib/api-client';
 import { LearningOverlay } from '@/components/game/LearningOverlay';
 import { MissionCompleteScreen } from '@/components/game/MissionCompleteScreen';
 import { GameHUD } from '@/components/game/GameHUD';
@@ -43,6 +45,7 @@ export default function MissionPage({ params }: MissionPageProps) {
   const router = useRouter();
 
   const { completeMission, clearPendingReward, pendingReward, activeZoneId } = useGameStore();
+  const { loadBattle, setReturnPath } = useCombatStore();
   const queryClient = useQueryClient();
 
   // Derive zone from the missionId prefix (format: "library-module-1")
@@ -51,24 +54,47 @@ export default function MissionPage({ params }: MissionPageProps) {
   const level = ZONE_LEVEL[zoneId] ?? 1;
 
   const [showComplete, setShowComplete] = useState(false);
+  const [battleLoading, setBattleLoading] = useState(false);
 
   const handleMissionComplete = useCallback((reward: MissionReward) => {
     completeMission(missionId, reward);
-    setShowComplete(true);
-  }, [missionId, completeMission]);
+    void queryClient.invalidateQueries({ queryKey: ['modules', level] });
+    setBattleLoading(true);
+
+    void (async () => {
+      try {
+        // Gate learning completion behind a minion battle
+        const config = await combatApi.initBattle({ battleType: 'minion', zoneId });
+        loadBattle(config);
+        setReturnPath(`/g/zone/${zoneId}`);
+        router.push(`/g/battle/${config.battleId}`);
+      } catch {
+        // Battle init failed — fall back to showing the reward screen directly
+        setBattleLoading(false);
+        setShowComplete(true);
+      }
+    })();
+  }, [missionId, completeMission, queryClient, level, zoneId, loadBattle, setReturnPath, router]);
 
   const handleDismissReward = useCallback(() => {
     clearPendingReward();
     setShowComplete(false);
-    // Invalidate the modules cache so ZonePage re-fetches from Firestore,
-    // reflecting the newly completed mission status immediately.
-    void queryClient.invalidateQueries({ queryKey: ['modules', level] });
     router.push(`/g/zone/${zoneId}`);
-  }, [clearPendingReward, queryClient, level, router, zoneId]);
+  }, [clearPendingReward, router, zoneId]);
 
   const handleClose = useCallback(() => {
     router.push(`/g/zone/${zoneId}`);
   }, [router, zoneId]);
+
+  // Entering battle — show full-screen loader so player isn't left on a blank page
+  if (battleLoading) {
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-4 bg-gray-950">
+        <div className="h-14 w-14 animate-spin rounded-full border-4 border-red-500 border-t-transparent" />
+        <p className="font-semibold text-red-400">Zombie approaching…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-gray-950">

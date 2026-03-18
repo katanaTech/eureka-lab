@@ -6,6 +6,7 @@ import { OrbitControls, Stars, ContactShadows, Environment } from '@react-three/
 import type { ZoneId } from '@eureka-lab/shared-types';
 import { ZoneIsland, ZONE_CONFIGS } from './ZoneIsland';
 import { PlayerCharacter } from './PlayerCharacter';
+import { ZombiePortal } from './ZombiePortal';
 import { useGameContext } from './GameProvider';
 
 interface WorldMapProps {
@@ -93,6 +94,11 @@ export function WorldMap({
       {/* Player character roaming the map */}
       <Suspense fallback={null}>
         <PlayerCharacter />
+      </Suspense>
+
+      {/* Overlord void portal — grows with each guardian defeated */}
+      <Suspense fallback={null}>
+        <ZombiePortal />
       </Suspense>
 
       {/* Camera controls — limited to top-down orbital view */}

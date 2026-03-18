@@ -15,6 +15,7 @@ import { AgentsModule } from './modules/agents/agents.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ClassroomsModule } from './modules/classrooms/classrooms.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { CombatModule } from './modules/combat/combat.module';
 
 /**
  * Root application module.
@@ -40,6 +41,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     PaymentsModule,
     ClassroomsModule,
     NotificationsModule,
+    CombatModule,
   ],
 })
 export class AppModule {}
