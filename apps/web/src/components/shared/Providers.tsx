@@ -13,6 +13,8 @@ interface ProvidersProps {
   locale: string;
   /** i18n messages */
   messages: Record<string, unknown>;
+  /** IANA time zone (e.g. 'UTC') — kept stable across server/client to avoid hydration mismatches */
+  timeZone: string;
 }
 
 /**
@@ -21,13 +23,14 @@ interface ProvidersProps {
  * @param children - App content
  * @param locale - Current locale code
  * @param messages - i18n messages for the locale
+ * @param timeZone - IANA time zone forwarded from the server config
  */
-export const Providers: FC<ProvidersProps> = ({ children, locale, messages }) => {
+export const Providers: FC<ProvidersProps> = ({ children, locale, messages, timeZone }) => {
   const queryClient = getQueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NextIntlClientProvider locale={locale} messages={messages}>
+      <NextIntlClientProvider locale={locale} messages={messages} timeZone={timeZone}>
         <OfflineBanner />
         {children}
       </NextIntlClientProvider>
