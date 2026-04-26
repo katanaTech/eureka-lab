@@ -23,7 +23,8 @@
 | 12 | Notifications (push + scheduler) | DONE |
 | 13 | Mobile PWA (dedicated /m/ routes + hooks) | DONE |
 | 14 | 3D Game Shell (routes, store, GPU detection) | DONE |
-| 15 | 3D Game Content (Three.js/R3F scenes, animations) | IN PROGRESS |
+| 15 | AI Zombie Combat (backend done; R3F frontend deferred → Phase 16) | BACKEND DONE |
+| 16 | Gamified UI Redesign — Cinematic Fantasy | SCHEDULED |
 
 ---
 
@@ -84,7 +85,26 @@
 
 ---
 
-## Next Up — After Phase 15
+## Phase 16 — Gamified UI Redesign (Scheduled)
+
+**Branch:** `feature/phase-16-fantasy-ui`
+**Sprint plan:** [planning/sprint-p16.md](sprint-p16.md)
+**Duration:** 4 sprints, ~8 weeks
+
+**Goal:** Replace entire gamified mode UI with 2D cinematic dark-fantasy design. Add KP economy +
+ability/weapon shop. Park R3F behind feature flag for A/B testing. Reuse Phase 15 combat backend.
+
+**Sprints:**
+- **A (Wk 1–2):** Foundation (design tokens, shared types, feature flag) + Backend (inventory, KP, settings, tenants)
+- **B (Wk 3–4):** FE state + ported components + Welcome → Character → Dashboard → Campaign pages
+- **C (Wk 5–6):** Battle page (critical path) + Shop + Settings + Routing
+- **D (Wk 7–8):** Mobile mirror + Playwright QA + i18n stubs + Production rollout
+
+**Tasks:** See Phase 16 section in task-board.md (~50 tasks across Parts A–K).
+
+---
+
+## Next Up — After Phase 16
 
 These are the highest-priority gaps identified in the codebase audit (2026-03-07):
 
@@ -131,4 +151,4 @@ These are the highest-priority gaps identified in the codebase audit (2026-03-07
 
 ---
 
-*Last updated: 2026-03-07 | Codebase audit complete. All phases 1–14 verified as done.*
+*Last updated: 2026-04-26 | Phase 15 backend done, FE deferred. Phase 16 scheduled across 4 sprints.*
