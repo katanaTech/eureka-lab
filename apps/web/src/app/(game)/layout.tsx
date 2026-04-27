@@ -1,6 +1,13 @@
 import type { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
+import { Cinzel } from 'next/font/google';
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute';
+
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['500', '700', '900'],
+  variable: '--font-cinzel',
+});
 
 /**
  * Dynamic import of GameProvider with SSR disabled.
@@ -35,7 +42,9 @@ interface GameLayoutProps {
 export default function GameLayout({ children }: GameLayoutProps) {
   return (
     <ProtectedRoute>
-      <GameProvider>{children}</GameProvider>
+      <GameProvider>
+        <div className={cinzel.variable}>{children}</div>
+      </GameProvider>
     </ProtectedRoute>
   );
 }

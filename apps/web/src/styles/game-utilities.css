@@ -1,0 +1,63 @@
+/*
+ * Phase 16 — Fantasy Mode Utility Classes
+ * Imported conditionally when uiMode === 'game'.
+ * Matches ai-adventure-island/src/index.css line-for-line.
+ */
+
+/* Glassmorphic panel */
+.panel {
+  background: var(--gradient-card);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Conic-gradient halo ring */
+.rune-ring {
+  position: relative;
+}
+.rune-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: var(--gradient-rune);
+  animation: rune-spin 8s linear infinite;
+  z-index: -1;
+  opacity: 0.6;
+}
+
+/* CRT scanline texture */
+.scanlines {
+  position: relative;
+}
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    hsl(0 0% 0% / 0.03) 2px,
+    hsl(0 0% 0% / 0.03) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Text glow variants */
+.text-glow-primary { text-shadow: var(--glow-primary); }
+.text-glow-gold { text-shadow: var(--glow-gold); }
+.text-glow-violet { text-shadow: var(--glow-secondary); }
+
+/* Background gradient shortcuts */
+.bg-gradient-primary { background: var(--gradient-primary); }
+.bg-gradient-secondary { background: var(--gradient-secondary); }
+.bg-gradient-gold { background: var(--gradient-gold); }
+.bg-gradient-card { background: var(--gradient-card); }
+
+/* Box-shadow glow shortcuts */
+.glow-primary { box-shadow: var(--glow-primary); }
+.glow-secondary { box-shadow: var(--glow-secondary); }
+.glow-gold { box-shadow: var(--glow-gold); }
