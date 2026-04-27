@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { MeshToonMaterial } from 'three';
 import type { Mesh, Group } from 'three';
 import type { CareerArchetype } from '@eureka-lab/shared-types';
-import { CAREER_OPTIONS } from './CareerPicker';
+import { CAREER_OPTIONS } from '../CareerPicker';
 
 interface CharacterModelProps {
   /** Career archetype — determines which GLB to load and the toon color */

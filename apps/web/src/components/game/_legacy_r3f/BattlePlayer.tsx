@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import type { Group, Mesh } from 'three';
 import type { CombatPhase } from '@eureka-lab/shared-types';
 import { useGameStore } from '@/stores/game-store';
-import { CAREER_OPTIONS } from './CareerPicker';
+import { CAREER_OPTIONS } from '../CareerPicker';
 
 interface BattlePlayerProps {
   /** Current combat phase — drives attack lunge and hurt recoil */

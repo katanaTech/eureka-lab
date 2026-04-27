@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { Group } from 'three';
 import { useGameStore } from '@/stores/game-store';
-import { CAREER_OPTIONS } from './CareerPicker';
+import { CAREER_OPTIONS } from '../CareerPicker';
 
 /**
  * Small player character that wanders the world map center.

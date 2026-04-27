@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, Float } from '@react-three/drei';
 import type { ZoneId } from '@eureka-lab/shared-types';
-import { useGameContext } from './GameProvider';
+import { useGameContext } from '../GameProvider';
 
 const ROOM_COLORS: Record<ZoneId, { bg: string; floor: string; accent: string; wallColor: string }> = {
   library:  { bg: '#030310', floor: '#0a0a20', accent: '#6366f1', wallColor: '#1e1b4b' },

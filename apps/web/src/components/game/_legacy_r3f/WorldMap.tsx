@@ -7,7 +7,7 @@ import type { ZoneId } from '@eureka-lab/shared-types';
 import { ZoneIsland, ZONE_CONFIGS } from './ZoneIsland';
 import { PlayerCharacter } from './PlayerCharacter';
 import { ZombiePortal } from './ZombiePortal';
-import { useGameContext } from './GameProvider';
+import { useGameContext } from '../GameProvider';
 
 interface WorldMapProps {
   /** Set of completed mission IDs used to compute zone progress */

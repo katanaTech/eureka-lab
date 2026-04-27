@@ -8,12 +8,12 @@ import { modulesApi, combatApi } from '@/lib/api-client';
 import { useGameStore } from '@/stores/game-store';
 import { useCombatStore } from '@/stores/combat-store';
 import { GameHUD } from '@/components/game/GameHUD';
-import { ZONE_CONFIGS } from '@/components/game/ZoneIsland';
+import { ZONE_CONFIGS } from '@/components/game/_legacy_r3f/ZoneIsland';
 import type { ZoneId } from '@eureka-lab/shared-types';
-import type { MissionData } from '@/components/game/MissionDoor';
+import type { MissionData } from '@/components/game/_legacy_r3f/MissionDoor';
 
 const ZoneInterior = dynamic(
-  () => import('@/components/game/ZoneInterior').then((m) => m.ZoneInterior),
+  () => import('@/components/game/_legacy_r3f/ZoneInterior').then((m) => m.ZoneInterior),
   { ssr: false, loading: () => <div className="h-screen w-screen bg-gray-950" /> },
 );
 

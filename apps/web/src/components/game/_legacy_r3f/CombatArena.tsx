@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import type { ZombieType, CombatPhase } from '@eureka-lab/shared-types';
-import { useGameContext } from './GameProvider';
+import { useGameContext } from '../GameProvider';
 import { ZombieCharacter } from './ZombieCharacter';
 import { BattlePlayer } from './BattlePlayer';
 import { CareerAttackEffect } from './CareerAttackEffect';

@@ -10,7 +10,7 @@ import { CharacterCustomizer } from '@/components/game/CharacterCustomizer';
 
 /** Canvas is client-only — dynamic import prevents SSR */
 const CharacterPreview = dynamic(
-  () => import('@/components/game/CharacterPreview').then((m) => m.CharacterPreview),
+  () => import('@/components/game/_legacy_r3f/CharacterPreview').then((m) => m.CharacterPreview),
   { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-gray-800 rounded-2xl" /> },
 );
 

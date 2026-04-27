@@ -7,7 +7,7 @@ import type { ZoneId } from '@eureka-lab/shared-types';
 import { MissionDoor, type MissionData } from './MissionDoor';
 import { ZoneNPC } from './ZoneNPC';
 import { ZoneDecorations } from './ZoneDecorations';
-import { useGameContext } from './GameProvider';
+import { useGameContext } from '../GameProvider';
 
 const ZONE_COLORS: Record<ZoneId, { bg: string; floor: string; accent: string }> = {
   library:  { bg: '#050510', floor: '#0a0a1f', accent: '#6366f1' },
