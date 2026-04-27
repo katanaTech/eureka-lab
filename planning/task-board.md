@@ -274,16 +274,16 @@
 > **Sprint plan:** [planning/sprint-p16.md](sprint-p16.md) — 4 sprints, 8 weeks estimated
 > **ADRs:** ADR-002 (paradigm), ADR-003 (KP economy), ADR-004 (UI mode), ADR-005 (narrative mapping)
 > **Branch:** `feature/phase-16-fantasy-ui`
-> **Status:** SCHEDULED — Sprint A ready to start. P16-OPEN-004 resolved (see sprint-p16.md §KP Tuning Values).
+> **Status:** IN PROGRESS — Sprints A+B complete (2026-04-27). Sprint C ready to start.
 
 ### Part A — Foundation (Design Tokens, Flag, Shared Types)
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-FND-001 | Add fantasy design tokens (CSS vars under `[data-ui-mode="game"]`) to globals.css | TODO | FE — see plan §4.1 |
-| P16-FND-002 | Load Cinzel display font via next/font/google in `(game)/layout.tsx` | TODO | FE |
-| P16-FND-003 | Extend Tailwind config: `font-display`, fantasy keyframes, animations | TODO | FE — see plan §4.3 |
-| P16-FND-004 | Create `apps/web/src/styles/game-utilities.css` (panel, rune-ring, scanlines, glow utilities) | TODO | FE — see plan §4.4 |
+| P16-FND-001 | Add fantasy design tokens (CSS vars under `[data-ui-mode="game"]`) to globals.css | DONE | FE 2026-04-27 |
+| P16-FND-002 | Load Cinzel display font via next/font/google in `(game)/layout.tsx` | DONE | FE 2026-04-27 |
+| P16-FND-003 | Extend Tailwind config: `font-display`, fantasy keyframes, animations | DONE | FE 2026-04-27 |
+| P16-FND-004 | Create `apps/web/src/styles/game-utilities.css` (panel, rune-ring, scanlines, glow utilities) | DONE | FE 2026-04-27 |
 | P16-FND-005 | Add `featureFlags.fantasyUi` to packages/shared-types | DONE | ARCH 2026-04-26 — `fantasyUi: boolean` added to `FeatureFlags` + `DEFAULT_FEATURE_FLAGS` (default `true`); shared-types built |
 | P16-FND-006 | Add Phase 16 shared types: `UiMode`, `FantasyClass`, mappings, `Inventory`, `ShopAbility`, `ShopWeapon` | DONE | ARCH 2026-04-26 — new file `packages/shared-types/src/phase16.types.ts`, re-exported from index; ADR-005 §2 corrected to 8-archetype mapping; API + web both lint clean |
 
@@ -291,49 +291,49 @@
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-BE-001 | New module `inventory/` — controller, service, DTOs, hardcoded shop catalog | TODO | BE — ADR-003 |
-| P16-BE-002 | `GET /api/v1/inventory` endpoint | TODO | BE |
-| P16-BE-003 | `GET /api/v1/shop/catalog` endpoint | TODO | BE |
-| P16-BE-004 | `POST /api/v1/inventory/buy` (atomic Firestore transaction) | TODO | BE |
-| P16-BE-005 | `POST /api/v1/inventory/equip` (weapon equip/unequip) | TODO | BE |
-| P16-BE-006 | Extend `users` module: `uiMode` field + `PUT /users/me/settings` extension | TODO | BE — ADR-004 |
-| P16-BE-007 | New endpoints: `GET/PUT /api/v1/users/me/character` (FantasyCharacter) | TODO | BE |
-| P16-BE-008 | New module `tenants/` (or extend if exists): `uiModeLock` field + admin endpoints | TODO | BE — ADR-004 |
-| P16-BE-009 | `UiModeResolver` service — single source of truth for effective mode | TODO | BE — ADR-004 |
-| P16-BE-010 | Hook KP earning into existing progress endpoints (mode-conditional) | TODO | BE — ADR-003 |
-| P16-BE-011 | Daily KP earn cap (sub-collection `inventories/{uid}/dailyEarn/{date}`) | TODO | BE — ADR-003 |
-| P16-BE-012 | Firestore security rules for `inventories/{userId}` and `tenants` updates | TODO | BE |
-| P16-BE-013 | Unit + integration tests for inventory module (atomicity, daily cap, mode-gating) | TODO | BE + QA |
+| P16-BE-001 | New module `inventory/` — controller, service, DTOs, hardcoded shop catalog | DONE | BE 2026-04-27 — atomic buy txn, lazy init, starter items |
+| P16-BE-002 | `GET /api/v1/inventory` endpoint | DONE | BE 2026-04-27 |
+| P16-BE-003 | `GET /api/v1/shop/catalog` endpoint | DONE | BE 2026-04-27 |
+| P16-BE-004 | `POST /api/v1/inventory/buy` (atomic Firestore transaction) | DONE | BE 2026-04-27 |
+| P16-BE-005 | `POST /api/v1/inventory/equip` (weapon equip/unequip) | DONE | BE 2026-04-27 |
+| P16-BE-006 | Extend `users` module: `uiMode` field + `PUT /users/me/settings` extension | DONE | BE 2026-04-27 — UsersController created |
+| P16-BE-007 | New endpoints: `GET/PUT /api/v1/users/me/character` (FantasyCharacter) | DONE | BE 2026-04-27 |
+| P16-BE-008 | New module `tenants/` — `uiModeLock` field + admin endpoints | DONE | BE 2026-04-27 |
+| P16-BE-009 | `UiModeResolver` service — single source of truth for effective mode | DONE | BE 2026-04-27 — tenant lock > user pref > 'normal' |
+| P16-BE-010 | Hook KP earning into existing progress endpoints (mode-conditional) | DONE | BE 2026-04-27 — progress + combat controllers inject KP |
+| P16-BE-011 | Daily KP earn cap (sub-collection `inventories/{uid}/dailyEarn/{date}`) | DONE | BE 2026-04-27 — 100 KP/day |
+| P16-BE-012 | Firestore security rules for `inventories/{userId}` and `tenants` updates | DONE | BE 2026-04-27 — rules in firestore-rules-phase16.txt |
+| P16-BE-013 | Unit + integration tests for inventory module (atomicity, daily cap, mode-gating) | DONE | BE+QA 2026-04-27 — 41 tests, 257 total all passing |
 
 ### Part C — Frontend State & Foundation
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-FE-001 | New Zustand store `inventory-store.ts` (KP, owned items, equipped weapon) | TODO | FE |
-| P16-FE-002 | New hook `useUiMode()` — reads effective mode, sets `<html data-ui-mode>` attr | TODO | FE |
-| P16-FE-003 | Extend `combat-store.ts` with `sparkCharges` field for KP-economy mechanic | TODO | FE |
-| P16-FE-004 | Park R3F components: move to `_legacy_r3f/`, update existing imports | TODO | FE — plan §6.3 |
+| P16-FE-001 | New Zustand store `inventory-store.ts` (KP, owned items, equipped weapon) | DONE | FE 2026-04-27 |
+| P16-FE-002 | New hook `useUiMode()` — reads effective mode, sets `<html data-ui-mode>` attr | DONE | FE 2026-04-27 |
+| P16-FE-003 | Extend `combat-store.ts` with `sparkCharges` field for KP-economy mechanic | DONE | FE 2026-04-27 |
+| P16-FE-004 | Park R3F components: move to `_legacy_r3f/`, update existing imports | DONE | FE 2026-04-27 — 15 R3F files moved, all imports updated |
 
 ### Part D — Fantasy UI Components (Ports from ai-adventure-island)
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-FE-010 | Port `Scene` component (background image wrapper) — `components/game/fantasy/Scene.tsx` | TODO | FE |
-| P16-FE-011 | Port `Logo` component — adapt to Eureka brand | TODO | FE |
-| P16-FE-012 | Port `GameButton` (primary/gold/ghost/danger variants) | TODO | FE |
-| P16-FE-013 | Port `KpBadge` — wire to `inventory-store` via TanStack Query | TODO | FE |
-| P16-FE-014 | Port `AiTutorChat` — wire to existing AI gateway + moderation | TODO | FE — CLAUDE.md rule #4 |
-| P16-FE-015 | Adapt `NavLink` from react-router-dom to Next `<Link>` | TODO | FE |
-| P16-FE-016 | Extract reusable `HpBar` component from Battle.tsx | TODO | FE |
+| P16-FE-010 | Port `Scene` component — `components/game/fantasy/Scene.tsx` | DONE | FE 2026-04-27 |
+| P16-FE-011 | Port `Logo` component — Eureka brand ("EUREKA LAB / QUEST FOR AI MASTERY") | DONE | FE 2026-04-27 |
+| P16-FE-012 | Port `GameButton` (primary/gold/ghost/danger variants) | DONE | FE 2026-04-27 |
+| P16-FE-013 | Port `KpBadge` — wired to `inventory-store` | DONE | FE 2026-04-27 |
+| P16-FE-014 | Port `AiTutorChat` — mock mode (real AI gateway wiring Sprint C) | DONE | FE 2026-04-27 — no dangerouslySetInnerHTML, security notice added |
+| P16-FE-015 | Adapt `NavLink` — Next.js `<Link>` + `usePathname` | DONE | FE 2026-04-27 |
+| P16-FE-016 | Extract reusable `HpBar` component | DONE | FE 2026-04-27 — player/enemy variants, ARIA progressbar |
 
 ### Part E — Page Ports (App Router)
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-PG-001 | `(game)/g/welcome/page.tsx` (replaces /g landing) — wire to Firebase auth | TODO | FE |
-| P16-PG-002 | `(game)/g/character/page.tsx` — character creation, persists FantasyCharacter | TODO | FE |
-| P16-PG-003 | `(game)/g/dashboard/page.tsx` (Realm Map, replaces /g/world) | TODO | FE |
-| P16-PG-004 | `(game)/g/campaign/[slug]/page.tsx` (replaces /g/zone/[zoneId]) — slug→zone lookup | TODO | FE |
+| P16-PG-001 | `(game)/g/welcome/page.tsx` — Firebase auth (email + Google) | DONE | FE 2026-04-27 |
+| P16-PG-002 | `(game)/g/character/page.tsx` — fantasy class carousel, saves to API | DONE | FE 2026-04-27 |
+| P16-PG-003 | `(game)/g/dashboard/page.tsx` (Realm Map) — 4 isles, lock/unlock | DONE | FE 2026-04-27 |
+| P16-PG-004 | `(game)/g/campaign/[slug]/page.tsx` — mission list with placeholders | DONE | FE 2026-04-27 |
 | P16-PG-005 | `(game)/g/campaign/[slug]/prepare/page.tsx` (NEW — boss preview screen) | TODO | FE |
 | P16-PG-006 | `(game)/g/campaign/[slug]/mission/[missionId]/prep/page.tsx` (lesson + practice) | TODO | FE |
 | P16-PG-007 | `(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` — wire to Phase 15 combat API | TODO | FE — critical |
