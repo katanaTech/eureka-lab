@@ -6,10 +6,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
-import type { Inventory, ShopCatalog } from '@eureka-lab/shared-types';
+import type { Inventory, KpEarnEvent, ShopCatalog, UiMode } from '@eureka-lab/shared-types';
 import { PurchaseItemDto } from './dto/purchase-item.dto';
 import { EquipWeaponDto } from './dto/equip-weapon.dto';
 import { SHOP_CATALOG, findAbilityById, findWeaponById } from './shop-catalog';
+import { DAILY_KP_CAP, KP_REWARDS } from './kp-rewards';
 
 /** Default inventory for new users — includes free starter items. */
 function buildDefaultInventory(): Inventory {
@@ -199,5 +200,101 @@ export class InventoryService {
     );
 
     return updated;
+  }
+
+  /**
+   * Award KP to a user for a game-mode event.
+   * Only awards KP when the user's effective UI mode is 'gamified'.
+   * Enforces a daily KP cap of {@link DAILY_KP_CAP} per UTC calendar day.
+   *
+   * @param userId - Firebase UID
+   * @param event - The KP earn event type
+   * @param effectiveUiMode - Resolved UI mode (from UiModeResolver)
+   * @returns KP actually awarded (0 if mode is normal or daily cap is reached)
+   */
+  async awardKp(
+    userId: string,
+    event: KpEarnEvent,
+    effectiveUiMode: UiMode,
+  ): Promise<number> {
+    if (effectiveUiMode !== 'gamified') {
+      return 0;
+    }
+
+    const requestedAmount = KP_REWARDS[event];
+    const granted = await this.checkAndIncrementDailyCap(userId, requestedAmount);
+
+    if (granted <= 0) {
+      this.logger.log(
+        `KP award skipped (daily cap reached): userId=${userId} event=${event}`,
+      );
+      return 0;
+    }
+
+    const ref = this.firebase.firestore
+      .collection(this.collection)
+      .doc(userId);
+
+    await this.firebase.firestore.runTransaction(async (txn) => {
+      const snap = await txn.get(ref);
+      const inventory: Inventory = snap.exists
+        ? (snap.data() as Inventory)
+        : buildDefaultInventory();
+
+      const updated: Inventory = {
+        ...inventory,
+        kp: inventory.kp + granted,
+        totalKpEarned: inventory.totalKpEarned + granted,
+        updatedAt: new Date().toISOString(),
+      };
+
+      txn.set(ref, updated);
+    });
+
+    this.logger.log(
+      `KP awarded: userId=${userId} event=${event} granted=${granted}`,
+    );
+
+    return granted;
+  }
+
+  /**
+   * Check and increment today's KP tally for a user.
+   * Returns the amount of KP that can still be granted, capped at {@link DAILY_KP_CAP}.
+   *
+   * Uses a Firestore sub-collection: inventories/{userId}/dailyEarn/{date}
+   * where date is a YYYY-MM-DD string (UTC).
+   *
+   * @param userId - Firebase UID
+   * @param requestedAmount - KP the caller wants to grant
+   * @returns Actual amount that can be granted (≤ requestedAmount, respects daily cap)
+   */
+  private async checkAndIncrementDailyCap(
+    userId: string,
+    requestedAmount: number,
+  ): Promise<number> {
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD UTC
+
+    const dailyRef = this.firebase.firestore
+      .collection(this.collection)
+      .doc(userId)
+      .collection('dailyEarn')
+      .doc(today);
+
+    return this.firebase.firestore.runTransaction(async (txn) => {
+      const snap = await txn.get(dailyRef);
+      const earnedToday: number = snap.exists
+        ? ((snap.data() as { earnedToday: number }).earnedToday ?? 0)
+        : 0;
+
+      const remaining = DAILY_KP_CAP - earnedToday;
+      const grantable = Math.min(requestedAmount, Math.max(0, remaining));
+
+      if (grantable > 0) {
+        txn.set(dailyRef, { earnedToday: earnedToday + grantable }, { merge: true });
+      }
+
+      return grantable;
+    });
   }
 }

@@ -17,6 +17,8 @@ import { ProgressService } from './progress.service';
 import { CompleteActivityDto } from './dto/complete-activity.dto';
 import { BadgeService } from '../gamification/badge.service';
 import { StreakService } from '../gamification/streak.service';
+import { InventoryService } from '../inventory/inventory.service';
+import { UiModeResolver } from '../tenants/ui-mode-resolver.service';
 
 /**
  * Progress controller — tracks module completion.
@@ -32,6 +34,8 @@ export class ProgressController {
     private readonly progressService: ProgressService,
     private readonly badgeService: BadgeService,
     private readonly streakService: StreakService,
+    private readonly inventoryService: InventoryService,
+    private readonly uiModeResolver: UiModeResolver,
   ) {}
 
   /**
@@ -93,6 +97,14 @@ export class ProgressController {
       activityType: dto.score !== undefined ? 'quiz' : 'lesson',
     });
 
+    /* Award KP in gamified mode only (mode-conditional per ADR-004) */
+    const effectiveMode = await this.uiModeResolver.resolve(user.uid, null);
+    const kpAwarded = await this.inventoryService.awardKp(
+      user.uid,
+      result.moduleCompleted ? 'lesson_completed' : 'practice_completed',
+      effectiveMode,
+    );
+
     this.logger.log({
       event: 'activity_complete_request',
       userId: user.uid,
@@ -100,6 +112,7 @@ export class ProgressController {
       activityIndex: dto.activityIndex,
       xpAwarded: result.xpAwarded,
       badgesUnlocked: badgeResult.newBadges.length,
+      kpAwarded,
     });
 
     return {
@@ -109,6 +122,7 @@ export class ProgressController {
       moduleCompleted: result.moduleCompleted,
       nextModuleId: result.nextModuleId,
       currentStreak: streakResult.streak,
+      kpAwarded,
     };
   }
 }
