@@ -56,6 +56,13 @@ export interface CombatState {
   badgesUnlocked: string[];
   certificateUrl: string | null;
 
+  // ── Gamified mode ability charges ────────────────────────────────────────
+  /**
+   * Number of spark charges available for use in gamified-mode battles.
+   * Earned during combat progression, consumed when activating special abilities.
+   */
+  sparkCharges: number;
+
   // ── Navigation ────────────────────────────────────────────────────────────
   /**
    * The path the battle was launched from.
@@ -115,6 +122,18 @@ export interface CombatState {
   setReturnPath: (path: string) => void;
 
   /**
+   * Set the number of spark charges available (e.g. awarded between battle rounds).
+   *
+   * @param charges - Non-negative integer to set
+   */
+  setSparkCharges: (charges: number) => void;
+
+  /**
+   * Consume one spark charge. No-op if the current count is already 0.
+   */
+  useSparkCharge: () => void;
+
+  /**
    * Reset all combat state. Called on victory/defeat dismiss or logout.
    */
   resetCombat: () => void;
@@ -139,6 +158,7 @@ const initialState = {
   xpAwarded: 0,
   badgesUnlocked: [],
   certificateUrl: null,
+  sparkCharges: 0,
   returnPath: null,
 };
 
@@ -233,6 +253,10 @@ export const useCombatStore = create<CombatState>()((set, get) => ({
   setCertificateUrl: (url) => set({ certificateUrl: url }),
 
   setReturnPath: (path) => set({ returnPath: path }),
+
+  setSparkCharges: (charges) => set({ sparkCharges: charges }),
+
+  useSparkCharge: () => set({ sparkCharges: Math.max(0, get().sparkCharges - 1) }),
 
   resetCombat: () => set(initialState),
 }));
