@@ -8,7 +8,7 @@ import { modulesApi, combatApi } from '@/lib/api-client';
 import { useGameStore } from '@/stores/game-store';
 import { useCombatStore } from '@/stores/combat-store';
 import { GameHUD } from '@/components/game/GameHUD';
-import { ZONE_CONFIGS } from '@/components/game/_legacy_r3f/ZoneIsland';
+import { ZONE_CONFIGS } from '@/components/game/zone-configs';
 import type { ZoneId } from '@eureka-lab/shared-types';
 import type { MissionData } from '@/components/game/_legacy_r3f/MissionDoor';
 

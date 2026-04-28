@@ -10,7 +10,7 @@ import { combatApi } from '@/lib/api-client';
 import { LearningOverlay } from '@/components/game/LearningOverlay';
 import { MissionCompleteScreen } from '@/components/game/MissionCompleteScreen';
 import { GameHUD } from '@/components/game/GameHUD';
-import { ZONE_CONFIGS } from '@/components/game/_legacy_r3f/ZoneIsland';
+import { ZONE_CONFIGS } from '@/components/game/zone-configs';
 import type { ZoneId, MissionReward } from '@eureka-lab/shared-types';
 
 /** Map zone ID to learning level (mirrors ZonePage) */

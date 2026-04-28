@@ -5,55 +5,11 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import type { Mesh } from 'three';
 import type { ZoneId } from '@eureka-lab/shared-types';
+import { type ZoneConfig, ZONE_CONFIGS } from '@/components/game/zone-configs';
+// ZoneId is used for the onEnter callback type below
 
-interface ZoneConfig {
-  id: ZoneId;
-  name: string;
-  level: number;
-  emoji: string;
-  color: string;
-  position: [number, number, number];
-  description: string;
-}
-
-export const ZONE_CONFIGS: ZoneConfig[] = [
-  {
-    id: 'library',
-    name: 'Library of Prompts',
-    level: 1,
-    emoji: '📚',
-    color: '#6366f1',
-    position: [-4, 0, 2],
-    description: 'Master the art of prompt engineering',
-  },
-  {
-    id: 'forge',
-    name: 'Automation Forge',
-    level: 2,
-    emoji: '⚙️',
-    color: '#f59e0b',
-    position: [4, 0, 2],
-    description: 'Build powerful AI-driven workflows',
-  },
-  {
-    id: 'citadel',
-    name: 'Code Citadel',
-    level: 3,
-    emoji: '🏰',
-    color: '#10b981',
-    position: [-4, 0, -3],
-    description: 'Create apps and games with AI',
-  },
-  {
-    id: 'academy',
-    name: 'Agent Academy',
-    level: 4,
-    emoji: '🤖',
-    color: '#8b5cf6',
-    position: [4, 0, -3],
-    description: 'Design your own AI agents',
-  },
-];
+export { ZONE_CONFIGS };
+export type { ZoneConfig };
 
 interface ZoneIslandProps {
   /** Zone configuration */
