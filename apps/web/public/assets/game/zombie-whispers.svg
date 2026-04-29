@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="384" viewBox="0 0 256 384">
+  <defs>
+    <linearGradient id="z-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a5568"/>
+      <stop offset="100%" stop-color="#1a202c"/>
+    </linearGradient>
+    <filter id="z-glow">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#a78bfa" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <!-- Body -->
+  <rect x="88" y="140" width="80" height="120" rx="8" fill="url(#z-body)" filter="url(#z-glow)"/>
+  <!-- Head -->
+  <circle cx="128" cy="110" r="40" fill="#4a5568" stroke="#a78bfa" stroke-width="1.5"/>
+  <!-- Eyes -->
+  <circle cx="112" cy="105" r="6" fill="#a78bfa"/>
+  <circle cx="144" cy="105" r="6" fill="#a78bfa"/>
+  <circle cx="112" cy="105" r="3" fill="#4c1d95"/>
+  <circle cx="144" cy="105" r="3" fill="#4c1d95"/>
+  <!-- Mouth -->
+  <path d="M110,125 Q128,135 146,125" fill="none" stroke="#a78bfa" stroke-width="2"/>
+  <!-- Arms -->
+  <rect x="56" y="155" width="32" height="14" rx="7" fill="#4a5568" transform="rotate(-15 72 162)"/>
+  <rect x="168" y="155" width="32" height="14" rx="7" fill="#4a5568" transform="rotate(15 184 162)"/>
+  <!-- Legs -->
+  <rect x="96" y="260" width="24" height="60" rx="6" fill="#4a5568"/>
+  <rect x="136" y="260" width="24" height="60" rx="6" fill="#4a5568"/>
+  <!-- Data corruption effect -->
+  <rect x="100" y="170" width="56" height="3" fill="#a78bfa" opacity="0.3"/>
+  <rect x="95" y="200" width="66" height="2" fill="#a78bfa" opacity="0.2"/>
+  <rect x="105" y="230" width="46" height="2" fill="#a78bfa" opacity="0.25"/>
+</svg>
