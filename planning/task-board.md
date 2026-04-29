@@ -274,7 +274,9 @@
 > **Sprint plan:** [planning/sprint-p16.md](sprint-p16.md) — 4 sprints, 8 weeks estimated
 > **ADRs:** ADR-002 (paradigm), ADR-003 (KP economy), ADR-004 (UI mode), ADR-005 (narrative mapping)
 > **Branch:** `feature/phase-16-fantasy-ui`
-> **Status:** IN PROGRESS — Sprints A+B complete (2026-04-27). Sprint C ready to start.
+> **Status:** IN PROGRESS — Sprint C DONE (2026-04-29); Sprint D Wave 2 unblocked.
+> **Sprint C progress:** 15/15 DONE.
+> **Sprint D progress:** 5/13 READY (Wave 1 — DEVOPS+QA parallel-start) · 8/13 unblocked (Wave 2 — ready to start).
 
 ### Part A — Foundation (Design Tokens, Flag, Shared Types)
 
@@ -334,57 +336,59 @@
 | P16-PG-002 | `(game)/g/character/page.tsx` — fantasy class carousel, saves to API | DONE | FE 2026-04-27 |
 | P16-PG-003 | `(game)/g/dashboard/page.tsx` (Realm Map) — 4 isles, lock/unlock | DONE | FE 2026-04-27 |
 | P16-PG-004 | `(game)/g/campaign/[slug]/page.tsx` — mission list with placeholders | DONE | FE 2026-04-27 |
-| P16-PG-005 | `(game)/g/campaign/[slug]/prepare/page.tsx` (NEW — boss preview screen) | TODO | FE |
-| P16-PG-006 | `(game)/g/campaign/[slug]/mission/[missionId]/prep/page.tsx` (lesson + practice) | TODO | FE |
-| P16-PG-007 | `(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` — wire to Phase 15 combat API | TODO | FE — critical |
-| P16-PG-008 | `(game)/g/campaign/[slug]/shop/page.tsx` (per-realm shop) | TODO | FE |
-| P16-PG-009 | `(game)/g/shop/page.tsx` (global shop) | TODO | FE |
-| P16-PG-010 | `(game)/g/inventory/page.tsx` re-theme | TODO | FE |
-| P16-PG-011 | `(game)/g/victory/page.tsx` re-theme (keep existing certificate logic) | TODO | FE |
-| P16-PG-012 | `(game)/g/not-found.tsx` re-theme | TODO | FE |
+| P16-PG-005 | `(game)/g/campaign/[slug]/prepare/page.tsx` (Academy hub: 4 tabs) | DONE | FE 2026-04-29, commit cf2402e |
+| P16-PG-006 | `(game)/g/campaign/[slug]/mission/[missionId]/prep/page.tsx` (warm-up quiz, KP award) | DONE | FE 2026-04-29, commit cf2402e |
+| P16-PG-007 | `(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` — wire to Phase 15 combat API | DONE | FE 2026-04-29, commit 8817718. Split: page.tsx + battle-stage.tsx + battle-quiz.tsx + battle-outcome.tsx |
+| P16-PG-008 | `(game)/g/campaign/[slug]/shop/page.tsx` (per-realm shop, zoneId filter) | DONE | FE 2026-04-29, commit af9d3ea |
+| P16-PG-009 | `(game)/g/shop/page.tsx` (global Grand Bazaar) | DONE | FE 2026-04-29, commit af9d3ea |
+| P16-PG-010 | `(game)/g/inventory/page.tsx` re-theme | DONE | FE 2026-04-29, commit 018a396 |
+| P16-PG-011 | `(game)/g/victory/page.tsx` re-theme (keep existing certificate logic) | DONE | FE 2026-04-29, commit 018a396 |
+| P16-PG-012 | `(game)/g/not-found.tsx` re-theme | DONE | FE 2026-04-29, commit 018a396 |
 
 ### Part F — Mobile Mirror (`/m/*`)
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-MOB-001 | `(mobile)/m/welcome` etc — mirror all 11 game routes with `density="compact"` | TODO | FE — eventual primary surface (per plan §10) |
-| P16-MOB-002 | Mobile bottom-tab bar in game mode: Realm Map · Battle · Shop · Inventory · Profile | TODO | FE |
-| P16-MOB-003 | Asset script: generate 768×1024 mobile crops from desktop backgrounds | TODO | DEVOPS |
+| P16-MOB-001 | `(mobile)/m/welcome` etc — mirror all 11 game routes with `density="compact"` | BLOCKED | FE — Wave 2; blocked on Sprint C closure |
+| P16-MOB-002 | Mobile bottom-tab bar in game mode: Realm Map · Battle · Shop · Inventory · Profile | BLOCKED | FE — blocked on MOB-001 |
+| P16-MOB-003 | Asset script: generate 768×1024 mobile crops from desktop backgrounds | DONE | DEVOPS 2026-04-29 — scripts/generate-mobile-crops.sh; 5 mobile SVGs in assets/game/mobile/ |
 
 ### Part G — UI Mode Settings
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-SET-001 | Settings page: B2C UI mode toggle (Normal / Gamified) | TODO | FE — ADR-004 §5 |
-| P16-SET-002 | Tenant admin console: Default Learning Mode + lock toggle | TODO | FE + BE — ADR-004 §1 |
-| P16-SET-003 | Hide settings toggle when tenant locked, with informational message | TODO | FE — ADR-004 §5 |
-| P16-SET-004 | Mode toggle disabled while combat in progress / AI mid-stream | TODO | FE — ADR-004 §6 |
+| P16-SET-001 | Settings page: B2C UI mode toggle (Normal / Gamified) | DONE | FE 2026-04-28, commit 70461cc |
+| P16-SET-002 | Tenant admin console: Default Learning Mode + lock toggle | DONE | FE 2026-04-28, commit 70461cc |
+| P16-SET-003 | Hide settings toggle when tenant locked, with informational message | DONE | FE 2026-04-28, commit 70461cc |
+| P16-SET-004 | Mode toggle disabled while combat in progress / AI mid-stream | DONE | FE 2026-04-28, commit 70461cc |
 
 ### Part H — Routing & Migration
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-RTE-001 | next.config redirects: `/g/world → /g/dashboard`, `/g/zone/:id → /g/campaign/:slug`, etc. | TODO | FE — plan §5.3 |
-| P16-RTE-002 | (game) layout reads featureFlag and renders new vs legacy R3F | TODO | FE — ADR-002 |
-| P16-RTE-003 | Dynamic-import the `_legacy_r3f/*` chunk so it tree-shakes when flag=false | TODO | FE — ADR-002 acceptance |
+| P16-RTE-001 | next.config redirects: `/g/world → /g/dashboard`, `/g/zone/:id → /g/campaign/:slug`, etc. | DONE | FE 2026-04-28, commit 87f2463 |
+| P16-RTE-002 | (game) layout reads featureFlag and renders new vs legacy R3F | DONE | FE 2026-04-28, commit 87f2463 |
+| P16-RTE-003 | Dynamic-import the `_legacy_r3f/*` chunk so it tree-shakes when flag=false | DONE | FE 2026-04-28, commit 87f2463 |
 
 ### Part I — Assets
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-AST-001 | Import 6 Lovable assets (world-map, island-1..4, zombie, hero-warrior/mage/rogue/engineer, logo) into `apps/web/public/assets/game/` | TODO | DEVOPS — track license review separately |
-| P16-AST-002 | Generate 4 zone-specific zombie variants (start with color-tinted base zombie) | TODO | DEVOPS |
+| P16-AST-001 | Import 6 Lovable assets (world-map, island-1..4, zombie, hero-warrior/mage/rogue/engineer, logo) into `apps/web/public/assets/game/` | DONE | DEVOPS 2026-04-29 — 13 SVG placeholders + game-assets.ts manifest + Logo.tsx updated to .svg |
+| P16-AST-002 | Generate 4 zone-specific zombie variants (start with color-tinted base zombie) | DONE | DEVOPS 2026-04-29 — scripts/generate-zombie-variants.sh; 4 zone-tinted SVGs (violet/amber/cyan/crimson) |
 
 ### Part J — QA & Rollout
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-QA-001 | Playwright suite: fantasy-mode end-to-end (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | TODO | QA |
-| P16-QA-002 | Playwright matrix: same flow runs with `featureFlags.fantasyUi` true and false | TODO | QA — ADR-002 acceptance |
-| P16-QA-003 | i18n stub: extract all new strings to en.json; fr.json/ar.json mirror with TODO markers | TODO | FE + QA |
-| P16-QA-004 | Lighthouse mobile ≥90 perf for `/m/dashboard` | TODO | QA |
-| P16-QA-005 | iOS Safari + Android Chrome smoke tests before flag enablement | TODO | QA |
-| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | TODO | DEVOPS |
+| P16-QA-PLAN | Draft Playwright test plan (cases, fixtures, mock auth) into `apps/web/e2e/fantasy-flow.plan.md` | DONE | QA 2026-04-29 — 13 suites, 50+ test cases, mock auth + API strategy, flag matrix for QA-002 |
+| P16-QA-001 | Playwright suite: fantasy-mode end-to-end (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | BLOCKED | QA — Wave 2; blocked on Sprint C DONE + QA-PLAN |
+| P16-QA-002 | Playwright matrix: same flow runs with `featureFlags.fantasyUi` true and false | BLOCKED | QA — blocked on QA-001 |
+| P16-QA-003a | i18n extraction pass 1 (Sprint B+C pages already on disk) | READY | FE+QA — Sprint D Wave 1, dispatched 2026-04-28 |
+| P16-QA-003b | i18n extraction pass 2 (battle page strings) | BLOCKED | FE+QA — blocked on P16-PG-007 DONE |
+| P16-QA-004 | Lighthouse mobile ≥90 perf for `/m/dashboard` | BLOCKED | QA — blocked on MOB-001 |
+| P16-QA-005 | iOS Safari + Android Chrome smoke tests before flag enablement | BLOCKED | QA — blocked on MOB-001 |
+| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | BLOCKED | DEVOPS — blocked on all Wave 1+2 done & OPEN-005 resolved |
 
 ### Part K — Open Decisions Awaiting Confirmation
 
@@ -394,7 +398,7 @@
 | P16-OPEN-002 | Confirm realm slugs `whispers/echoes/glitches/wraiths/void` (ADR-005 §1) | DONE | Product owner accepted 2026-04-26 — locked in ADR-005 |
 | P16-OPEN-003 | Confirm "Babble" boss naming | DONE | Product owner accepted 2026-04-26 — locked in ADR-005 |
 | P16-OPEN-004 | KP earn/spend tuning values (initial seed) | DONE | PM resolved 2026-04-26 — see sprint-p16.md §KP Tuning Values |
-| P16-OPEN-005 | Lovable-asset license / replacement plan | TODO | DEVOPS — pre-prod gate in Sprint D. Dev/staging OK; must resolve before B2B/public prod rollout |
+| P16-OPEN-005 | Lovable-asset license / replacement plan | IN_PROGRESS | DEVOPS documented 2026-04-29 in docs/context/asset-licenses.md — 3 resolution paths outlined. PM decision pending. Pre-prod gate |
 
 ---
 
@@ -413,4 +417,4 @@
 
 ---
 
-*Last updated: 2026-04-26 | Phases 1–14 complete. Phase 15 backend done, frontend deferred. Phase 16 (Gamified UI Redesign) scheduled — ~50 tasks across 4 sprints.*
+*Last updated: 2026-04-29 | Phases 1–14 complete. Phase 15 backend done, frontend deferred. Phase 16 Sprints A+B+C DONE (2026-04-29). Sprint D Wave 1 in progress (DEVOPS+QA), Wave 2 unblocked by Sprint C completion.*

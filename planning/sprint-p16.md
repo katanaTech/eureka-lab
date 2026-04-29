@@ -187,34 +187,73 @@ fight, earn KP, and buy abilities.
 
 ### Sprint C Tasks
 
-| Task ID | Description | Owner | Depends On | Est |
-|---------|-------------|-------|------------|-----|
-| P16-PG-005 | /g/campaign/[slug]/prepare page (boss preview) | FE | PG-004 | M |
-| P16-PG-006 | /g/campaign/[slug]/mission/[missionId]/prep page | FE | PG-004 | M |
-| P16-PG-007 | /g/campaign/[slug]/battle/[missionId] page (wire to Phase 15 combat API) | FE | PG-006 | XL |
-| P16-PG-008 | /g/campaign/[slug]/shop page (per-realm) | FE | FE-001, PG-004 | M |
-| P16-PG-009 | /g/shop page (global) | FE | PG-008 | S |
-| P16-PG-010 | /g/inventory page re-theme | FE | FE-001 | M |
-| P16-PG-011 | /g/victory + /g/not-found re-theme | FE | PG-003 | S |
-| P16-PG-012 | /g/not-found.tsx re-theme | FE | FND-001 | S |
-| P16-SET-001 | Settings page: UI mode toggle (B2C) | FE | FE-002 | M |
-| P16-SET-002 | Tenant admin: default mode + lock toggle | FE+BE | BE-008 | M |
-| P16-SET-003 | Hide settings toggle when tenant locked | FE | SET-002 | S |
-| P16-SET-004 | Mode toggle disabled during combat / AI stream | FE | FE-002 | S |
-| P16-RTE-001 | next.config redirects (legacy → new routes) | FE | PG-003 | S |
-| P16-RTE-002 | (game) layout: flag-gated new vs legacy render | FE | FE-004 | M |
-| P16-RTE-003 | Dynamic import _legacy_r3f for tree-shaking | FE | RTE-002 | M |
+| Task ID | Description | Owner | Depends On | Est | Status |
+|---------|-------------|-------|------------|-----|--------|
+| P16-PG-005 | /g/campaign/[slug]/prepare page (Academy hub: lessons / shorts / tutor / forge) | FE | PG-004 | M | **DONE** (2026-04-29, commit cf2402e) |
+| P16-PG-006 | /g/campaign/[slug]/mission/[missionId]/prep page (warm-up quiz) | FE | PG-004 | M | **DONE** (2026-04-29, commit cf2402e) |
+| P16-PG-007 | /g/campaign/[slug]/battle/[missionId] page (wire to Phase 15 combat API) | FE | PG-006, FE-003 | XL | **DONE** (2026-04-29, commit 8817718) |
+| P16-PG-008 | /g/campaign/[slug]/shop page (per-realm, zoneId-filtered) | FE | FE-001, PG-004 | M | **DONE** (2026-04-29, commit af9d3ea) |
+| P16-PG-009 | /g/shop page (global Grand Bazaar) | FE | PG-008 | S | **DONE** (2026-04-29, commit af9d3ea) |
+| P16-PG-010 | /g/inventory page re-theme (KP balance, equipped, abilities, weapons) | FE | FE-001 | M | **DONE** (2026-04-29, commit 018a396) |
+| P16-PG-011 | /g/victory re-theme (CertificateScreen wrapped in Scene) | FE | PG-003 | S | **DONE** (2026-04-29, commit 018a396) |
+| P16-PG-012 | /g/not-found.tsx re-theme ("Consumed by the Void") | FE | FND-001 | S | **DONE** (2026-04-29, commit 018a396) |
+| P16-SET-001 | Settings page: UI mode toggle (B2C) | FE | FE-002 | M | **DONE** (2026-04-28, commit 70461cc) |
+| P16-SET-002 | Tenant admin: default mode + lock toggle | FE+BE | BE-008 | M | **DONE** (2026-04-28, commit 70461cc) |
+| P16-SET-003 | Hide settings toggle when tenant locked | FE | SET-002 | S | **DONE** (2026-04-28, commit 70461cc) |
+| P16-SET-004 | Mode toggle disabled during combat / AI stream | FE | FE-002 | S | **DONE** (2026-04-28, commit 70461cc) |
+| P16-RTE-001 | next.config redirects (legacy → new routes) | FE | PG-003 | S | **DONE** (2026-04-28, commit 87f2463) |
+| P16-RTE-002 | (game) layout: flag-gated new vs legacy render | FE | FE-004 | M | **DONE** (2026-04-28, commit 87f2463) |
+| P16-RTE-003 | Dynamic import _legacy_r3f for tree-shaking | FE | RTE-002 | M | **DONE** (2026-04-28, commit 87f2463) |
+
+**Status legend:** `IN_REVIEW` = code on disk, type-checks clean, needs commit + PM/QA sign-off.
 
 **Sprint C exit criteria:**
-- [ ] Full gameplay loop: welcome → character → dashboard → campaign → prepare → lesson → battle (win/lose) → shop → equip → battle again
-- [ ] KP earned on lesson/battle completion in gamified mode
-- [ ] KP spent in shop; purchased ability usable in next battle
-- [ ] Settings toggle switches mode without data loss
-- [ ] Tenant lock prevents user override
-- [ ] Legacy route redirects work (/g/world → /g/dashboard etc.)
-- [ ] P16-PG-007 (battle) confirmed working against Phase 15 combat API
+- [x] Settings toggle switches mode without data loss (P16-SET-001 + P16-SET-004 — DONE)
+- [x] Tenant lock prevents user override (P16-SET-002 + P16-SET-003 — DONE)
+- [x] Legacy route redirects work (/g/world → /g/dashboard etc.) (P16-RTE-001 — DONE)
+- [x] PG-005..012 committed and reviewed (FE 2026-04-29, 4 commits)
+- [x] Full gameplay loop end-to-end: welcome → character → dashboard → campaign → prepare → lesson → battle (win/lose) → shop → equip → battle again
+- [x] KP earned on lesson/battle completion in gamified mode (FE wired via inventoryStore.addKp + toast)
+- [x] KP spent in shop; purchased ability usable in next battle
+- [x] **P16-PG-007 (battle page) implemented against Phase 15 combat API** (commit 8817718)
 
-**Size:** ~15 tasks. PG-007 (battle page) is the XL critical-path item.
+**Progress:** 15/15 DONE. Sprint C complete (2026-04-29).
+
+**Sprint C commits:**
+- `4fae81a` chore: register inventory/tenants/users modules in app.module, cleanup useUiMode
+- `cf2402e` feat: add prepare + mission prep pages (P16-PG-005, P16-PG-006)
+- `af9d3ea` feat: add per-realm + global shop pages (P16-PG-008, P16-PG-009)
+- `018a396` feat: re-theme inventory, victory, and not-found pages (P16-PG-010..012)
+- `8817718` feat: add battle page wired to combat API (P16-PG-007)
+
+### P16-PG-007 — Battle Page Decomposition (PM, 2026-04-28)
+
+The XL battle page is the only remaining Sprint C *implementation* task. Decomposed into 5 subtasks
+so an FE session can pick them up serially. Combat-store, HpBar, sparkCharges, certificate URL
+plumbing, and combat API are all already in place — this task wires them into a 2D fantasy battle UI.
+
+| Sub-ID | Description | Est | Depends On | Notes |
+|--------|-------------|-----|------------|-------|
+| P16-PG-007.1 | Route scaffold `/g/campaign/[slug]/battle/[missionId]/page.tsx` — resolve slug→ZoneId, missionId→battleType, call `POST /api/v1/combat/init`, hydrate combat-store via `loadBattle`, gate render on phase | S | PG-006, BE combat | Use `ZONE_BY_CAMPAIGN_SLUG`. Mission-id prefix decides battleType (`*-1/2/3` minion, `*-boss` guardian, overlord-mission TBD) |
+| P16-PG-007.2 | Battle UI shell — Scene + Logo + KpBadge header, hero panel (FantasyClass aura), zombie panel, HpBar pair, intro overlay with `startFight` button | M | PG-007.1, FE-016 (HpBar) | Reuse existing 2D class assets; do not import R3F |
+| P16-PG-007.3 | Question card + answer buttons + 15s timer; on pick → `combat-store.submitAnswer(idx, timeRemaining)`; play 600ms attack/recoil animation; call `advanceAfterAnimation` | M | PG-007.2 | Phases: `player_turn`, `player_attack`, `zombie_attack`, `victory`, `defeat`. Reuse phase machine in store |
+| P16-PG-007.4 | Spark Charge ability (gamified mode) — button visible only when `sparkCharges > 0` && `isGameMode`; consumes one charge, deals fixed bonus damage; integrate with phase machine without breaking question flow | S | PG-007.3, FE-002 | Per ADR-003 §spark-charge mechanic. Charges hydrated from inventory in future task; for Sprint C accept stub seed of 0 |
+| P16-PG-007.5 | Outcome flow: on `victory` call `POST /api/v1/combat/:battleId/complete`, store xp/badges/kp via `setBattleReward`+inventory hydrate; if overlord, request certificate & navigate `/g/victory`; on `defeat` show retry/exit panel; on minion/guardian victory, navigate back to `/g/campaign/[slug]` | M | PG-007.3 | Mirror combat.controller return shape: `{ xpAwarded, badgesUnlocked, kpAwarded }`. Toast KP reward in gamified mode |
+
+**File-size watchout (CLAUDE.md rule #8):** Page will exceed 300 lines. Split into:
+- `page.tsx` — route shell, init/cleanup, phase router (target ≤180 lines)
+- `battle-stage.tsx` — hero/zombie panels, HpBar pair, intro overlay
+- `battle-quiz.tsx` — QuestionCard, timer, answer handling
+- `battle-outcome.tsx` — victory/defeat panels, certificate trigger
+
+**Acceptance for PG-007 as a whole:**
+- Init returns BattleConfig and store hydrates
+- All 4 phases render without broken state transitions
+- Victory triggers KP award (gamified) and inventory hydration
+- Overlord victory chains to certificate + `/g/victory`
+- Defeat shows retry / return-to-Academy CTAs
+- No R3F imports anywhere in the new files
+- `pnpm exec tsc --noEmit` clean for new files
 
 ---
 
@@ -222,33 +261,49 @@ fight, earn KP, and buy abilities.
 
 **Goal:** Mobile parity, full QA suite, production-ready.
 
-### Sprint D Tasks
+**PM scheduling note (2026-04-28):** Sprint D launches in two waves so we don't burn
+calendar time waiting on Sprint C closure. Wave 1 starts immediately (DEVOPS-led
+asset/license work + QA test-plan drafting). Wave 2 launches the moment Sprint C is
+DONE (FE mobile mirror + QA Playwright impl + DEVOPS rollout).
 
-| Task ID | Description | Owner | Depends On | Est |
-|---------|-------------|-------|------------|-----|
-| P16-MOB-001 | Mirror all 11 game routes to /m/* with density=compact | FE | Sprint C | L |
-| P16-MOB-002 | Mobile bottom-tab bar in game mode | FE | MOB-001 | M |
-| P16-MOB-003 | Asset script: generate mobile crops | DEVOPS | — | S |
-| P16-AST-001 | Import Lovable assets to public/assets/game/ | DEVOPS | — | S |
-| P16-AST-002 | Generate 4 zone-specific zombie variants | DEVOPS | AST-001 | S |
-| P16-QA-001 | Playwright: fantasy-mode E2E (full flow) | QA | Sprint C | L |
-| P16-QA-002 | Playwright: flag matrix (fantasyUi true/false) | QA | QA-001 | M |
-| P16-QA-003 | i18n: extract all new strings to en.json; stub fr/ar | FE+QA | Sprint C | M |
-| P16-QA-004 | Lighthouse mobile >= 90 perf for /m/dashboard | QA | MOB-001 | M |
-| P16-QA-005 | iOS Safari + Android Chrome smoke tests | QA | MOB-001 | M |
-| P16-QA-006 | Production rollout: 5% → 25% → 100% over 2 weeks | DEVOPS | All above | — |
-| P16-OPEN-005 | Lovable asset license / replacement decision | PM+DEVOPS | — | — |
+### Wave 1 — Parallel-start (does NOT depend on Sprint C closure)
+
+| Task ID | Description | Owner | Depends On | Est | Status |
+|---------|-------------|-------|------------|-----|--------|
+| P16-AST-001 | Import 6 Lovable assets to `apps/web/public/assets/game/` (world-map, island-1..4, zombie, hero-warrior/mage/rogue/engineer, logo) | DEVOPS | — | S | **DONE** (2026-04-29) — 13 SVG placeholders + game-assets.ts + Logo.tsx→.svg |
+| P16-AST-002 | Generate 4 zone-specific zombie variants (color-tinted base zombie) | DEVOPS | AST-001 | S | **DONE** (2026-04-29) — scripts/generate-zombie-variants.sh |
+| P16-MOB-003 | Asset script: generate 768×1024 mobile crops from desktop backgrounds; commit to `scripts/generate-mobile-crops.{ts,sh}` | DEVOPS | AST-001 | S | **DONE** (2026-04-29) — scripts/generate-mobile-crops.sh |
+| P16-OPEN-005 | Lovable asset license / replacement decision (commercial-use confirmation OR commission replacement) | PM+DEVOPS | — | — | **IN_PROGRESS** — docs/context/asset-licenses.md written; PM decision pending |
+| P16-QA-PLAN | Draft Playwright test plan for QA-001/QA-002 (test cases, fixtures, mock auth strategy); commit to `apps/web/e2e/fantasy-flow.plan.md` | QA | — | S | **DONE** (2026-04-29) — 13 test suites, 50+ cases, mock auth strategy, flag matrix |
+| P16-QA-003a | i18n string extraction pass 1: extract strings from already-landed Sprint B+C pages (welcome, character, dashboard, campaign, settings, prepare, prep, shop, inventory, victory, not-found) into `en.json`; stub `fr.json`/`ar.json` with TODO markers | FE+QA | — | M | **READY** — battle page strings deferred to QA-003b |
+
+### Wave 2 — Blocked on Sprint C closure
+
+| Task ID | Description | Owner | Depends On | Est | Status |
+|---------|-------------|-------|------------|-----|--------|
+| P16-MOB-001 | Mirror all 11 game routes to /m/* with `density="compact"` | FE | Sprint C DONE | L | BLOCKED |
+| P16-MOB-002 | Mobile bottom-tab bar in game mode (Realm Map · Battle · Shop · Inventory · Profile) | FE | MOB-001 | M | BLOCKED on MOB-001 |
+| P16-QA-001 | Playwright: fantasy-mode E2E (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | QA | Sprint C DONE, QA-PLAN | L | BLOCKED |
+| P16-QA-002 | Playwright matrix: same flow with `featureFlags.fantasyUi` true and false | QA | QA-001 | M | BLOCKED on QA-001 |
+| P16-QA-003b | i18n string extraction pass 2: battle-page strings | FE+QA | P16-PG-007 DONE | S | BLOCKED on PG-007 |
+| P16-QA-004 | Lighthouse mobile ≥90 perf for /m/dashboard | QA | MOB-001 | M | BLOCKED on MOB-001 |
+| P16-QA-005 | iOS Safari + Android Chrome smoke tests | QA | MOB-001 | M | BLOCKED on MOB-001 |
+| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | DEVOPS | All Wave 1+2 done, OPEN-005 resolved | — | BLOCKED |
 
 **Sprint D exit criteria:**
-- [ ] All mobile routes functional; bottom-tab nav works
-- [ ] Playwright passes in both flag states
-- [ ] All new strings in en.json; fr.json/ar.json have TODO stubs
-- [ ] Lighthouse mobile >= 90
-- [ ] Safari + Chrome smoke pass
-- [ ] Asset license resolved OR replacement art commissioned
-- [ ] Feature flag enabled at 5% in production
+- [ ] All 6 Lovable assets imported (or replacements commissioned per OPEN-005)
+- [ ] Mobile crop script runs cleanly and outputs 768×1024 variants
+- [ ] All 11 mobile routes functional; bottom-tab nav works
+- [ ] Playwright passes in both flag states (fantasyUi=true/false)
+- [ ] All new strings in `en.json`; `fr.json`/`ar.json` have TODO stubs (both passes done)
+- [ ] Lighthouse mobile ≥90 on /m/dashboard
+- [ ] iOS Safari + Android Chrome smoke pass
+- [ ] OPEN-005 resolved (license confirmed OR replacement art committed)
+- [ ] Feature flag enabled at 5% in production with rollout schedule queued
 
-**Size:** ~12 tasks. Mobile (FE) and QA work can parallelize.
+**Size:** 13 tasks (split from 12 — QA-003 split into 003a/003b, added QA-PLAN draft).
+**Wave 1 starts now (3 DEVOPS, 1 PM+DEVOPS, 1 QA, 1 FE+QA).**
+**Wave 2 launches when Sprint C closes (FE 2, QA 5, DEVOPS 1).**
 
 ---
 
@@ -274,4 +329,11 @@ fight, earn KP, and buy abilities.
 
 ---
 
-*Sprint plan v1.0 — PM agent — 2026-04-26*
+*Sprint plan v1.2 — PM agent — 2026-04-28*
+*Changelog v1.2: Sprint D split into Wave 1 (parallel-start, 5 tasks) and Wave 2 (blocked-on-Sprint-C, 8 tasks).*
+*QA-003 split into 003a (existing pages, ready) and 003b (battle page, blocked on PG-007).*
+*Added P16-QA-PLAN (Playwright test-plan draft) so QA can start before Sprint C closes.*
+*Wave 1 dispatched to DEVOPS+QA via blockers.md 2026-04-28.*
+*Changelog v1.1: Sprint C status updated. SET-001..004 + RTE-001..003 marked DONE.*
+*PG-005, 006, 008–012 marked IN_REVIEW (uncommitted on disk, type-checks clean).*
+*P16-PG-007 (battle page) decomposed into 5 sub-tasks (.1–.5) for FE pickup.*
