@@ -12,8 +12,6 @@ interface LogoProps {
 
 /**
  * Eureka Lab brand logo with animated glow effect.
- * Logo asset will be added in Sprint D at /assets/game/logo.png.
- *
  * @param props.className - Optional extra CSS classes
  * @param props.withText - Show brand text alongside the emblem (default: true)
  * @returns A flex row containing the logo image and optional brand text
@@ -22,7 +20,7 @@ export function Logo({ className, withText = true }: LogoProps) {
   return (
     <div className={cn('flex items-center gap-3', className)}>
       <Image
-        src="/assets/game/logo.png"
+        src="/assets/game/logo.svg"
         alt="Eureka Lab emblem"
         width={48}
         height={48}
