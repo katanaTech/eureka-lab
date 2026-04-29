@@ -33,16 +33,6 @@ export function useUiMode(): UseUiModeResult {
     document.documentElement.dataset.uiMode = uiMode;
   }, [uiMode]);
 
-  /**
-   * Placeholder setter kept for forward-compatibility.
-   * Will be replaced by the server-driven resolver but lets callers
-   * override locally during development.
-   *
-   * @param mode - The UI mode to activate
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _setUiMode = (mode: UiMode) => setUiMode(mode);
-
   return {
     uiMode,
     isGameMode: uiMode === 'gamified',

@@ -24,7 +24,7 @@
 | 13 | Mobile PWA (dedicated /m/ routes + hooks) | DONE |
 | 14 | 3D Game Shell (routes, store, GPU detection) | DONE |
 | 15 | AI Zombie Combat (backend done; R3F frontend deferred → Phase 16) | BACKEND DONE |
-| 16 | Gamified UI Redesign — Cinematic Fantasy | SCHEDULED |
+| 16 | Gamified UI Redesign — Cinematic Fantasy | IN PROGRESS (Sprint A) |
 
 ---
 

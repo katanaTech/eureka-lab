@@ -1144,5 +1144,5 @@ components:
 
 ---
 
-*Version: 1.1 (ARCH-001 complete; ARCH-002 proposed) | Maintained by: ARCH agent*
+*Version: 1.2 (ARCH-001 complete; ARCH-002 implemented — Sprint A BE done 2026-04-27) | Maintained by: ARCH agent*
 *Changes require ARCH approval and must notify FE + BE agents via planning/blockers.md*
