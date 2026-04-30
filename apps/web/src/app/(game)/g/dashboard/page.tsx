@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   REALM_NAME_BY_ZONE,
   CAMPAIGN_SLUG_BY_ZONE,
@@ -48,6 +49,7 @@ const UNLOCK_REQUIRES: Partial<Record<ZoneId, ZoneId>> = {
  */
 export default function DashboardPage() {
   const router = useRouter();
+  const t = useTranslations('Phase16Dashboard');
   const defeatedGuardianZones = useGameStore((s) => s.defeatedGuardianZones);
   const careerArchetype = useGameStore((s) => s.careerArchetype);
   const characterCustomization = useGameStore((s) => s.characterCustomization);
@@ -61,7 +63,7 @@ export default function DashboardPage() {
     : 'warrior';
 
   const auraHsl = FANTASY_CLASS_DEFAULT_AURA_HSL[fantasyClass];
-  const heroName = characterCustomization.name || user?.displayName || 'Hero';
+  const heroName = characterCustomization.name || user?.displayName || t('defaultHeroName');
 
   /**
    * Whether a given zone is currently unlocked to play.
@@ -114,7 +116,7 @@ export default function DashboardPage() {
                 {heroName}
               </p>
               <p className="mt-0.5 text-[10px] text-muted-foreground capitalize">
-                {fantasyClass} · Lv {user?.level ?? 1}
+                {t('heroLevel', { className: fantasyClass, level: user?.level ?? 1 })}
               </p>
             </div>
           </div>
@@ -122,9 +124,9 @@ export default function DashboardPage() {
             variant="ghost"
             size="sm"
             onClick={handleSignOut}
-            aria-label="Sign out"
+            aria-label={t('signOutAria')}
           >
-            Sign Out
+            {t('signOut')}
           </GameButton>
         </div>
       </header>
@@ -132,10 +134,10 @@ export default function DashboardPage() {
       {/* Hero strip */}
       <div className="mx-auto mt-10 max-w-5xl text-center">
         <h1 className="font-display text-4xl uppercase tracking-widest text-glow-primary">
-          Realm Map
+          {t('heading')}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground tracking-wider">
-          The Four Isles of AI — choose your next conquest
+          {t('subheading')}
         </p>
       </div>
 
@@ -152,10 +154,14 @@ export default function DashboardPage() {
               key={zone.id}
               icon={zone.icon}
               realmName={realmName}
-              bossName={bossName}
-              missionCount={zone.missionCount}
+              bossLabel={t('bossLabel', { bossName })}
+              missionCountLine={t('missionCountLine', { count: zone.missionCount })}
               slug={slug}
               unlocked={unlocked}
+              lockedAria={t('lockedAria')}
+              enterIsleLabel={t('enterIsle')}
+              prepareLabel={t('prepare')}
+              lockedHint={t('lockedHint')}
             />
           );
         })}
@@ -163,7 +169,7 @@ export default function DashboardPage() {
 
       {/* Footer note */}
       <p className="mx-auto mt-10 max-w-5xl text-center text-xs text-muted-foreground/50">
-        Defeat each isle&apos;s guardian to unlock the next realm
+        {t('footerNote')}
       </p>
     </Scene>
   );
@@ -174,10 +180,14 @@ export default function DashboardPage() {
 interface ZoneCardProps {
   icon: string;
   realmName: string;
-  bossName: string;
-  missionCount: number;
+  bossLabel: string;
+  missionCountLine: string;
   slug: string;
   unlocked: boolean;
+  lockedAria: string;
+  enterIsleLabel: string;
+  prepareLabel: string;
+  lockedHint: string;
 }
 
 /**
@@ -185,19 +195,27 @@ interface ZoneCardProps {
  *
  * @param props.icon - Emoji icon for the zone
  * @param props.realmName - Display name for the realm
- * @param props.bossName - Name of the realm boss
- * @param props.missionCount - Number of missions in the zone
+ * @param props.bossLabel - Pre-translated "Boss: {name}" line
+ * @param props.missionCountLine - Pre-translated mission count line
  * @param props.slug - URL slug for the campaign route
  * @param props.unlocked - Whether this zone is accessible
+ * @param props.lockedAria - aria-label for the lock icon
+ * @param props.enterIsleLabel - CTA label for entering the isle
+ * @param props.prepareLabel - CTA label for the prepare action
+ * @param props.lockedHint - Hint text shown when the zone is locked
  * @returns A styled campaign card
  */
 function ZoneCard({
   icon,
   realmName,
-  bossName,
-  missionCount,
+  bossLabel,
+  missionCountLine,
   slug,
   unlocked,
+  lockedAria,
+  enterIsleLabel,
+  prepareLabel,
+  lockedHint,
 }: ZoneCardProps) {
   return (
     <div
@@ -218,11 +236,11 @@ function ZoneCard({
             {realmName}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Boss: <span className="text-primary/80">{bossName}</span>
+            <span className="text-primary/80">{bossLabel}</span>
           </p>
         </div>
         {!unlocked && (
-          <span className="ml-auto text-xl" aria-label="Locked" role="img">
+          <span className="ml-auto text-xl" aria-label={lockedAria} role="img">
             🔒
           </span>
         )}
@@ -230,25 +248,25 @@ function ZoneCard({
 
       {/* Mission count */}
       <p className="mb-5 text-sm text-muted-foreground">
-        {missionCount} missions · Defeat the guardian to progress
+        {missionCountLine}
       </p>
 
       {unlocked ? (
         <div className="flex gap-3">
           <Link href={`/g/campaign/${slug}`} className="flex-1">
             <GameButton variant="primary" size="sm" className="w-full">
-              Enter Isle
+              {enterIsleLabel}
             </GameButton>
           </Link>
           <Link href={`/g/campaign/${slug}/prepare`}>
             <GameButton variant="ghost" size="sm">
-              Prepare
+              {prepareLabel}
             </GameButton>
           </Link>
         </div>
       ) : (
         <p className="text-xs text-muted-foreground/60 italic">
-          Defeat the previous isle&apos;s guardian to unlock this realm
+          {lockedHint}
         </p>
       )}
     </div>

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useCombatStore } from '@/stores/combat-store';
 import { CertificateScreen } from '@/components/game/CertificateScreen';
 import { Scene } from '@/components/game/fantasy';
@@ -16,6 +17,7 @@ import { Scene } from '@/components/game/fantasy';
  */
 export default function VictoryPage() {
   const router = useRouter();
+  const t = useTranslations('Phase16Victory');
   const { certificateUrl, xpAwarded, badgesUnlocked, resetCombat } = useCombatStore();
 
   // Guard: no certificate = user navigated here directly
@@ -37,7 +39,7 @@ export default function VictoryPage() {
         <div
           className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"
           role="status"
-          aria-label="Loading victory screen"
+          aria-label={t('loadingAria')}
         />
       </Scene>
     );

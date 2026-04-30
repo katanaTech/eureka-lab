@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import type { UiMode, TenantUiModeLock } from '@eureka-lab/shared-types';
 import { Scene, Logo, GameButton } from '@/components/game/fantasy';
 import { useAuthStore } from '@/stores/auth-store';
@@ -31,6 +32,7 @@ type LockFetchState = 'idle' | 'loading' | 'loaded' | 'error';
  */
 export default function SettingsPage() {
   const router = useRouter();
+  const t = useTranslations('Phase16Settings');
   const user = useAuthStore((s) => s.user);
   const combatPhase = useCombatStore((s) => s.phase);
   const { uiMode } = useUiMode();
@@ -126,17 +128,17 @@ export default function SettingsPage() {
             variant="ghost"
             size="sm"
             onClick={() => router.push('/g/dashboard')}
-            aria-label="Back to dashboard"
+            aria-label={t('backAria')}
           >
-            ← Back
+            {t('back')}
           </GameButton>
         </header>
 
         <h1 className="mb-2 font-display text-3xl uppercase tracking-widest text-glow-primary">
-          Settings
+          {t('heading')}
         </h1>
         <p className="mb-8 text-sm text-muted-foreground tracking-wider">
-          Customise your Eureka Lab experience
+          {t('subheading')}
         </p>
 
         {/* UI Mode card */}
@@ -148,10 +150,10 @@ export default function SettingsPage() {
             id="ui-mode-heading"
             className="mb-1 font-display text-base uppercase tracking-widest text-foreground"
           >
-            Interface Mode
+            {t('uiModeHeading')}
           </h2>
           <p className="mb-6 text-xs text-muted-foreground">
-            Choose how the platform looks and feels.
+            {t('uiModeDescription')}
           </p>
 
           {/* Mode descriptions */}
@@ -161,16 +163,20 @@ export default function SettingsPage() {
               active={effectiveMode === 'normal'}
               disabled={isToggleDisabled}
               onSelect={handleToggle}
-              title="Normal"
-              description="Clean, focused layout — ideal for studying without distractions."
+              title={t('modeNormalTitle')}
+              description={t('modeNormalDescription')}
+              activeLabel={t('modeActive')}
+              ariaLabel={t('modeSelectAria', { title: t('modeNormalTitle') })}
             />
             <ModeCard
               mode="gamified"
               active={effectiveMode === 'gamified'}
               disabled={isToggleDisabled}
               onSelect={handleToggle}
-              title="Gamified"
-              description="Fantasy adventure skin — earn KP, unlock gear, and battle AI zombies."
+              title={t('modeGamifiedTitle')}
+              description={t('modeGamifiedDescription')}
+              activeLabel={t('modeActive')}
+              ariaLabel={t('modeSelectAria', { title: t('modeGamifiedTitle') })}
             />
           </div>
 
@@ -180,7 +186,7 @@ export default function SettingsPage() {
               role="alert"
               className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-2 text-xs text-destructive"
             >
-              Cannot change UI mode during an active battle.
+              {t('combatBlock')}
             </p>
           )}
 
@@ -190,9 +196,9 @@ export default function SettingsPage() {
               role="status"
               className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-xs text-muted-foreground"
             >
-              Your organisation has locked the UI mode to{' '}
-              <strong className="capitalize text-foreground">{tenantLock.mode}</strong>.
-              Contact your administrator to change this.
+              {t('tenantLockNoticeBefore')}
+              <strong className="capitalize text-foreground">{tenantLock.mode}</strong>
+              {t('tenantLockNoticeAfter')}
             </p>
           )}
 
@@ -202,7 +208,7 @@ export default function SettingsPage() {
               role="status"
               className="rounded-lg border border-green-500/40 bg-green-500/10 px-4 py-2 text-xs text-green-400"
             >
-              Preference saved. Reload the page to apply the new mode.
+              {t('saveSuccess')}
             </p>
           )}
 
@@ -211,13 +217,13 @@ export default function SettingsPage() {
               role="alert"
               className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-2 text-xs text-destructive"
             >
-              Failed to save — please try again.
+              {t('saveError')}
             </p>
           )}
 
           {lockFetchState === 'loading' && (
             <p className="mt-2 text-xs text-muted-foreground/60 italic">
-              Checking organisation settings…
+              {t('lockLoading')}
             </p>
           )}
         </section>
@@ -229,9 +235,9 @@ export default function SettingsPage() {
               variant="ghost"
               size="sm"
               onClick={() => router.push('/g/settings/admin')}
-              aria-label="Open admin settings"
+              aria-label={t('adminShortcutAria')}
             >
-              Organisation settings →
+              {t('adminShortcut')}
             </GameButton>
           </div>
         )}
@@ -256,6 +262,10 @@ interface ModeCardProps {
   title: string;
   /** Short description of what this mode offers */
   description: string;
+  /** Pre-translated label for the active state badge */
+  activeLabel: string;
+  /** Pre-translated aria-label for the button */
+  ariaLabel: string;
 }
 
 /**
@@ -267,16 +277,27 @@ interface ModeCardProps {
  * @param props.onSelect - Handler called when the card is clicked
  * @param props.title - Display title
  * @param props.description - Short description text
+ * @param props.activeLabel - Pre-translated label rendered when this card is active
+ * @param props.ariaLabel - Pre-translated aria-label for the underlying button
  * @returns A styled button-like card for mode selection
  */
-function ModeCard({ mode, active, disabled, onSelect, title, description }: ModeCardProps) {
+function ModeCard({
+  mode,
+  active,
+  disabled,
+  onSelect,
+  title,
+  description,
+  activeLabel,
+  ariaLabel,
+}: ModeCardProps) {
   const icon = mode === 'gamified' ? '⚔️' : '📖';
 
   return (
     <button
       type="button"
       aria-pressed={active}
-      aria-label={`Select ${title} mode`}
+      aria-label={ariaLabel}
       disabled={disabled}
       onClick={() => onSelect(mode)}
       className={[
@@ -299,7 +320,7 @@ function ModeCard({ mode, active, disabled, onSelect, title, description }: Mode
       </span>
       {active && (
         <span className="mt-2 block text-[10px] font-display uppercase tracking-widest text-primary">
-          Active
+          {activeLabel}
         </span>
       )}
     </button>

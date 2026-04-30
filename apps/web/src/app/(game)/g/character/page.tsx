@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { FANTASY_CLASS_BY_CAREER, type FantasyClass } from '@eureka-lab/shared-types';
 import { useGameStore } from '@/stores/game-store';
@@ -20,6 +21,7 @@ import { FANTASY_CLASSES, AURA_PRESETS } from '@/components/game/fantasy/class-d
  */
 export default function CharacterPage() {
   const router = useRouter();
+  const t = useTranslations('Phase16Character');
   const { careerArchetype, setCareer } = useGameStore();
   const user = useAuthStore((s) => s.user);
 
@@ -65,7 +67,7 @@ export default function CharacterPage() {
    */
   async function handleConfirm() {
     if (!heroName.trim()) {
-      toast.error('Please enter your hero name before forging your destiny.');
+      toast.error(t('errorMissingName'));
       return;
     }
     setIsSaving(true);
@@ -88,7 +90,7 @@ export default function CharacterPage() {
         const msg =
           typeof json === 'object' && json !== null && 'message' in json
             ? String((json as Record<string, unknown>).message)
-            : 'Failed to save character. Please try again.';
+            : t('errorSaveFailed');
         toast.error(msg);
         return;
       }
@@ -100,7 +102,7 @@ export default function CharacterPage() {
 
       router.replace('/g/dashboard');
     } catch {
-      toast.error('A network error occurred. Please check your connection.');
+      toast.error(t('errorNetwork'));
     } finally {
       setIsSaving(false);
     }
@@ -112,10 +114,10 @@ export default function CharacterPage() {
       <div className="mb-8 flex flex-col items-center gap-3 text-center">
         <Logo withText={false} />
         <h1 className="font-display text-3xl text-glow-primary uppercase tracking-widest">
-          Forge Your Legend
+          {t('heading')}
         </h1>
         <p className="text-sm text-muted-foreground tracking-wider">
-          Choose your class and step into the realm
+          {t('subheading')}
         </p>
       </div>
 
@@ -124,14 +126,14 @@ export default function CharacterPage() {
         {/* Class carousel */}
         <div className="mb-8">
           <p className="mb-3 text-xs font-display uppercase tracking-widest text-primary/80">
-            Choose Your Class
+            {t('chooseClassLabel')}
           </p>
           <div className="flex items-center gap-4">
             {/* Prev */}
             <button
               type="button"
               onClick={handlePrev}
-              aria-label="Previous class"
+              aria-label={t('prevClassAria')}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
             >
               ←
@@ -162,7 +164,7 @@ export default function CharacterPage() {
                   <p className="mt-1 text-xs text-muted-foreground">{currentClass.description}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className="rounded-full border border-primary/20 px-2 py-0.5 text-[10px] tracking-wider text-primary/70">
-                      ⚔ {currentClass.weapon}
+                      {t('weaponPrefix', { weapon: currentClass.weapon })}
                     </span>
                     {currentClass.abilities.map((ability) => (
                       <span
@@ -181,7 +183,7 @@ export default function CharacterPage() {
             <button
               type="button"
               onClick={handleNext}
-              aria-label="Next class"
+              aria-label={t('nextClassAria')}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
             >
               →
@@ -202,7 +204,7 @@ export default function CharacterPage() {
                   'h-1.5 w-6 rounded-full transition-all',
                   i === selectedIndex ? 'bg-primary' : 'bg-primary/20',
                 ].join(' ')}
-                aria-label={`Select ${c.title}`}
+                aria-label={t('selectClassAria', { className: c.title })}
               />
             ))}
           </div>
@@ -214,14 +216,14 @@ export default function CharacterPage() {
             htmlFor="heroName"
             className="text-xs font-display uppercase tracking-widest text-primary/80"
           >
-            Hero Name
+            {t('heroNameLabel')}
           </label>
           <input
             id="heroName"
             type="text"
             value={heroName}
             onChange={(e) => setHeroName(e.target.value)}
-            placeholder="Enter your legend's name…"
+            placeholder={t('heroNamePlaceholder')}
             maxLength={30}
             className="h-11 rounded-lg border border-primary/30 bg-background/60 px-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
@@ -230,7 +232,7 @@ export default function CharacterPage() {
         {/* Aura colour picker */}
         <div className="mb-8 flex flex-col gap-2">
           <p className="text-xs font-display uppercase tracking-widest text-primary/80">
-            Aura Colour
+            {t('auraLabel')}
           </p>
           <div className="flex gap-3">
             {AURA_PRESETS.map((preset) => (
@@ -238,7 +240,7 @@ export default function CharacterPage() {
                 key={preset.hsl}
                 type="button"
                 onClick={() => setAuraHsl(preset.hsl)}
-                aria-label={`${preset.label} aura`}
+                aria-label={t('auraOptionAria', { label: preset.label })}
                 className={[
                   'h-9 w-9 rounded-full border-2 transition-all hover:scale-110',
                   auraHsl === preset.hsl ? 'border-white scale-110' : 'border-transparent',
@@ -260,7 +262,7 @@ export default function CharacterPage() {
           disabled={isSaving || !heroName.trim()}
           className="w-full"
         >
-          {isSaving ? 'Forging destiny…' : '⚔ Begin Your Quest'}
+          {isSaving ? t('saving') : t('submit')}
         </GameButton>
       </div>
     </Scene>

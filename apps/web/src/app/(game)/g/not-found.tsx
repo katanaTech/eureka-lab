@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Scene, Logo, GameButton } from '@/components/game/fantasy';
 
 /**
@@ -8,6 +9,7 @@ import { Scene, Logo, GameButton } from '@/components/game/fantasy';
  * @returns A fantasy-themed 404 screen with a link back to the dashboard
  */
 export default function GameNotFound() {
+  const t = useTranslations('Phase16NotFound');
   return (
     <Scene className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
       {/* Logo */}
@@ -25,12 +27,10 @@ export default function GameNotFound() {
 
       {/* Narrative message */}
       <h1 className="font-display text-2xl uppercase tracking-widest text-glow-primary">
-        Consumed by the Void
+        {t('heading')}
       </h1>
       <p className="mt-4 max-w-md text-sm text-muted-foreground leading-relaxed">
-        The path you seek has been consumed by the void. No realm, no isle, no
-        passage remains where you tread. Perhaps the Anti-AI Overlord erased it
-        from existence.
+        {t('body')}
       </p>
 
       {/* Decorative sigil */}
@@ -42,13 +42,13 @@ export default function GameNotFound() {
 
       {/* CTA */}
       <Link href="/g/dashboard">
-        <GameButton variant="primary" size="lg" aria-label="Return to the Realm Map">
-          Return to the Realm Map
+        <GameButton variant="primary" size="lg" aria-label={t('ctaAria')}>
+          {t('cta')}
         </GameButton>
       </Link>
 
       <p className="mt-6 text-xs text-muted-foreground/40 tracking-widest uppercase">
-        The journey is not over, hero.
+        {t('footerNote')}
       </p>
     </Scene>
   );
