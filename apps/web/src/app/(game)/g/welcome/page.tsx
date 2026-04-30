@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -14,19 +15,26 @@ import { Scene, Logo, GameButton } from '@/components/game/fantasy';
 
 type AuthMode = 'login' | 'register';
 
-/** Maps Firebase auth error codes to user-friendly messages. */
-function getFirebaseErrorMessage(code: string): string {
+/**
+ * Maps Firebase auth error codes to translation keys under the
+ * `Phase16Welcome` namespace. The caller resolves the key with
+ * `useTranslations('Phase16Welcome')` so messages stay i18n-aware.
+ *
+ * @param code - The Firebase auth error code (e.g. `auth/wrong-password`)
+ * @returns The translation key (without namespace prefix)
+ */
+function getFirebaseErrorMessageKey(code: string): string {
   const map: Record<string, string> = {
-    'auth/email-already-in-use': 'That email sigil is already bound to another hero.',
-    'auth/invalid-email': 'The email sigil appears to be malformed.',
-    'auth/weak-password': 'Your secret rune must be at least 6 characters.',
-    'auth/user-not-found': 'No hero found with that email sigil.',
-    'auth/wrong-password': 'The secret rune you entered is incorrect.',
-    'auth/too-many-requests': 'Too many failed attempts. Please wait before trying again.',
-    'auth/popup-closed-by-user': 'The sign-in portal was closed. Please try again.',
-    'auth/network-request-failed': 'A network error occurred. Check your connection.',
+    'auth/email-already-in-use': 'errorEmailInUse',
+    'auth/invalid-email': 'errorInvalidEmail',
+    'auth/weak-password': 'errorWeakPassword',
+    'auth/user-not-found': 'errorUserNotFound',
+    'auth/wrong-password': 'errorWrongPassword',
+    'auth/too-many-requests': 'errorTooManyRequests',
+    'auth/popup-closed-by-user': 'errorPopupClosed',
+    'auth/network-request-failed': 'errorNetwork',
   };
-  return map[code] ?? 'An unexpected error occurred. Please try again.';
+  return map[code] ?? 'errorUnexpected';
 }
 
 /**
@@ -38,6 +46,7 @@ function getFirebaseErrorMessage(code: string): string {
  */
 export default function WelcomePage() {
   const router = useRouter();
+  const t = useTranslations('Phase16Welcome');
   const [mode, setMode] = useState<AuthMode>('login');
   const [heroName, setHeroName] = useState('');
   const [email, setEmail] = useState('');
@@ -50,7 +59,7 @@ export default function WelcomePage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!auth) {
-      toast.error('Authentication service is not configured.');
+      toast.error(t('errorAuthNotConfigured'));
       return;
     }
     setIsSubmitting(true);
@@ -71,7 +80,7 @@ export default function WelcomePage() {
       }
     } catch (err: unknown) {
       const code = (err as { code?: string }).code ?? '';
-      toast.error(getFirebaseErrorMessage(code));
+      toast.error(t(getFirebaseErrorMessageKey(code)));
     } finally {
       setIsSubmitting(false);
     }
@@ -82,7 +91,7 @@ export default function WelcomePage() {
    */
   async function handleGoogleSignIn() {
     if (!auth) {
-      toast.error('Authentication service is not configured.');
+      toast.error(t('errorAuthNotConfigured'));
       return;
     }
     setIsSubmitting(true);
@@ -93,7 +102,7 @@ export default function WelcomePage() {
       router.replace('/g');
     } catch (err: unknown) {
       const code = (err as { code?: string }).code ?? '';
-      toast.error(getFirebaseErrorMessage(code));
+      toast.error(t(getFirebaseErrorMessageKey(code)));
     } finally {
       setIsSubmitting(false);
     }
@@ -106,10 +115,10 @@ export default function WelcomePage() {
         <Logo />
         <div className="mt-2">
           <h1 className="font-display text-4xl text-glow-primary uppercase tracking-widest">
-            The Awakening
+            {t('heading')}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground tracking-wider">
-            Your quest for AI mastery begins here
+            {t('subheading')}
           </p>
         </div>
       </div>
@@ -128,7 +137,7 @@ export default function WelcomePage() {
                 : 'text-muted-foreground hover:text-foreground',
             ].join(' ')}
           >
-            Enter the Realm
+            {t('tabLogin')}
           </button>
           <button
             type="button"
@@ -140,7 +149,7 @@ export default function WelcomePage() {
                 : 'text-muted-foreground hover:text-foreground',
             ].join(' ')}
           >
-            Forge My Legend
+            {t('tabRegister')}
           </button>
         </div>
 
@@ -152,14 +161,14 @@ export default function WelcomePage() {
                 htmlFor="heroName"
                 className="text-xs font-display uppercase tracking-widest text-primary/80"
               >
-                Hero Name
+                {t('heroNameLabel')}
               </label>
               <input
                 id="heroName"
                 type="text"
                 value={heroName}
                 onChange={(e) => setHeroName(e.target.value)}
-                placeholder="Sir Aria the Brave"
+                placeholder={t('heroNamePlaceholder')}
                 autoComplete="name"
                 className="h-11 rounded-lg border border-primary/30 bg-background/60 px-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
@@ -172,14 +181,14 @@ export default function WelcomePage() {
               htmlFor="email"
               className="text-xs font-display uppercase tracking-widest text-primary/80"
             >
-              Email Sigil
+              {t('emailLabel')}
             </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="hero@realm.com"
+              placeholder={t('emailPlaceholder')}
               required
               autoComplete="email"
               className="h-11 rounded-lg border border-primary/30 bg-background/60 px-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -192,14 +201,14 @@ export default function WelcomePage() {
               htmlFor="password"
               className="text-xs font-display uppercase tracking-widest text-primary/80"
             >
-              Secret Rune
+              {t('passwordLabel')}
             </label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder={t('passwordPlaceholder')}
               required
               autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
               minLength={6}
@@ -215,17 +224,17 @@ export default function WelcomePage() {
             className="mt-2 w-full"
           >
             {isSubmitting
-              ? 'Casting spell…'
+              ? t('submitting')
               : mode === 'register'
-              ? 'Forge My Legend'
-              : 'Enter the Realm'}
+              ? t('submitRegister')
+              : t('submitLogin')}
           </GameButton>
         </form>
 
         {/* Divider */}
         <div className="my-6 flex items-center gap-3">
           <span className="h-px flex-1 bg-primary/20" />
-          <span className="text-xs text-muted-foreground">or</span>
+          <span className="text-xs text-muted-foreground">{t('orDivider')}</span>
           <span className="h-px flex-1 bg-primary/20" />
         </div>
 
@@ -249,12 +258,12 @@ export default function WelcomePage() {
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
           </svg>
-          Continue with Google
+          {t('googleSignIn')}
         </GameButton>
       </div>
 
       <p className="mt-8 text-xs text-muted-foreground/60 text-center max-w-sm">
-        By entering this realm you agree to the Terms of Service and Privacy Policy.
+        {t('termsNotice')}
       </p>
     </Scene>
   );
