@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Sword, Brain, Zap, Shield, Sparkles, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -36,6 +37,7 @@ const ABILITY_ICON_MAP: Record<ShopAbilityIcon, React.ReactNode> = {
  * @returns The inventory management screen
  */
 export default function InventoryPage() {
+  const t = useTranslations('Phase16Inventory');
   const [catalog, setCatalog] = useState<ShopCatalog | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [equippingId, setEquippingId] = useState<string | null>(null);
@@ -68,9 +70,9 @@ export default function InventoryPage() {
         setInventory(inv);
         setCatalog(cat);
       })
-      .catch(() => toast.error('Failed to load inventory. Please refresh.'))
+      .catch(() => toast.error(t('loadFailed')))
       .finally(() => setIsLoading(false));
-  }, [setInventory]);
+  }, [setInventory, t]);
 
   /**
    * Equip or unequip a weapon via the API.
@@ -93,9 +95,9 @@ export default function InventoryPage() {
 
         const updatedInventory = await res.json();
         setInventory(updatedInventory);
-        toast.success(weaponId ? 'Weapon equipped!' : 'Weapon unequipped.');
+        toast.success(weaponId ? t('equipped') : t('unequipped'));
       } catch {
-        toast.error('Equip action failed. Please try again.');
+        toast.error(t('equipFailed'));
         fetch('/api/v1/inventory')
           .then((r) => r.json())
           .then((inv: Inventory) => setInventory(inv))
@@ -104,7 +106,7 @@ export default function InventoryPage() {
         setEquippingId(null);
       }
     },
-    [equipWeapon, setInventory]
+    [equipWeapon, setInventory, t]
   );
 
   // Resolve item details from catalog
@@ -125,7 +127,7 @@ export default function InventoryPage() {
           <KpBadge />
           <Link href="/g/dashboard">
             <GameButton variant="ghost" size="sm">
-              ← Dashboard
+              {t('backDashboard')}
             </GameButton>
           </Link>
         </div>
@@ -137,10 +139,10 @@ export default function InventoryPage() {
           <Package className="h-8 w-8 text-accent" aria-hidden />
         </div>
         <h1 className="font-display text-4xl uppercase tracking-widest text-glow-primary">
-          Inventory
+          {t('heading')}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground tracking-wider">
-          Your arsenal — abilities and weapons earned in battle
+          {t('subheading')}
         </p>
       </div>
 
@@ -149,7 +151,7 @@ export default function InventoryPage() {
           <div
             className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"
             role="status"
-            aria-label="Loading inventory"
+            aria-label={t('loadingAria')}
           />
         </div>
       ) : (
@@ -159,15 +161,15 @@ export default function InventoryPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                  Knowledge Points
+                  {t('kpHeading')}
                 </p>
                 <p className="mt-1 font-display text-3xl text-glow-gold">
-                  {kp} <span className="text-sm text-muted-foreground">KP</span>
+                  {kp} <span className="text-sm text-muted-foreground">{t('kpUnit')}</span>
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground/60 uppercase tracking-wider">
-                  Lifetime Earned
+                  {t('kpLifetime')}
                 </p>
                 <p className="font-display text-lg text-accent/80">{totalKpEarned}</p>
               </div>
@@ -180,7 +182,7 @@ export default function InventoryPage() {
               id="equipped-heading"
               className="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground"
             >
-              Equipped Weapon
+              {t('equippedHeading')}
             </h2>
             {equippedWeapon ? (
               <div className="flex items-center justify-between rounded-xl border border-accent/40 bg-accent/5 p-4">
@@ -194,7 +196,7 @@ export default function InventoryPage() {
                     </p>
                     <p className="text-xs text-muted-foreground">{equippedWeapon.description}</p>
                     <span className="mt-1 inline-block rounded border border-primary/30 px-1.5 py-0.5 text-[10px] text-primary/80">
-                      +{equippedWeapon.bonusDamage} DMG
+                      {t('weaponBonus', { bonus: equippedWeapon.bonusDamage })}
                     </span>
                   </div>
                 </div>
@@ -203,14 +205,14 @@ export default function InventoryPage() {
                   size="sm"
                   onClick={() => handleEquip(null)}
                   disabled={equippingId !== null}
-                  aria-label={`Unequip ${equippedWeapon.name}`}
+                  aria-label={t('unequipAria', { name: equippedWeapon.name })}
                 >
-                  {equippingId === 'unequip' ? 'Saving…' : 'Unequip'}
+                  {equippingId === 'unequip' ? t('unequipping') : t('unequip')}
                 </GameButton>
               </div>
             ) : (
               <div className="rounded-xl border border-primary/10 bg-card/40 p-4 text-sm text-muted-foreground/60 italic">
-                No weapon equipped — visit the shop to find one
+                {t('noEquipped')}
               </div>
             )}
           </section>
@@ -221,11 +223,11 @@ export default function InventoryPage() {
               id="abilities-heading"
               className="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground"
             >
-              Abilities ({ownedAbilities.length})
+              {t('abilitiesHeading', { count: ownedAbilities.length })}
             </h2>
             {ownedAbilities.length === 0 ? (
               <div className="rounded-xl border border-primary/10 bg-card/40 p-4 text-sm text-muted-foreground/60 italic">
-                No abilities owned yet — visit the shop to unlock your first power
+                {t('noAbilities')}
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -246,11 +248,11 @@ export default function InventoryPage() {
                       </p>
                       <div className="mt-1.5 flex flex-wrap gap-1.5 text-[10px]">
                         <span className="rounded border border-primary/30 px-1.5 py-0.5 text-primary/80">
-                          DMG {ability.damage[0]}–{ability.damage[1]}
+                          {t('abilityDamage', { min: ability.damage[0], max: ability.damage[1] })}
                         </span>
                         {ability.cooldown > 0 && (
                           <span className="rounded border border-muted-foreground/30 px-1.5 py-0.5 text-muted-foreground">
-                            CD {ability.cooldown}t
+                            {t('abilityCooldown', { cooldown: ability.cooldown })}
                           </span>
                         )}
                       </div>
@@ -267,11 +269,11 @@ export default function InventoryPage() {
               id="weapons-heading"
               className="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground"
             >
-              Weapons ({ownedWeapons.length})
+              {t('weaponsHeading', { count: ownedWeapons.length })}
             </h2>
             {ownedWeapons.length === 0 ? (
               <div className="rounded-xl border border-primary/10 bg-card/40 p-4 text-sm text-muted-foreground/60 italic">
-                No weapons owned yet — visit the shop to arm yourself
+                {t('noWeapons')}
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -298,7 +300,7 @@ export default function InventoryPage() {
                           </p>
                           {isEquipped && (
                             <span className="rounded-full border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[10px] text-accent tracking-wider">
-                              EQUIPPED
+                              {t('equippedBadge')}
                             </span>
                           )}
                         </div>
@@ -307,7 +309,7 @@ export default function InventoryPage() {
                         </p>
                         <div className="mt-1.5 flex items-center justify-between">
                           <span className="rounded border border-primary/30 px-1.5 py-0.5 text-[10px] text-primary/80">
-                            +{weapon.bonusDamage} DMG
+                            {t('weaponBonus', { bonus: weapon.bonusDamage })}
                           </span>
                           {isEquipped ? (
                             <GameButton
@@ -315,9 +317,9 @@ export default function InventoryPage() {
                               size="sm"
                               onClick={() => handleEquip(null)}
                               disabled={equippingId !== null}
-                              aria-label={`Unequip ${weapon.name}`}
+                              aria-label={t('unequipAria', { name: weapon.name })}
                             >
-                              {equippingId === 'unequip' ? 'Saving…' : 'Unequip'}
+                              {equippingId === 'unequip' ? t('unequipping') : t('unequip')}
                             </GameButton>
                           ) : (
                             <GameButton
@@ -325,9 +327,9 @@ export default function InventoryPage() {
                               size="sm"
                               onClick={() => handleEquip(weapon.id)}
                               disabled={equippingId !== null}
-                              aria-label={`Equip ${weapon.name}`}
+                              aria-label={t('equipAria', { name: weapon.name })}
                             >
-                              {isThisEquipping ? 'Equipping…' : 'Equip'}
+                              {isThisEquipping ? t('equipping') : t('equip')}
                             </GameButton>
                           )}
                         </div>
@@ -343,7 +345,7 @@ export default function InventoryPage() {
           <div className="flex justify-center pt-2">
             <Link href="/g/shop">
               <GameButton variant="ghost" size="md">
-                Visit Grand Bazaar
+                {t('visitBazaar')}
               </GameButton>
             </Link>
           </div>

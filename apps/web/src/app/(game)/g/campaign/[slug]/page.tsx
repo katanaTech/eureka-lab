@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Crown } from 'lucide-react';
 import {
   ZONE_BY_CAMPAIGN_SLUG,
@@ -181,6 +182,7 @@ const DIFFICULTY_BADGE_STYLE: Record<MissionDifficulty, string> = {
 export default function CampaignPage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
+  const t = useTranslations('Phase16Campaign');
 
   const slug = params.slug ?? '';
   const zoneId: ZoneId | undefined = ZONE_BY_CAMPAIGN_SLUG[slug];
@@ -207,7 +209,7 @@ export default function CampaignPage() {
           <KpBadge />
           <Link href="/g/dashboard">
             <GameButton variant="ghost" size="sm">
-              ← Realm Map
+              {t('backRealmMap')}
             </GameButton>
           </Link>
         </div>
@@ -219,7 +221,7 @@ export default function CampaignPage() {
           {realmName}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground tracking-wider">
-          Guardian: <span className="text-primary/80">{bossName}</span>
+          <span className="text-primary/80">{t('guardianLabel', { bossName })}</span>
         </p>
       </div>
 
@@ -231,6 +233,14 @@ export default function CampaignPage() {
             number={index + 1}
             mission={mission}
             slug={slug}
+            difficultyLabel={t(`difficulty${mission.difficulty}` as
+              | 'difficultyApprentice'
+              | 'difficultyAdept'
+              | 'difficultyMaster'
+              | 'difficultyLegendary')}
+            bossBadge={t('bossBadge')}
+            challengeCta={t('challengeCta')}
+            beginMissionCta={t('beginMissionCta')}
           />
         ))}
       </div>
@@ -239,7 +249,7 @@ export default function CampaignPage() {
       <div className="mx-auto mt-8 max-w-3xl flex justify-center">
         <Link href={`/g/campaign/${slug}/prepare`}>
           <GameButton variant="ghost" size="md">
-            Open Academy
+            {t('openAcademy')}
           </GameButton>
         </Link>
       </div>
@@ -253,6 +263,14 @@ interface MissionCardProps {
   number: number;
   mission: PlaceholderMission;
   slug: string;
+  /** Pre-translated difficulty badge text */
+  difficultyLabel: string;
+  /** Pre-translated boss badge text */
+  bossBadge: string;
+  /** Pre-translated CTA for boss missions */
+  challengeCta: string;
+  /** Pre-translated CTA for non-boss missions */
+  beginMissionCta: string;
 }
 
 /**
@@ -261,9 +279,21 @@ interface MissionCardProps {
  * @param props.number - Display number for the mission
  * @param props.mission - Mission data
  * @param props.slug - Campaign URL slug (for building the battle link)
+ * @param props.difficultyLabel - Translated difficulty badge text
+ * @param props.bossBadge - Translated boss badge text
+ * @param props.challengeCta - Translated CTA for boss missions
+ * @param props.beginMissionCta - Translated CTA for normal missions
  * @returns A styled mission card with title, difficulty badge, and action button
  */
-function MissionCard({ number, mission, slug }: MissionCardProps) {
+function MissionCard({
+  number,
+  mission,
+  slug,
+  difficultyLabel,
+  bossBadge,
+  challengeCta,
+  beginMissionCta,
+}: MissionCardProps) {
   const difficultyStyle = DIFFICULTY_BADGE_STYLE[mission.difficulty];
 
   return (
@@ -300,11 +330,11 @@ function MissionCard({ number, mission, slug }: MissionCardProps) {
               difficultyStyle,
             ].join(' ')}
           >
-            {mission.difficulty}
+            {difficultyLabel}
           </span>
           {mission.isBoss && (
             <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] tracking-wider text-amber-400">
-              BOSS
+              {bossBadge}
             </span>
           )}
         </div>
@@ -321,10 +351,10 @@ function MissionCard({ number, mission, slug }: MissionCardProps) {
             {mission.isBoss ? (
               <>
                 <Crown className="h-3 w-3" aria-hidden />
-                Challenge
+                {challengeCta}
               </>
             ) : (
-              'Begin Mission'
+              beginMissionCta
             )}
           </GameButton>
         </Link>

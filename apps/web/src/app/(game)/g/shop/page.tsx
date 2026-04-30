@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Sword, Zap, Brain, Shield, Sparkles, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -34,6 +35,7 @@ const ABILITY_ICON_MAP: Record<ShopAbilityIcon, React.ReactNode> = {
  * @returns The global shop screen
  */
 export default function GlobalShopPage() {
+  const t = useTranslations('Phase16ShopGlobal');
   const [catalog, setCatalog] = useState<ShopCatalog | null>(null);
   const [isLoadingCatalog, setIsLoadingCatalog] = useState(true);
   const [buyingId, setBuyingId] = useState<string | null>(null);
@@ -60,9 +62,9 @@ export default function GlobalShopPage() {
         return res.json() as Promise<ShopCatalog>;
       })
       .then((data) => setCatalog(data))
-      .catch(() => toast.error('Failed to load shop. Please try again.'))
+      .catch(() => toast.error(t('loadFailed')))
       .finally(() => setIsLoadingCatalog(false));
-  }, []);
+  }, [t]);
 
   /**
    * Buy an ability or weapon from the shop.
@@ -74,7 +76,7 @@ export default function GlobalShopPage() {
   const handleBuy = useCallback(
     async (itemId: string, itemType: 'ability' | 'weapon', cost: number) => {
       if (kp < cost) {
-        toast.error('Not enough KP to buy this item.');
+        toast.error(t('notEnoughKp'));
         return;
       }
 
@@ -97,9 +99,9 @@ export default function GlobalShopPage() {
 
         const updatedInventory = await res.json();
         setInventory(updatedInventory);
-        toast.success('Item purchased!');
+        toast.success(t('purchased'));
       } catch {
-        toast.error('Purchase failed. Please try again.');
+        toast.error(t('purchaseFailed'));
         fetch('/api/v1/inventory')
           .then((r) => r.json())
           .then((inv) => setInventory(inv))
@@ -108,7 +110,7 @@ export default function GlobalShopPage() {
         setBuyingId(null);
       }
     },
-    [kp, spendKp, addAbility, addWeapon, setInventory]
+    [kp, spendKp, addAbility, addWeapon, setInventory, t]
   );
 
   /**
@@ -132,9 +134,9 @@ export default function GlobalShopPage() {
 
         const updatedInventory = await res.json();
         setInventory(updatedInventory);
-        toast.success(weaponId ? 'Weapon equipped!' : 'Weapon unequipped.');
+        toast.success(weaponId ? t('equipped') : t('unequipped'));
       } catch {
-        toast.error('Equip action failed. Please try again.');
+        toast.error(t('equipFailed'));
         fetch('/api/v1/inventory')
           .then((r) => r.json())
           .then((inv) => setInventory(inv))
@@ -143,7 +145,7 @@ export default function GlobalShopPage() {
         setEquippingId(null);
       }
     },
-    [equipWeapon, setInventory]
+    [equipWeapon, setInventory, t]
   );
 
   return (
@@ -155,7 +157,7 @@ export default function GlobalShopPage() {
           <KpBadge />
           <Link href="/g/dashboard">
             <GameButton variant="ghost" size="sm">
-              ← Dashboard
+              {t('backDashboard')}
             </GameButton>
           </Link>
         </div>
@@ -167,10 +169,10 @@ export default function GlobalShopPage() {
           <ShoppingBag className="h-8 w-8 text-accent" aria-hidden />
         </div>
         <h1 className="font-display text-4xl uppercase tracking-widest text-glow-primary">
-          Grand Bazaar
+          {t('heading')}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground tracking-wider">
-          The full arsenal of Knowledge — abilities and weapons from all realms
+          {t('subheading')}
         </p>
       </div>
 
@@ -179,7 +181,7 @@ export default function GlobalShopPage() {
           <div
             className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"
             role="status"
-            aria-label="Loading shop"
+            aria-label={t('loadingAria')}
           />
         </div>
       ) : (
@@ -190,11 +192,11 @@ export default function GlobalShopPage() {
               id="abilities-heading"
               className="mb-4 text-sm font-bold uppercase tracking-widest text-muted-foreground"
             >
-              Abilities ({catalog?.abilities.length ?? 0})
+              {t('abilitiesHeading', { count: catalog?.abilities.length ?? 0 })}
             </h2>
             {(catalog?.abilities.length ?? 0) === 0 ? (
               <p className="text-sm text-muted-foreground/60 italic">
-                No abilities in the catalog yet.
+                {t('noAbilities')}
               </p>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -206,6 +208,13 @@ export default function GlobalShopPage() {
                     canAfford={kp >= ability.cost}
                     isBuying={buyingId === ability.id}
                     onBuy={() => handleBuy(ability.id, 'ability', ability.cost)}
+                    kpCost={t('kpCost', { cost: ability.cost })}
+                    ownedLabel={t('ownedBadge')}
+                    buyAria={t('buyAria', { name: ability.name, cost: ability.cost })}
+                    buyLabel={t('buy')}
+                    buyingLabel={t('buying')}
+                    damageLabel={t('abilityDamage', { min: ability.damage[0], max: ability.damage[1] })}
+                    cooldownLabel={t('abilityCooldown', { cooldown: ability.cooldown })}
                   />
                 ))}
               </div>
@@ -218,11 +227,11 @@ export default function GlobalShopPage() {
               id="weapons-heading"
               className="mb-4 text-sm font-bold uppercase tracking-widest text-muted-foreground"
             >
-              Weapons ({catalog?.weapons.length ?? 0})
+              {t('weaponsHeading', { count: catalog?.weapons.length ?? 0 })}
             </h2>
             {(catalog?.weapons.length ?? 0) === 0 ? (
               <p className="text-sm text-muted-foreground/60 italic">
-                No weapons in the catalog yet.
+                {t('noWeapons')}
               </p>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -238,6 +247,18 @@ export default function GlobalShopPage() {
                     onBuy={() => handleBuy(weapon.id, 'weapon', weapon.cost)}
                     onEquip={() => handleEquip(weapon.id)}
                     onUnequip={() => handleEquip(null)}
+                    kpCost={t('kpCost', { cost: weapon.cost })}
+                    equippedBadge={t('equippedBadge')}
+                    bonusLabel={t('weaponBonus', { bonus: weapon.bonusDamage })}
+                    buyAria={t('buyAria', { name: weapon.name, cost: weapon.cost })}
+                    equipAria={t('equipAria', { name: weapon.name })}
+                    unequipAria={t('unequipAria', { name: weapon.name })}
+                    buyLabel={t('buy')}
+                    buyingLabel={t('buying')}
+                    equipLabel={t('equip')}
+                    equippingLabel={t('equipping')}
+                    unequipLabel={t('unequip')}
+                    unequippingLabel={t('unequipping')}
                   />
                 ))}
               </div>
@@ -257,6 +278,20 @@ interface GlobalAbilityCardProps {
   canAfford: boolean;
   isBuying: boolean;
   onBuy: () => void;
+  /** Pre-translated KP cost label */
+  kpCost: string;
+  /** Pre-translated owned badge label */
+  ownedLabel: string;
+  /** Pre-translated buy button aria label */
+  buyAria: string;
+  /** Pre-translated buy button label */
+  buyLabel: string;
+  /** Pre-translated buying-in-progress label */
+  buyingLabel: string;
+  /** Pre-translated damage stat label */
+  damageLabel: string;
+  /** Pre-translated cooldown stat label */
+  cooldownLabel: string;
 }
 
 /**
@@ -267,6 +302,13 @@ interface GlobalAbilityCardProps {
  * @param props.canAfford - Whether the player has enough KP to buy
  * @param props.isBuying - True while the buy request is in-flight
  * @param props.onBuy - Callback to trigger purchase
+ * @param props.kpCost - Translated KP cost label
+ * @param props.ownedLabel - Translated owned badge text
+ * @param props.buyAria - Translated buy aria label
+ * @param props.buyLabel - Translated buy button text
+ * @param props.buyingLabel - Translated buying-in-progress text
+ * @param props.damageLabel - Translated damage stat
+ * @param props.cooldownLabel - Translated cooldown stat
  * @returns A styled ability card with stats and buy button
  */
 function GlobalAbilityCard({
@@ -275,6 +317,13 @@ function GlobalAbilityCard({
   canAfford,
   isBuying,
   onBuy,
+  kpCost,
+  ownedLabel,
+  buyAria,
+  buyLabel,
+  buyingLabel,
+  damageLabel,
+  cooldownLabel,
 }: GlobalAbilityCardProps) {
   return (
     <div
@@ -296,11 +345,11 @@ function GlobalAbilityCard({
           <p className="mt-1 text-xs text-muted-foreground">{ability.description}</p>
           <div className="mt-2 flex flex-wrap gap-2 text-[10px]">
             <span className="rounded border border-primary/30 px-1.5 py-0.5 text-primary/80">
-              DMG {ability.damage[0]}–{ability.damage[1]}
+              {damageLabel}
             </span>
             {ability.cooldown > 0 && (
               <span className="rounded border border-muted-foreground/30 px-1.5 py-0.5 text-muted-foreground">
-                CD {ability.cooldown}t
+                {cooldownLabel}
               </span>
             )}
             {ability.unlockHintZoneId && (
@@ -312,18 +361,18 @@ function GlobalAbilityCard({
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <span className="font-display text-sm text-accent">{ability.cost} KP</span>
+        <span className="font-display text-sm text-accent">{kpCost}</span>
         {owned ? (
-          <span className="text-xs font-semibold text-emerald-400">Owned</span>
+          <span className="text-xs font-semibold text-emerald-400">{ownedLabel}</span>
         ) : (
           <GameButton
             variant="gold"
             size="sm"
             onClick={onBuy}
             disabled={!canAfford || isBuying}
-            aria-label={`Buy ${ability.name} for ${ability.cost} KP`}
+            aria-label={buyAria}
           >
-            {isBuying ? 'Buying…' : 'Buy'}
+            {isBuying ? buyingLabel : buyLabel}
           </GameButton>
         )}
       </div>
@@ -343,6 +392,30 @@ interface GlobalWeaponCardProps {
   onBuy: () => void;
   onEquip: () => void;
   onUnequip: () => void;
+  /** Pre-translated KP cost label */
+  kpCost: string;
+  /** Pre-translated equipped badge text */
+  equippedBadge: string;
+  /** Pre-translated bonus damage label */
+  bonusLabel: string;
+  /** Pre-translated buy aria label */
+  buyAria: string;
+  /** Pre-translated equip aria label */
+  equipAria: string;
+  /** Pre-translated unequip aria label */
+  unequipAria: string;
+  /** Pre-translated buy label */
+  buyLabel: string;
+  /** Pre-translated buying label */
+  buyingLabel: string;
+  /** Pre-translated equip label */
+  equipLabel: string;
+  /** Pre-translated equipping label */
+  equippingLabel: string;
+  /** Pre-translated unequip label */
+  unequipLabel: string;
+  /** Pre-translated unequipping label */
+  unequippingLabel: string;
 }
 
 /**
@@ -369,6 +442,18 @@ function GlobalWeaponCard({
   onBuy,
   onEquip,
   onUnequip,
+  kpCost,
+  equippedBadge,
+  bonusLabel,
+  buyAria,
+  equipAria,
+  unequipAria,
+  buyLabel,
+  buyingLabel,
+  equipLabel,
+  equippingLabel,
+  unequipLabel,
+  unequippingLabel,
 }: GlobalWeaponCardProps) {
   return (
     <div
@@ -392,14 +477,14 @@ function GlobalWeaponCard({
             </h3>
             {equipped && (
               <span className="rounded-full border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[10px] text-accent tracking-wider">
-                EQUIPPED
+                {equippedBadge}
               </span>
             )}
           </div>
           <p className="mt-1 text-xs text-muted-foreground">{weapon.description}</p>
           <div className="mt-2 flex flex-wrap gap-2 text-[10px]">
             <span className="rounded border border-primary/30 px-1.5 py-0.5 text-primary/80">
-              +{weapon.bonusDamage} DMG
+              {bonusLabel}
             </span>
             {weapon.unlockHintZoneId && (
               <span className="rounded border border-accent/30 px-1.5 py-0.5 text-accent/70 capitalize">
@@ -410,7 +495,7 @@ function GlobalWeaponCard({
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <span className="font-display text-sm text-accent">{weapon.cost} KP</span>
+        <span className="font-display text-sm text-accent">{kpCost}</span>
         <div className="flex gap-2">
           {!owned ? (
             <GameButton
@@ -418,9 +503,9 @@ function GlobalWeaponCard({
               size="sm"
               onClick={onBuy}
               disabled={!canAfford || isBuying}
-              aria-label={`Buy ${weapon.name} for ${weapon.cost} KP`}
+              aria-label={buyAria}
             >
-              {isBuying ? 'Buying…' : 'Buy'}
+              {isBuying ? buyingLabel : buyLabel}
             </GameButton>
           ) : equipped ? (
             <GameButton
@@ -428,9 +513,9 @@ function GlobalWeaponCard({
               size="sm"
               onClick={onUnequip}
               disabled={isEquipping}
-              aria-label={`Unequip ${weapon.name}`}
+              aria-label={unequipAria}
             >
-              {isEquipping ? 'Saving…' : 'Unequip'}
+              {isEquipping ? unequippingLabel : unequipLabel}
             </GameButton>
           ) : (
             <GameButton
@@ -438,9 +523,9 @@ function GlobalWeaponCard({
               size="sm"
               onClick={onEquip}
               disabled={isEquipping}
-              aria-label={`Equip ${weapon.name}`}
+              aria-label={equipAria}
             >
-              {isEquipping ? 'Equipping…' : 'Equip'}
+              {isEquipping ? equippingLabel : equipLabel}
             </GameButton>
           )}
         </div>
