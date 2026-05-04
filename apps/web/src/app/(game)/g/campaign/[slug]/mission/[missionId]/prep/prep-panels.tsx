@@ -7,6 +7,7 @@
  */
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Swords, BookOpen } from 'lucide-react';
 import { GameButton } from '@/components/game/fantasy';
 import { cn } from '@/lib/utils';
@@ -35,10 +36,11 @@ interface QuestionCardProps {
  * @returns A card with 4 option buttons
  */
 export function QuestionCard({ question, questionNumber, picked, onPick }: QuestionCardProps) {
+  const t = useTranslations('Phase16MissionPrep');
   return (
     <div className="rounded-xl border border-primary/20 bg-card/60 p-5">
       <p className="font-display text-xs uppercase tracking-wider text-muted-foreground mb-2">
-        Question {questionNumber}
+        {t('questionLabel', { number: questionNumber })}
       </p>
       <p className="text-sm font-semibold mb-4">{question.text}</p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -103,15 +105,18 @@ export function ResultsPanel({
   slug,
   missionId,
 }: ResultsPanelProps) {
+  const t = useTranslations('Phase16MissionPrep');
   const earned = correctCount * kpPerCorrect;
 
   return (
     <div>
       {/* Score summary */}
       <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 px-6 py-5 text-center">
-        <p className="font-display text-4xl text-glow-primary">{correctCount}/3</p>
+        <p className="font-display text-4xl text-glow-primary">
+          {t('scoreSummary', { correct: correctCount })}
+        </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          {earned > 0 ? `+${earned} KP earned` : 'No KP this time — keep training!'}
+          {earned > 0 ? t('kpEarned', { kp: earned }) : t('noKpThisTime')}
         </p>
       </div>
 
@@ -138,12 +143,13 @@ export function ResultsPanel({
               </p>
               {!isCorrect && picks[i] !== null && (
                 <p className="text-xs text-muted-foreground mb-1">
-                  Your answer:{' '}
+                  {t('yourAnswer')}
                   <span className="text-red-400">{q.options[picks[i] as number]}</span>
                 </p>
               )}
               <p className="text-xs text-muted-foreground">
-                Correct: <span className="text-emerald-400">{q.options[q.correct]}</span>
+                {t('correctLabel')}
+                <span className="text-emerald-400">{q.options[q.correct]}</span>
               </p>
               <p className="mt-1 text-xs text-muted-foreground italic">{q.explain}</p>
             </div>
@@ -156,13 +162,13 @@ export function ResultsPanel({
         <Link href={`/g/campaign/${slug}/prepare`}>
           <GameButton variant="ghost" size="sm">
             <BookOpen className="h-4 w-4" aria-hidden />
-            Open Academy
+            {t('openAcademy')}
           </GameButton>
         </Link>
         <Link href={`/g/campaign/${slug}/battle/${missionId}`}>
           <GameButton variant={correctCount === 3 ? 'gold' : 'primary'} size="md">
             <Swords className="h-4 w-4" aria-hidden />
-            Begin Battle
+            {t('beginBattle')}
           </GameButton>
         </Link>
       </div>
@@ -184,22 +190,23 @@ interface KpComparisonProps {
  * @returns A two-column comparison card
  */
 export function KpComparison({ heroKp }: KpComparisonProps) {
+  const t = useTranslations('Phase16MissionPrep');
   const stars = heroKp >= 50 ? '★★★' : heroKp >= 20 ? '★★☆' : '★☆☆';
 
   return (
     <div className="mb-6 flex items-center justify-between rounded-xl border border-primary/20 bg-card/60 px-5 py-4">
       <div className="text-center">
         <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-          Your KP (lifetime)
+          {t('kpYourLifetime')}
         </p>
         <p className="font-display text-2xl text-primary">{heroKp}</p>
       </div>
       <div className="text-center px-4">
-        <p className="text-xs text-muted-foreground">vs</p>
+        <p className="text-xs text-muted-foreground">{t('kpVs')}</p>
       </div>
       <div className="text-center">
         <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-          Enemy Strength
+          {t('enemyStrength')}
         </p>
         <p className="font-display text-2xl text-amber-400">{stars}</p>
       </div>
@@ -228,23 +235,23 @@ interface NoQuizFallbackProps {
  * @returns A minimal fallback panel with navigation buttons
  */
 export function NoQuizFallback({ slug, missionId, realmName }: NoQuizFallbackProps) {
+  const t = useTranslations('Phase16MissionPrep');
   return (
     <div className="rounded-xl border border-primary/20 bg-card/60 p-8 text-center">
       <p className="text-sm text-muted-foreground mb-6">
-        No warm-up quiz available for this mission yet. Jump straight into battle or visit the{' '}
-        <span className="text-primary">{realmName}</span> Academy to prepare.
+        {t('noQuizFallback', { realmName })}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Link href={`/g/campaign/${slug}/prepare`}>
           <GameButton variant="ghost" size="sm">
             <BookOpen className="h-4 w-4" aria-hidden />
-            Open Academy
+            {t('openAcademy')}
           </GameButton>
         </Link>
         <Link href={`/g/campaign/${slug}/battle/${missionId}`}>
           <GameButton variant="primary" size="md">
             <Swords className="h-4 w-4" aria-hidden />
-            Begin Battle
+            {t('beginBattle')}
           </GameButton>
         </Link>
       </div>

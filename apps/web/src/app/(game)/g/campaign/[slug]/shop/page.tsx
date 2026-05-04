@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Sword, Zap, Brain, Shield, Sparkles, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -40,6 +41,7 @@ const ABILITY_ICON_MAP: Record<ShopAbilityIcon, React.ReactNode> = {
 export default function CampaignShopPage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
+  const t = useTranslations('Phase16ShopRealm');
 
   const slug = params.slug ?? '';
   const zoneId: ZoneId | undefined = ZONE_BY_CAMPAIGN_SLUG[slug];
@@ -79,9 +81,9 @@ export default function CampaignShopPage() {
         return res.json() as Promise<ShopCatalog>;
       })
       .then((data) => setCatalog(data))
-      .catch(() => toast.error('Failed to load shop. Please try again.'))
+      .catch(() => toast.error(t('loadFailed')))
       .finally(() => setIsLoadingCatalog(false));
-  }, [zoneId]);
+  }, [zoneId, t]);
 
   /**
    * Buy an ability or weapon from the shop.
@@ -93,7 +95,7 @@ export default function CampaignShopPage() {
   const handleBuy = useCallback(
     async (itemId: string, itemType: 'ability' | 'weapon', cost: number) => {
       if (kp < cost) {
-        toast.error('Not enough KP to buy this item.');
+        toast.error(t('notEnoughKp'));
         return;
       }
 
@@ -117,9 +119,9 @@ export default function CampaignShopPage() {
 
         const updatedInventory = await res.json();
         setInventory(updatedInventory);
-        toast.success('Item purchased!');
+        toast.success(t('purchased'));
       } catch {
-        toast.error('Purchase failed. Please try again.');
+        toast.error(t('purchaseFailed'));
         // Revert optimistic update by re-fetching inventory
         fetch('/api/v1/inventory')
           .then((r) => r.json())
@@ -129,7 +131,7 @@ export default function CampaignShopPage() {
         setBuyingId(null);
       }
     },
-    [kp, spendKp, addAbility, addWeapon, setInventory]
+    [kp, spendKp, addAbility, addWeapon, setInventory, t]
   );
 
   /**
@@ -154,9 +156,9 @@ export default function CampaignShopPage() {
 
         const updatedInventory = await res.json();
         setInventory(updatedInventory);
-        toast.success(weaponId ? 'Weapon equipped!' : 'Weapon unequipped.');
+        toast.success(weaponId ? t('equipped') : t('unequipped'));
       } catch {
-        toast.error('Equip action failed. Please try again.');
+        toast.error(t('equipFailed'));
         fetch('/api/v1/inventory')
           .then((r) => r.json())
           .then((inv) => setInventory(inv))
@@ -165,7 +167,7 @@ export default function CampaignShopPage() {
         setEquippingId(null);
       }
     },
-    [equipWeapon, setInventory]
+    [equipWeapon, setInventory, t]
   );
 
   if (!zoneId) return null;
@@ -189,7 +191,7 @@ export default function CampaignShopPage() {
           <KpBadge />
           <Link href={`/g/campaign/${slug}`}>
             <GameButton variant="ghost" size="sm">
-              ← Campaign
+              {t('backCampaign')}
             </GameButton>
           </Link>
         </div>
@@ -201,10 +203,10 @@ export default function CampaignShopPage() {
           <ShoppingBag className="h-8 w-8 text-accent" aria-hidden />
         </div>
         <h1 className="font-display text-4xl uppercase tracking-widest text-glow-primary">
-          {realmName} Shop
+          {t('heading', { realmName })}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground tracking-wider">
-          Spend your Knowledge Points on powers and weapons
+          {t('subheading')}
         </p>
       </div>
 
@@ -213,7 +215,7 @@ export default function CampaignShopPage() {
           <div
             className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent"
             role="status"
-            aria-label="Loading shop"
+            aria-label={t('loadingAria')}
           />
         </div>
       ) : (
@@ -224,11 +226,11 @@ export default function CampaignShopPage() {
               id="abilities-heading"
               className="mb-4 text-sm font-bold uppercase tracking-widest text-muted-foreground"
             >
-              Abilities
+              {t('abilitiesHeading')}
             </h2>
             {abilities.length === 0 ? (
               <p className="text-sm text-muted-foreground/60 italic">
-                No abilities available in this realm yet.
+                {t('noAbilities')}
               </p>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -240,6 +242,13 @@ export default function CampaignShopPage() {
                     canAfford={kp >= ability.cost}
                     isBuying={buyingId === ability.id}
                     onBuy={() => handleBuy(ability.id, 'ability', ability.cost)}
+                    kpCost={t('kpCost', { cost: ability.cost })}
+                    ownedLabel={t('ownedBadge')}
+                    buyAria={t('buyAria', { name: ability.name, cost: ability.cost })}
+                    buyLabel={t('buy')}
+                    buyingLabel={t('buying')}
+                    damageLabel={t('abilityDamage', { min: ability.damage[0], max: ability.damage[1] })}
+                    cooldownLabel={t('abilityCooldown', { cooldown: ability.cooldown })}
                   />
                 ))}
               </div>
@@ -252,11 +261,11 @@ export default function CampaignShopPage() {
               id="weapons-heading"
               className="mb-4 text-sm font-bold uppercase tracking-widest text-muted-foreground"
             >
-              Weapons
+              {t('weaponsHeading')}
             </h2>
             {weapons.length === 0 ? (
               <p className="text-sm text-muted-foreground/60 italic">
-                No weapons available in this realm yet.
+                {t('noWeapons')}
               </p>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -272,6 +281,18 @@ export default function CampaignShopPage() {
                     onBuy={() => handleBuy(weapon.id, 'weapon', weapon.cost)}
                     onEquip={() => handleEquip(weapon.id)}
                     onUnequip={() => handleEquip(null)}
+                    kpCost={t('kpCost', { cost: weapon.cost })}
+                    equippedBadge={t('equippedBadge')}
+                    bonusLabel={t('weaponBonus', { bonus: weapon.bonusDamage })}
+                    buyAria={t('buyAria', { name: weapon.name, cost: weapon.cost })}
+                    equipAria={t('equipAria', { name: weapon.name })}
+                    unequipAria={t('unequipAria', { name: weapon.name })}
+                    buyLabel={t('buy')}
+                    buyingLabel={t('buying')}
+                    equipLabel={t('equip')}
+                    equippingLabel={t('equipping')}
+                    unequipLabel={t('unequip')}
+                    unequippingLabel={t('unequipping')}
                   />
                 ))}
               </div>
@@ -291,6 +312,13 @@ interface AbilityCardProps {
   canAfford: boolean;
   isBuying: boolean;
   onBuy: () => void;
+  kpCost: string;
+  ownedLabel: string;
+  buyAria: string;
+  buyLabel: string;
+  buyingLabel: string;
+  damageLabel: string;
+  cooldownLabel: string;
 }
 
 /**
@@ -301,9 +329,29 @@ interface AbilityCardProps {
  * @param props.canAfford - Whether the player has enough KP to buy
  * @param props.isBuying - True while the buy request is in-flight
  * @param props.onBuy - Callback to trigger purchase
+ * @param props.kpCost - Pre-translated KP cost label (e.g. "60 KP")
+ * @param props.ownedLabel - Pre-translated "Owned" badge text
+ * @param props.buyAria - Pre-translated buy-button accessible label
+ * @param props.buyLabel - Pre-translated buy-button text
+ * @param props.buyingLabel - Pre-translated text shown while purchase is in flight
+ * @param props.damageLabel - Pre-translated damage range string
+ * @param props.cooldownLabel - Pre-translated cooldown string
  * @returns A styled ability card with stats and buy button
  */
-function AbilityCard({ ability, owned, canAfford, isBuying, onBuy }: AbilityCardProps) {
+function AbilityCard({
+  ability,
+  owned,
+  canAfford,
+  isBuying,
+  onBuy,
+  kpCost,
+  ownedLabel,
+  buyAria,
+  buyLabel,
+  buyingLabel,
+  damageLabel,
+  cooldownLabel,
+}: AbilityCardProps) {
   return (
     <div
       className={[
@@ -324,31 +372,29 @@ function AbilityCard({ ability, owned, canAfford, isBuying, onBuy }: AbilityCard
           <p className="mt-1 text-xs text-muted-foreground">{ability.description}</p>
           <div className="mt-2 flex flex-wrap gap-2 text-[10px]">
             <span className="rounded border border-primary/30 px-1.5 py-0.5 text-primary/80">
-              DMG {ability.damage[0]}–{ability.damage[1]}
+              {damageLabel}
             </span>
             {ability.cooldown > 0 && (
               <span className="rounded border border-muted-foreground/30 px-1.5 py-0.5 text-muted-foreground">
-                CD {ability.cooldown}t
+                {cooldownLabel}
               </span>
             )}
           </div>
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <span className="font-display text-sm text-accent">
-          {ability.cost} KP
-        </span>
+        <span className="font-display text-sm text-accent">{kpCost}</span>
         {owned ? (
-          <span className="text-xs font-semibold text-emerald-400">Owned</span>
+          <span className="text-xs font-semibold text-emerald-400">{ownedLabel}</span>
         ) : (
           <GameButton
             variant="gold"
             size="sm"
             onClick={onBuy}
             disabled={!canAfford || isBuying}
-            aria-label={`Buy ${ability.name} for ${ability.cost} KP`}
+            aria-label={buyAria}
           >
-            {isBuying ? 'Buying…' : 'Buy'}
+            {isBuying ? buyingLabel : buyLabel}
           </GameButton>
         )}
       </div>
@@ -368,6 +414,18 @@ interface WeaponCardProps {
   onBuy: () => void;
   onEquip: () => void;
   onUnequip: () => void;
+  kpCost: string;
+  equippedBadge: string;
+  bonusLabel: string;
+  buyAria: string;
+  equipAria: string;
+  unequipAria: string;
+  buyLabel: string;
+  buyingLabel: string;
+  equipLabel: string;
+  equippingLabel: string;
+  unequipLabel: string;
+  unequippingLabel: string;
 }
 
 /**
@@ -382,6 +440,18 @@ interface WeaponCardProps {
  * @param props.onBuy - Callback to trigger purchase
  * @param props.onEquip - Callback to equip the weapon
  * @param props.onUnequip - Callback to unequip the weapon
+ * @param props.kpCost - Pre-translated KP cost label (e.g. "150 KP")
+ * @param props.equippedBadge - Pre-translated "EQUIPPED" badge text
+ * @param props.bonusLabel - Pre-translated bonus damage label
+ * @param props.buyAria - Pre-translated buy-button accessible label
+ * @param props.equipAria - Pre-translated equip-button accessible label
+ * @param props.unequipAria - Pre-translated unequip-button accessible label
+ * @param props.buyLabel - Pre-translated buy-button text
+ * @param props.buyingLabel - Pre-translated text shown while purchase is in flight
+ * @param props.equipLabel - Pre-translated equip-button text
+ * @param props.equippingLabel - Pre-translated text shown while equip is in flight
+ * @param props.unequipLabel - Pre-translated unequip-button text
+ * @param props.unequippingLabel - Pre-translated text shown while unequip is saving
  * @returns A styled weapon card with stats, buy, and equip buttons
  */
 function WeaponCard({
@@ -394,6 +464,18 @@ function WeaponCard({
   onBuy,
   onEquip,
   onUnequip,
+  kpCost,
+  equippedBadge,
+  bonusLabel,
+  buyAria,
+  equipAria,
+  unequipAria,
+  buyLabel,
+  buyingLabel,
+  equipLabel,
+  equippingLabel,
+  unequipLabel,
+  unequippingLabel,
 }: WeaponCardProps) {
   return (
     <div
@@ -417,22 +499,20 @@ function WeaponCard({
             </h3>
             {equipped && (
               <span className="rounded-full border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[10px] text-accent tracking-wider">
-                EQUIPPED
+                {equippedBadge}
               </span>
             )}
           </div>
           <p className="mt-1 text-xs text-muted-foreground">{weapon.description}</p>
           <div className="mt-2">
             <span className="rounded border border-primary/30 px-1.5 py-0.5 text-[10px] text-primary/80">
-              +{weapon.bonusDamage} DMG
+              {bonusLabel}
             </span>
           </div>
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <span className="font-display text-sm text-accent">
-          {weapon.cost} KP
-        </span>
+        <span className="font-display text-sm text-accent">{kpCost}</span>
         <div className="flex gap-2">
           {!owned ? (
             <GameButton
@@ -440,9 +520,9 @@ function WeaponCard({
               size="sm"
               onClick={onBuy}
               disabled={!canAfford || isBuying}
-              aria-label={`Buy ${weapon.name} for ${weapon.cost} KP`}
+              aria-label={buyAria}
             >
-              {isBuying ? 'Buying…' : 'Buy'}
+              {isBuying ? buyingLabel : buyLabel}
             </GameButton>
           ) : equipped ? (
             <GameButton
@@ -450,9 +530,9 @@ function WeaponCard({
               size="sm"
               onClick={onUnequip}
               disabled={isEquipping}
-              aria-label={`Unequip ${weapon.name}`}
+              aria-label={unequipAria}
             >
-              {isEquipping ? 'Saving…' : 'Unequip'}
+              {isEquipping ? unequippingLabel : unequipLabel}
             </GameButton>
           ) : (
             <GameButton
@@ -460,9 +540,9 @@ function WeaponCard({
               size="sm"
               onClick={onEquip}
               disabled={isEquipping}
-              aria-label={`Equip ${weapon.name}`}
+              aria-label={equipAria}
             >
-              {isEquipping ? 'Equipping…' : 'Equip'}
+              {isEquipping ? equippingLabel : equipLabel}
             </GameButton>
           )}
         </div>

@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { X, Play, ShoppingBag, Sword } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -39,6 +40,7 @@ interface LessonsTabProps {
  * @returns A list of lesson cards
  */
 export function LessonsTab({ zoneId }: LessonsTabProps) {
+  const t = useTranslations('Phase16Prepare');
   const [open, setOpen] = useState<PlaceholderLesson | null>(null);
 
   return (
@@ -55,8 +57,8 @@ export function LessonsTab({ zoneId }: LessonsTabProps) {
               <h3 className="font-display text-sm uppercase tracking-wider">{lesson.title}</h3>
               <p className="mt-1 text-xs text-muted-foreground">{lesson.intro}</p>
               <div className="mt-2 flex gap-3 text-xs text-muted-foreground">
-                <span>⏱ {lesson.minutes} min</span>
-                <span>⚡ +{lesson.kp} KP</span>
+                <span>{t('lessonMinutes', { minutes: lesson.minutes })}</span>
+                <span>{t('lessonKp', { kp: lesson.kp })}</span>
               </div>
             </div>
           </button>
@@ -84,6 +86,7 @@ interface LessonModalProps {
  * @returns A full-screen overlay modal
  */
 function LessonModal({ lesson, onClose }: LessonModalProps) {
+  const t = useTranslations('Phase16Prepare');
   const addKp = useInventoryStore((s) => s.addKp);
   const [picked, setPicked] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -94,7 +97,7 @@ function LessonModal({ lesson, onClose }: LessonModalProps) {
     setSubmitted(true);
     if (picked === lesson.check.correct) {
       addKp(lesson.kp);
-      toast.success(`+${lesson.kp} KP earned!`);
+      toast.success(t('kpToastEarned', { kp: lesson.kp }));
     }
   }
 
@@ -113,7 +116,7 @@ function LessonModal({ lesson, onClose }: LessonModalProps) {
           <span className="text-2xl" aria-hidden>{lesson.emoji}</span>
           <button
             onClick={onClose}
-            aria-label="Close lesson"
+            aria-label={t('closeLessonAria')}
             className="rounded p-1 text-muted-foreground hover:text-foreground"
           >
             <X className="h-5 w-5" aria-hidden />
@@ -150,7 +153,7 @@ function LessonModal({ lesson, onClose }: LessonModalProps) {
           </div>
           {submitted ? (
             <p className={cn('mt-3 text-xs', isCorrect ? 'text-emerald-400' : 'text-red-400')}>
-              {isCorrect ? '✓ Correct! ' : '✗ Not quite. '}{lesson.check.explain}
+              {isCorrect ? t('correctPrefix') : t('wrongPrefix')}{lesson.check.explain}
             </p>
           ) : (
             <GameButton
@@ -160,17 +163,17 @@ function LessonModal({ lesson, onClose }: LessonModalProps) {
               disabled={picked === null}
               onClick={handleSubmit}
             >
-              Submit Answer
+              {t('submitAnswer')}
             </GameButton>
           )}
           {isWrong && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Correct answer: {lesson.check.options[lesson.check.correct]}
+              {t('correctAnswerPrefix', { answer: lesson.check.options[lesson.check.correct] })}
             </p>
           )}
         </div>
         <div className="mt-6 flex justify-end">
-          <GameButton variant="ghost" size="sm" onClick={onClose}>Close</GameButton>
+          <GameButton variant="ghost" size="sm" onClick={onClose}>{t('close')}</GameButton>
         </div>
       </div>
     </div>
@@ -191,6 +194,7 @@ interface ShortsTabProps {
  * @returns A video card
  */
 export function ShortsTab({ zoneId }: ShortsTabProps) {
+  const t = useTranslations('Phase16Prepare');
   const [open, setOpen] = useState(false);
   const video: PlaceholderVideo = PLACEHOLDER_VIDEOS[zoneId];
 
@@ -207,8 +211,8 @@ export function ShortsTab({ zoneId }: ShortsTabProps) {
           <h3 className="font-display text-sm uppercase tracking-wider">{video.title}</h3>
           <p className="mt-1 text-xs text-muted-foreground">{video.blurb}</p>
           <div className="mt-2 flex gap-3 text-xs text-muted-foreground">
-            <span>⏱ {video.duration}</span>
-            <span>⚡ +{video.kp} KP</span>
+            <span>{t('videoDuration', { duration: video.duration })}</span>
+            <span>{t('videoKp', { kp: video.kp })}</span>
           </div>
         </div>
       </button>
@@ -232,6 +236,7 @@ interface VideoModalProps {
  * @returns A modal dialog
  */
 function VideoModal({ video, onClose }: VideoModalProps) {
+  const t = useTranslations('Phase16Prepare');
   const addKp = useInventoryStore((s) => s.addKp);
   const [claimed, setClaimed] = useState(false);
 
@@ -240,7 +245,7 @@ function VideoModal({ video, onClose }: VideoModalProps) {
     if (claimed) return;
     setClaimed(true);
     addKp(video.kp);
-    toast.success(`+${video.kp} KP earned for watching!`);
+    toast.success(t('kpToastWatching', { kp: video.kp }));
   }
 
   return (
@@ -257,7 +262,7 @@ function VideoModal({ video, onClose }: VideoModalProps) {
           </h2>
           <button
             onClick={onClose}
-            aria-label="Close video"
+            aria-label={t('closeVideoAria')}
             className="rounded p-1 text-muted-foreground hover:text-foreground"
           >
             <X className="h-5 w-5" aria-hidden />
@@ -281,9 +286,9 @@ function VideoModal({ video, onClose }: VideoModalProps) {
             disabled={claimed}
             onClick={handleClaim}
           >
-            {claimed ? `✓ +${video.kp} KP claimed` : `Claim +${video.kp} KP`}
+            {claimed ? t('claimedKp', { kp: video.kp }) : t('claimKp', { kp: video.kp })}
           </GameButton>
-          <GameButton variant="ghost" size="sm" onClick={onClose}>Close</GameButton>
+          <GameButton variant="ghost" size="sm" onClick={onClose}>{t('close')}</GameButton>
         </div>
       </div>
     </div>
@@ -298,6 +303,7 @@ function VideoModal({ video, onClose }: VideoModalProps) {
  * @returns Shop catalog UI
  */
 export function ForgeTab() {
+  const t = useTranslations('Phase16Prepare');
   const [catalog, setCatalog] = useState<ShopCatalog | null>(null);
   const [loading, setLoading] = useState(true);
   const { kp, ownedAbilityIds, ownedWeaponIds, equippedWeaponId, spendKp, addAbility, addWeapon, equipWeapon } =
@@ -311,9 +317,9 @@ export function ForgeTab() {
         return res.json() as Promise<ShopCatalog>;
       })
       .then((data) => setCatalog(data))
-      .catch(() => toast.error('Could not load the Forge. Try again later.'))
+      .catch(() => toast.error(t('loadShopError')))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   /**
    * Purchase a shop item via the backend API.
@@ -323,7 +329,7 @@ export function ForgeTab() {
    * @param cost - KP cost to deduct
    */
   async function handleBuy(id: string, type: 'ability' | 'weapon', cost: number) {
-    if (kp < cost) { toast.error('Not enough KP!'); return; }
+    if (kp < cost) { toast.error(t('notEnoughKp')); return; }
     try {
       const res = await fetch('/api/v1/inventory/buy', {
         method: 'POST',
@@ -333,9 +339,9 @@ export function ForgeTab() {
       if (!res.ok) throw new Error('Purchase failed');
       spendKp(cost);
       if (type === 'ability') addAbility(id); else addWeapon(id);
-      toast.success('Item purchased!');
+      toast.success(t('purchased'));
     } catch {
-      toast.error('Purchase failed. Please try again.');
+      toast.error(t('purchaseFailed'));
     }
   }
 
@@ -353,17 +359,17 @@ export function ForgeTab() {
       });
       if (!res.ok) throw new Error('Equip failed');
       equipWeapon(weaponId);
-      toast.success('Weapon equipped!');
+      toast.success(t('equipped'));
     } catch {
-      toast.error('Could not equip weapon. Please try again.');
+      toast.error(t('equipFailed'));
     }
   }
 
   if (loading) {
-    return <p className="py-12 text-center text-sm text-muted-foreground">Loading Forge…</p>;
+    return <p className="py-12 text-center text-sm text-muted-foreground">{t('loadingForge')}</p>;
   }
   if (!catalog) {
-    return <p className="py-12 text-center text-sm text-red-400">Forge unavailable.</p>;
+    return <p className="py-12 text-center text-sm text-red-400">{t('forgeUnavailable')}</p>;
   }
 
   return (
@@ -373,7 +379,7 @@ export function ForgeTab() {
           id="abilities-heading"
           className="mb-3 flex items-center gap-2 font-display text-sm uppercase tracking-widest text-muted-foreground"
         >
-          <ShoppingBag className="h-4 w-4" aria-hidden /> Abilities
+          <ShoppingBag className="h-4 w-4" aria-hidden /> {t('abilitiesHeading')}
         </h2>
         <div className="flex flex-col gap-3">
           {catalog.abilities.map((ability: ShopAbility) => (
@@ -391,7 +397,7 @@ export function ForgeTab() {
           id="weapons-heading"
           className="mb-3 flex items-center gap-2 font-display text-sm uppercase tracking-widest text-muted-foreground"
         >
-          <Sword className="h-4 w-4" aria-hidden /> Weapons
+          <Sword className="h-4 w-4" aria-hidden /> {t('weaponsHeading')}
         </h2>
         <div className="flex flex-col gap-3">
           {catalog.weapons.map((weapon: ShopWeapon) => (
@@ -427,22 +433,29 @@ interface AbilityCardProps {
  * @returns A styled shop card
  */
 function AbilityCard({ ability, owned, onBuy }: AbilityCardProps) {
+  const t = useTranslations('Phase16Prepare');
   return (
     <div className="flex items-start gap-4 rounded-xl border border-primary/20 bg-card/60 p-4">
       <div className="flex-1 min-w-0">
         <h3 className="font-display text-sm uppercase tracking-wider">{ability.name}</h3>
         <p className="mt-1 text-xs text-muted-foreground">{ability.description}</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Damage: {ability.damage[0]}–{ability.damage[1]} · Cooldown: {ability.cooldown}t
+          {t('abilityStats', {
+            min: ability.damage[0],
+            max: ability.damage[1],
+            cooldown: ability.cooldown,
+          })}
         </p>
       </div>
       <div className="shrink-0">
         {owned ? (
           <span className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400">
-            Owned
+            {t('ownedBadge')}
           </span>
         ) : (
-          <GameButton variant="gold" size="sm" onClick={onBuy}>{ability.cost} KP</GameButton>
+          <GameButton variant="gold" size="sm" onClick={onBuy}>
+            {t('abilityCost', { cost: ability.cost })}
+          </GameButton>
         )}
       </div>
     </div>
@@ -468,23 +481,28 @@ interface WeaponCardProps {
  * @returns A styled shop card
  */
 function WeaponCard({ weapon, owned, equipped, onBuy, onEquip }: WeaponCardProps) {
+  const t = useTranslations('Phase16Prepare');
   return (
     <div className="flex items-start gap-4 rounded-xl border border-primary/20 bg-card/60 p-4">
       <div className="flex-1 min-w-0">
         <h3 className="font-display text-sm uppercase tracking-wider">{weapon.name}</h3>
         <p className="mt-1 text-xs text-muted-foreground">{weapon.description}</p>
-        <p className="mt-1 text-xs text-muted-foreground">Bonus damage: +{weapon.bonusDamage}</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t('weaponBonus', { bonus: weapon.bonusDamage })}
+        </p>
       </div>
       <div className="shrink-0 flex flex-col items-end gap-2">
         {!owned && (
-          <GameButton variant="gold" size="sm" onClick={onBuy}>{weapon.cost} KP</GameButton>
+          <GameButton variant="gold" size="sm" onClick={onBuy}>
+            {t('abilityCost', { cost: weapon.cost })}
+          </GameButton>
         )}
         {owned && !equipped && (
-          <GameButton variant="primary" size="sm" onClick={onEquip}>Equip</GameButton>
+          <GameButton variant="primary" size="sm" onClick={onEquip}>{t('equipCta')}</GameButton>
         )}
         {equipped && (
           <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">
-            Equipped
+            {t('equippedBadge')}
           </span>
         )}
       </div>
