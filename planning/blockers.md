@@ -19,6 +19,40 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-05-04 — QA → PM: Sprint D Wave 1 QA tasks complete (P16-QA-PLAN + P16-QA-003a)
+
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**P16-QA-PLAN — DONE.** Playwright test plan committed (`b8c2a6c`) at
+[apps/web/e2e/fantasy-flow.plan.md](../apps/web/e2e/fantasy-flow.plan.md).
+
+**P16-QA-003a — DONE** across 4 commits:
+
+1. `06aac4a` — i18n(phase-16): begin Sprint B+C string extraction (welcome wired)
+2. `a577f83` — i18n(phase-16): wire character/dashboard/settings/not-found/victory to translations
+3. `cb1bc31` — i18n(phase-16): add Phase16Campaign/Prepare/MissionPrep/ShopRealm/ShopGlobal/Inventory namespaces and wire high-traffic pages
+4. `afb1896` — i18n(phase-16): finish wiring shop sub-components and prepare/prep panels (closeout — completed by PM after QA hit usage limit twice on this work)
+
+**Result:**
+- 12 Phase16 namespaces defined in `apps/web/src/messages/{en,fr,ar}.json` (Welcome, Character, Dashboard, Settings, NotFound, Victory, Campaign, Prepare, MissionPrep, ShopRealm, ShopGlobal, Inventory)
+- Real Arabic + French translations (not stubs) — quality bar set by first QA session, maintained through closeout
+- Messages files grew 411 → ~700 lines per locale
+- All 13 Sprint B+C source pages + sub-components wired with `useTranslations()`
+- `pnpm exec tsc --noEmit` clean for production code (test-file errors are pre-existing Vitest mock typing, unrelated)
+
+**Deferred (intentional):**
+- **P16-QA-003b** — battle page strings (`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/`). Per original Wave 1 plan, deferred until after PG-007 review.
+- **Lesson/video content** — `PLACEHOLDER_LESSONS` and `PLACEHOLDER_VIDEOS` data in `lesson-data.ts` remains English-only. This is educational content, not UI chrome — when real lessons are authored they'll need their own i18n strategy (likely separate per-lesson translation files rather than namespace bloat).
+
+**Follow-up note for FE/PM:**
+- `NoQuizFallback` in `prep-panels.tsx` lost the inline `text-primary` styling around `realmName` because the message-format placeholder injects plain text. If visual emphasis is needed back, refactor to either `t.rich` with a tag-style key or split the message into 3 keys (before/middle/after) like `Phase16Settings.tenantLockNotice*` does.
+
+**Sprint D Wave 1 status:** All QA-owned items now DONE. DEVOPS items (AST-001/002, MOB-003, OPEN-005) all DONE per `2026-04-29 DEVOPS → PM` entry below. Wave 1 is complete.
+
+**Sprint D Wave 2 status:** Still BLOCKED on Sprint C (technically DONE) and FE pickup. Remaining work: P16-MOB-001/002 (FE), P16-QA-001/002 (Playwright impl), P16-QA-004/005 (Lighthouse + smoke), P16-QA-006 (rollout — also blocked on OPEN-005 license decision).
+
+---
+
 ### 2026-04-29 — FE → PM: Sprint C complete
 
 **Branch:** `feature/phase-16-fantasy-ui`
