@@ -1,187 +1,270 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import type { CareerArchetype } from '@eureka-lab/shared-types';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { FANTASY_CLASS_BY_CAREER, type FantasyClass } from '@eureka-lab/shared-types';
 import { useGameStore } from '@/stores/game-store';
-import { CareerPicker, CAREER_OPTIONS } from '@/components/game/CareerPicker';
-import { CharacterCustomizer } from '@/components/game/CharacterCustomizer';
+import { useAuthStore } from '@/stores/auth-store';
+import { Scene, Logo, GameButton } from '@/components/game/fantasy';
+import { FANTASY_CLASSES, AURA_PRESETS } from '@/components/game/fantasy/class-data';
 
-/** Canvas is client-only — dynamic import prevents SSR */
-const CharacterPreview = dynamic(
-  () => import('@/components/game/CharacterPreview').then((m) => m.CharacterPreview),
-  { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-gray-800 rounded-2xl" /> },
-);
-
-type Step = 'career' | 'customize' | 'confirm';
+// ── Component ────────────────────────────────────────────────────────────────
 
 /**
- * Character creator — 3-step wizard:
- * 1. Pick a career archetype
- * 2. Customise appearance
- * 3. Confirm and begin adventure
+ * Character creation page — fantasy 2D version.
+ * Lets players choose a fantasy class, set their hero name, and pick an aura.
+ * Persists the character to the backend and updates the game store on confirm.
+ *
+ * @returns The character creation screen
  */
 export default function CharacterPage() {
   const router = useRouter();
-  const { setCareer, setCustomization, characterCustomization } = useGameStore();
+  const t = useTranslations('Phase16Character');
+  const { careerArchetype, setCareer } = useGameStore();
+  const user = useAuthStore((s) => s.user);
 
-  const [step, setStep] = useState<Step>('career');
-  const [selectedCareer, setSelectedCareer] = useState<CareerArchetype | null>(null);
-  const [celebrating, setCelebrating] = useState(false);
+  // Derive the suggested class from career if one is set
+  const suggestedClass: FantasyClass = careerArchetype
+    ? FANTASY_CLASS_BY_CAREER[careerArchetype]
+    : 'mage';
 
-  const careerOption = CAREER_OPTIONS.find((c) => c.id === selectedCareer);
+  const [selectedIndex, setSelectedIndex] = useState<number>(
+    FANTASY_CLASSES.findIndex((c) => c.id === suggestedClass) ?? 0,
+  );
+  const [heroName, setHeroName] = useState<string>(
+    user?.displayName ?? '',
+  );
+  const suggestedClassData = FANTASY_CLASSES.find((c) => c.id === suggestedClass);
+  const [auraHsl, setAuraHsl] = useState<string>(
+    suggestedClassData?.auraHsl ?? '268 70% 60%',
+  );
+  const [isSaving, setIsSaving] = useState(false);
 
-  function handleCareerSelect(career: CareerArchetype) {
-    setSelectedCareer(career);
-    const option = CAREER_OPTIONS.find((c) => c.id === career);
-    if (option) {
-      setCustomization({ outfitColor: option.outfitColor });
+  const currentClass = FANTASY_CLASSES[selectedIndex];
+
+  /** Navigate the class carousel left. */
+  const handlePrev = useCallback(() => {
+    setSelectedIndex((i) => {
+      const next = (i - 1 + FANTASY_CLASSES.length) % FANTASY_CLASSES.length;
+      setAuraHsl(FANTASY_CLASSES[next].auraHsl);
+      return next;
+    });
+  }, []);
+
+  /** Navigate the class carousel right. */
+  const handleNext = useCallback(() => {
+    setSelectedIndex((i) => {
+      const next = (i + 1) % FANTASY_CLASSES.length;
+      setAuraHsl(FANTASY_CLASSES[next].auraHsl);
+      return next;
+    });
+  }, []);
+
+  /**
+   * Saves character data to the backend API and updates client stores.
+   */
+  async function handleConfirm() {
+    if (!heroName.trim()) {
+      toast.error(t('errorMissingName'));
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const payload = {
+        name: heroName.trim(),
+        class: currentClass.id,
+        classColorHsl: auraHsl,
+        weaponName: currentClass.weapon,
+      };
+
+      const res = await fetch('/api/v1/users/me/character', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const json: unknown = await res.json().catch(() => null);
+        const msg =
+          typeof json === 'object' && json !== null && 'message' in json
+            ? String((json as Record<string, unknown>).message)
+            : t('errorSaveFailed');
+        toast.error(msg);
+        return;
+      }
+
+      // Map fantasy class back to a career archetype for the game store.
+      // Use the first career that maps to this class, or keep existing.
+      const careerForClass = careerArchetype ?? 'engineer';
+      setCareer(careerForClass);
+
+      router.replace('/g/dashboard');
+    } catch {
+      toast.error(t('errorNetwork'));
+    } finally {
+      setIsSaving(false);
     }
   }
 
-  function handleBeginAdventure() {
-    if (!selectedCareer) return;
-    setCelebrating(true);
-    setCareer(selectedCareer);
-    // Brief celebration before navigating
-    setTimeout(() => {
-      router.push('/g/world');
-    }, 1500);
-  }
-
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-gray-950 text-white">
-      {/* Left panel — form */}
-      <div className="flex w-full flex-col overflow-y-auto p-6 lg:w-1/2">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-black tracking-tight text-white">
-            {step === 'career' && 'Who do you want to be?'}
-            {step === 'customize' && 'Make it yours'}
-            {step === 'confirm' && 'Ready to begin?'}
-          </h1>
-          <p className="mt-1 text-gray-400">
-            {step === 'career' && 'Choose the career that inspires you the most.'}
-            {step === 'customize' && "Personalize your hero's look."}
-            {step === 'confirm' && 'Your adventure in AI awaits!'}
+    <Scene className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
+      {/* Header */}
+      <div className="mb-8 flex flex-col items-center gap-3 text-center">
+        <Logo withText={false} />
+        <h1 className="font-display text-3xl text-glow-primary uppercase tracking-widest">
+          {t('heading')}
+        </h1>
+        <p className="text-sm text-muted-foreground tracking-wider">
+          {t('subheading')}
+        </p>
+      </div>
+
+      {/* Main panel */}
+      <div className="w-full max-w-2xl rounded-2xl border border-primary/30 bg-card/80 backdrop-blur-sm p-8 shadow-[0_0_40px_-10px_hsl(var(--primary)/0.4)]">
+        {/* Class carousel */}
+        <div className="mb-8">
+          <p className="mb-3 text-xs font-display uppercase tracking-widest text-primary/80">
+            {t('chooseClassLabel')}
           </p>
-        </div>
+          <div className="flex items-center gap-4">
+            {/* Prev */}
+            <button
+              type="button"
+              onClick={handlePrev}
+              aria-label={t('prevClassAria')}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+            >
+              ←
+            </button>
 
-        {/* Step indicator */}
-        <div className="mb-6 flex gap-2">
-          {(['career', 'customize', 'confirm'] as Step[]).map((s, i) => (
+            {/* Class card */}
             <div
-              key={s}
-              className={[
-                'h-1.5 flex-1 rounded-full transition-all',
-                step === s ? 'bg-indigo-400' : i < ['career', 'customize', 'confirm'].indexOf(step) ? 'bg-indigo-700' : 'bg-gray-700',
-              ].join(' ')}
-            />
-          ))}
-        </div>
-
-        {/* Step content */}
-        {step === 'career' && (
-          <CareerPicker selected={selectedCareer} onSelect={handleCareerSelect} />
-        )}
-
-        {step === 'customize' && selectedCareer && (
-          <CharacterCustomizer
-            career={selectedCareer}
-            customization={characterCustomization}
-            onChange={setCustomization}
-          />
-        )}
-
-        {step === 'confirm' && selectedCareer && (
-          <div className="flex flex-col gap-4">
-            <div className={`rounded-2xl bg-gradient-to-br p-5 ${careerOption?.color ?? ''}`}>
-              <p className="text-lg font-bold">{careerOption?.name} — {careerOption?.tagline}</p>
-              <p className="mt-1 text-sm text-white/80">{careerOption?.description}</p>
-            </div>
-            <div className="rounded-xl bg-gray-800 p-4 text-sm text-gray-300">
-              <p><span className="font-semibold text-white">Name:</span> {characterCustomization.name || 'Anonymous Hero'}</p>
-              <p className="mt-1"><span className="font-semibold text-white">Career:</span> {careerOption?.name}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation buttons */}
-        <div className="mt-auto flex gap-3 pt-6">
-          {step !== 'career' && (
-            <button
-              type="button"
-              onClick={() => setStep(step === 'confirm' ? 'customize' : 'career')}
-              className="rounded-xl border border-gray-600 px-5 py-2.5 text-sm font-semibold text-gray-300 hover:bg-gray-800"
+              className="flex-1 rounded-xl border p-5 transition-all"
+              style={{
+                borderColor: `hsl(${currentClass.auraHsl} / 0.5)`,
+                background: `radial-gradient(ellipse at top, hsl(${currentClass.auraHsl} / 0.12), transparent 70%)`,
+              }}
             >
-              Back
-            </button>
-          )}
-
-          {step === 'career' && (
-            <button
-              type="button"
-              disabled={!selectedCareer}
-              onClick={() => setStep('customize')}
-              className="ml-auto rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-500 disabled:opacity-40"
-            >
-              Next: Customize →
-            </button>
-          )}
-
-          {step === 'customize' && (
-            <button
-              type="button"
-              disabled={!characterCustomization.name.trim()}
-              onClick={() => setStep('confirm')}
-              className="ml-auto rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-indigo-500 disabled:opacity-40"
-            >
-              Next: Confirm →
-            </button>
-          )}
-
-          {step === 'confirm' && (
-            <button
-              type="button"
-              onClick={handleBeginAdventure}
-              disabled={celebrating}
-              className="ml-auto rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-3 text-base font-black text-white shadow-lg shadow-indigo-500/40 transition hover:from-indigo-400 hover:to-purple-500 disabled:opacity-60"
-            >
-              {celebrating ? '🎉 Beginning adventure…' : '⚔️ Begin Adventure!'}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Right panel — 3D preview */}
-      <div className="hidden lg:flex lg:w-1/2 lg:flex-col">
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6">
-          <div className="relative h-80 w-64 overflow-hidden rounded-3xl border border-gray-700 bg-gray-900 shadow-2xl">
-            {selectedCareer ? (
-              <CharacterPreview
-                career={selectedCareer}
-                outfitColor={characterCustomization.outfitColor}
-                skinTone={characterCustomization.skinTone}
-                celebrating={celebrating}
-              />
-            ) : (
-              <div className="flex h-full flex-col items-center justify-center text-gray-600">
-                <span className="text-6xl">❓</span>
-                <p className="mt-3 text-sm">Pick a career to preview your character</p>
+              <div className="flex items-start gap-4">
+                {/* Aura orb */}
+                <div
+                  className="h-12 w-12 shrink-0 rounded-full shadow-lg"
+                  style={{
+                    background: `hsl(${currentClass.auraHsl})`,
+                    boxShadow: `0 0 20px hsl(${currentClass.auraHsl} / 0.6)`,
+                  }}
+                  aria-hidden
+                />
+                <div className="min-w-0">
+                  <h2 className="font-display text-lg uppercase tracking-wide" style={{ color: `hsl(${currentClass.auraHsl})` }}>
+                    {currentClass.title}
+                  </h2>
+                  <p className="mt-1 text-xs text-muted-foreground">{currentClass.description}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="rounded-full border border-primary/20 px-2 py-0.5 text-[10px] tracking-wider text-primary/70">
+                      {t('weaponPrefix', { weapon: currentClass.weapon })}
+                    </span>
+                    {currentClass.abilities.map((ability) => (
+                      <span
+                        key={ability}
+                        className="rounded-full border border-white/10 px-2 py-0.5 text-[10px] tracking-wider text-muted-foreground"
+                      >
+                        {ability}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-          {selectedCareer && careerOption && (
-            <div className="text-center">
-              <p className="text-2xl font-black text-white">
-                {characterCustomization.name || 'Your Hero'}
-              </p>
-              <p className="text-sm text-gray-400">{careerOption.emoji} {careerOption.name}</p>
             </div>
-          )}
+
+            {/* Next */}
+            <button
+              type="button"
+              onClick={handleNext}
+              aria-label={t('nextClassAria')}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+            >
+              →
+            </button>
+          </div>
+
+          {/* Carousel dots */}
+          <div className="mt-3 flex justify-center gap-1.5" aria-hidden>
+            {FANTASY_CLASSES.map((c, i) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => {
+                  setSelectedIndex(i);
+                  setAuraHsl(FANTASY_CLASSES[i].auraHsl);
+                }}
+                className={[
+                  'h-1.5 w-6 rounded-full transition-all',
+                  i === selectedIndex ? 'bg-primary' : 'bg-primary/20',
+                ].join(' ')}
+                aria-label={t('selectClassAria', { className: c.title })}
+              />
+            ))}
+          </div>
         </div>
+
+        {/* Hero Name */}
+        <div className="mb-6 flex flex-col gap-1.5">
+          <label
+            htmlFor="heroName"
+            className="text-xs font-display uppercase tracking-widest text-primary/80"
+          >
+            {t('heroNameLabel')}
+          </label>
+          <input
+            id="heroName"
+            type="text"
+            value={heroName}
+            onChange={(e) => setHeroName(e.target.value)}
+            placeholder={t('heroNamePlaceholder')}
+            maxLength={30}
+            className="h-11 rounded-lg border border-primary/30 bg-background/60 px-4 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
+
+        {/* Aura colour picker */}
+        <div className="mb-8 flex flex-col gap-2">
+          <p className="text-xs font-display uppercase tracking-widest text-primary/80">
+            {t('auraLabel')}
+          </p>
+          <div className="flex gap-3">
+            {AURA_PRESETS.map((preset) => (
+              <button
+                key={preset.hsl}
+                type="button"
+                onClick={() => setAuraHsl(preset.hsl)}
+                aria-label={t('auraOptionAria', { label: preset.label })}
+                className={[
+                  'h-9 w-9 rounded-full border-2 transition-all hover:scale-110',
+                  auraHsl === preset.hsl ? 'border-white scale-110' : 'border-transparent',
+                ].join(' ')}
+                style={{
+                  background: `hsl(${preset.hsl})`,
+                  boxShadow: auraHsl === preset.hsl ? `0 0 12px hsl(${preset.hsl})` : undefined,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Confirm */}
+        <GameButton
+          variant="gold"
+          size="lg"
+          onClick={handleConfirm}
+          disabled={isSaving || !heroName.trim()}
+          className="w-full"
+        >
+          {isSaving ? t('saving') : t('submit')}
+        </GameButton>
       </div>
-    </div>
+    </Scene>
   );
 }

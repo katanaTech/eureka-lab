@@ -16,7 +16,9 @@ import {
 import { CombatService } from './combat.service';
 import { InitBattleDto } from './dto/init-battle.dto';
 import { CompleteBattleDto } from './dto/complete-battle.dto';
-import type { BattleConfig } from '@eureka-lab/shared-types';
+import type { BattleConfig, KpEarnEvent } from '@eureka-lab/shared-types';
+import { InventoryService } from '../inventory/inventory.service';
+import { UiModeResolver } from '../tenants/ui-mode-resolver.service';
 
 /**
  * Controller for the combat system.
@@ -33,7 +35,11 @@ import type { BattleConfig } from '@eureka-lab/shared-types';
 export class CombatController {
   private readonly logger = new Logger(CombatController.name);
 
-  constructor(private readonly combatService: CombatService) {}
+  constructor(
+    private readonly combatService: CombatService,
+    private readonly inventoryService: InventoryService,
+    private readonly uiModeResolver: UiModeResolver,
+  ) {}
 
   /**
    * Initialise a new battle session.
@@ -53,23 +59,42 @@ export class CombatController {
   }
 
   /**
-   * Record the outcome of a completed battle and award XP on victory.
+   * Record the outcome of a completed battle, award XP on victory, and award
+   * mode-conditional KP based on battle type (gamified mode only).
    *
    * @param user - Authenticated child user
    * @param battleId - The battle session ID returned by initBattle
    * @param dto - Outcome and performance data
-   * @returns XP awarded and any badge IDs unlocked
+   * @returns XP awarded, badge IDs unlocked, and KP awarded
    */
   @Post(':battleId/complete')
   async completeBattle(
     @CurrentUser() user: AuthenticatedUser,
     @Param('battleId') battleId: string,
     @Body() dto: CompleteBattleDto,
-  ): Promise<{ xpAwarded: number; badgesUnlocked: string[] }> {
+  ): Promise<{ xpAwarded: number; badgesUnlocked: string[]; kpAwarded: number }> {
     this.logger.log(
       `completeBattle: userId=${user.uid} battleId=${battleId} outcome=${dto.outcome}`,
     );
-    return this.combatService.completeBattle(user.uid, battleId, dto);
+
+    const result = await this.combatService.completeBattle(user.uid, battleId, dto);
+
+    /* Award KP in gamified mode only for victories (ADR-004) */
+    let kpAwarded = 0;
+    if (dto.outcome === 'victory') {
+      const kpEventMap: Record<string, KpEarnEvent> = {
+        minion: 'minion_defeated',
+        guardian: 'guardian_defeated',
+        overlord: 'overlord_defeated',
+      };
+      const kpEvent = kpEventMap[result.battleType];
+      if (kpEvent !== undefined) {
+        const effectiveMode = await this.uiModeResolver.resolve(user.uid, null);
+        kpAwarded = await this.inventoryService.awardKp(user.uid, kpEvent, effectiveMode);
+      }
+    }
+
+    return { xpAwarded: result.xpAwarded, badgesUnlocked: result.badgesUnlocked, kpAwarded };
   }
 
   /**

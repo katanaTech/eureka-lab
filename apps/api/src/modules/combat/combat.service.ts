@@ -168,7 +168,7 @@ export class CombatService {
     userId: string,
     battleId: string,
     dto: CompleteBattleDto,
-  ): Promise<{ xpAwarded: number; badgesUnlocked: string[] }> {
+  ): Promise<{ xpAwarded: number; badgesUnlocked: string[]; battleType: BattleType }> {
     const ref = this.firebase.firestore.collection(this.collection).doc(battleId);
     const snap = await ref.get();
 
@@ -217,7 +217,7 @@ export class CombatService {
       `Battle ${battleId} completed: userId=${userId} outcome=${dto.outcome} xp=${xpAwarded}`,
     );
 
-    return { xpAwarded, badgesUnlocked };
+    return { xpAwarded, badgesUnlocked, battleType: session.battleType };
   }
 
   /**

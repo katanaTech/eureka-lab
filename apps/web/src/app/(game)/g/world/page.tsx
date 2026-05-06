@@ -12,7 +12,7 @@ import type { ZoneId } from '@eureka-lab/shared-types';
 const ALL_ZONES: ZoneId[] = ['library', 'forge', 'citadel', 'academy'];
 
 const WorldMap = dynamic(
-  () => import('@/components/game/WorldMap').then((m) => m.WorldMap),
+  () => import('@/components/game/_legacy_r3f/WorldMap').then((m) => m.WorldMap),
   { ssr: false, loading: () => <div className="h-screen w-screen bg-gray-950" /> },
 );
 

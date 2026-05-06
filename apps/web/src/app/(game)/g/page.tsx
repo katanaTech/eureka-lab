@@ -15,9 +15,9 @@ export default function GameEntryPage() {
 
   useEffect(() => {
     if (careerArchetype) {
-      router.replace('/g/world');
+      router.replace('/g/dashboard');
     } else {
-      router.replace('/g/character');
+      router.replace('/g/welcome');
     }
   }, [careerArchetype, router]);
 

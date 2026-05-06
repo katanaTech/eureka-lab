@@ -197,18 +197,21 @@
 
 ---
 
-## PHASE 15 — AI Zombie Combat System (IN PROGRESS)
+## PHASE 15 — AI Zombie Combat System (BACKEND DONE · FRONTEND DEFERRED)
 
 > Current branch: `feature/phase-15-3d-game`
 > Full design spec: `planning/phase-15-combat-design.md`
+> **PM decision 2026-04-26:** Backend complete. Frontend (Parts A, D–F) deferred — Phase 16
+> replaces R3F UI with 2D cinematic fantasy. Existing R3F stubs parked in P16-FE-004.
+> Revisit only if A/B data favours R3F (ADR-006, post-launch).
 
-### Part A — World Polish (prerequisite)
+### Part A — World Polish (DEFERRED — superseded by Phase 16)
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| GAME3D-001 | Zone environment details | TODO | Floating books (library), sparks (forge), code shards (citadel), orbs (academy) — drei Float + Sparkles in ZoneInterior |
-| GAME3D-002 | Zombie spawning portal on world map | TODO | Pulsing ring mesh near each island to hint at combat |
-| GAME3D-003 | Battle entry flash transition | TODO | Full-screen white CSS flash overlay on navigate to /g/battle |
+| GAME3D-001 | Zone environment details | DEFERRED | Superseded by Phase 16 fantasy 2D realm design |
+| GAME3D-002 | Zombie spawning portal on world map | DEFERRED | Superseded by Phase 16 campaign route |
+| GAME3D-003 | Battle entry flash transition | DEFERRED | Phase 16 handles battle entry in 2D |
 
 ### Part B — Shared Types (blocks all combat work)
 
@@ -228,40 +231,174 @@
 | COMBAT-BE-006 | Certificate endpoint | DONE | Included in CombatService.generateCertificate() — SVG injection-safe, signed URL returned |
 | COMBAT-BE-007 | Combat tests | DONE | 25 tests passing: quiz-bank, service (initBattle, completeBattle, generateCertificate), controller |
 
-### Part D — Frontend: State + Routes
+### Part D — Frontend: State + Routes (DEFERRED — replaced by Phase 16)
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| COMBAT-FE-001 | combat-store.ts | TODO | Zustand state machine: CombatPhase, HP tracking, question index, damage values — see design spec §11 |
-| COMBAT-FE-002 | /g/battle/[battleId]/page.tsx | TODO | Desktop route: fetches config, renders CombatArena; detects mobile → redirects to /m/battle |
-| COMBAT-FE-003 | /g/victory/page.tsx | TODO | Certificate screen — Stars R3F bg + HTML certificate overlay, html2canvas download |
-| COMBAT-FE-004 | /m/battle/[battleId]/page.tsx | TODO | Mobile route: renders MobileCombatView (2D CSS fallback) |
+| COMBAT-FE-001 | combat-store.ts | DEFERRED | Phase 16 builds combat-store with fantasy UI + sparkCharges (P16-FE-003) |
+| COMBAT-FE-002 | /g/battle/[battleId]/page.tsx | DEFERRED | Replaced by P16-PG-007 (/g/campaign/[slug]/battle/[missionId]) |
+| COMBAT-FE-003 | /g/victory/page.tsx | DEFERRED | Replaced by P16-PG-011 (re-themed victory page) |
+| COMBAT-FE-004 | /m/battle/[battleId]/page.tsx | DEFERRED | Replaced by P16-MOB-001 (mobile mirror) |
 
-### Part E — Frontend: Combat Components
-
-| ID | Task | Status | Notes |
-|----|------|--------|-------|
-| COMBAT-FE-005 | ZombieCharacter.tsx | TODO | 5 zombie types built from R3F primitives + meshToonMaterial; useFrame animations: idle bob, attack lunge, stagger, death squash — see design spec §5–6 |
-| COMBAT-FE-006 | CombatArena.tsx | TODO | R3F canvas: player left, zombie right; zone-coloured lighting; phase changes dispatched to combat-store |
-| COMBAT-FE-007 | CareerAttackEffect.tsx | TODO | Career-specific projectile per archetype (letters/brackets/paint/mini-bot) via drei Sparkles or sphere meshes |
-| COMBAT-FE-008 | CombatHUD.tsx | TODO | HP bars (player + zombie), phase label, turn indicator — pure HTML overlay on canvas |
-| COMBAT-FE-009 | QuestionCard.tsx | TODO | Question text, 4 option buttons (A/B/C/D), 15-sec countdown timer, correct/wrong feedback — shared between 3D and mobile |
-| COMBAT-FE-010 | DamageNumber.tsx | TODO | Floating "+{n}" / "-{n}" that rises and fades via CSS keyframes; positioned over player or zombie |
-| COMBAT-FE-011 | CombatIntroScreen.tsx | TODO | Zombie slides in, dialogue bubble, name reveal, "FIGHT!" button |
-| COMBAT-FE-012 | CombatVictoryScreen.tsx | TODO | Win animation, XP counter, badges earned, "Continue" button |
-| COMBAT-FE-013 | CombatDefeatScreen.tsx | TODO | Lose animation, encouragement message, "Try Again" → restart same battle |
-| COMBAT-FE-014 | MobileCombatView.tsx | TODO | 2D CSS: zone-emoji zombie, career-emoji player, CSS-animated attacks, HP bars, reuses QuestionCard |
-| COMBAT-FE-015 | CertificateScreen.tsx | TODO | Child's name, date, "AI Literacy Champion", 4 zone badge icons, Download + Share (Web Share API) |
-
-### Part F — Game Flow Integration
+### Part E — Frontend: Combat Components (DEFERRED — replaced by Phase 16 fantasy 2D)
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| COMBAT-FLOW-001 | Minion trigger in mission/[missionId]/page.tsx | TODO | After MissionCompleteScreen dismiss → POST /combat/init { battleType:'minion' } → /g/battle/[id] |
-| COMBAT-FLOW-002 | Guardian trigger in zone/[zoneId]/page.tsx | TODO | All zone missions done after minion victory → POST /combat/init { battleType:'guardian' } → /g/battle/[id] |
-| COMBAT-FLOW-003 | Overlord trigger in world/page.tsx | TODO | All 4 guardians defeated → Overlord banner → POST /combat/init { battleType:'overlord' } → /g/battle/[id] |
-| COMBAT-FLOW-004 | Zone unlock on guardian victory | TODO | Guardian victory → next island unlocked in game-store + world page re-renders |
-| COMBAT-FLOW-005 | Overlord victory → /g/victory | TODO | Navigate to certificate screen, pass childName from auth store |
+| COMBAT-FE-005 | ZombieCharacter.tsx | DEFERRED | R3F zombie replaced by 2D fantasy zombie in Phase 16 battle page |
+| COMBAT-FE-006 | CombatArena.tsx | DEFERRED | R3F canvas replaced by 2D fantasy battle screen |
+| COMBAT-FE-007 | CareerAttackEffect.tsx | DEFERRED | Replaced by fantasy-class attack effects in Phase 16 |
+| COMBAT-FE-008 | CombatHUD.tsx | DEFERRED | Replaced by P16-FE-016 (HpBar) + fantasy HUD |
+| COMBAT-FE-009 | QuestionCard.tsx | DEFERRED | Will be rebuilt as shared component in Phase 16 battle page |
+| COMBAT-FE-010 | DamageNumber.tsx | DEFERRED | CSS damage numbers rebuilt in Phase 16 battle |
+| COMBAT-FE-011 | CombatIntroScreen.tsx | DEFERRED | Replaced by fantasy battle intro in P16-PG-007 |
+| COMBAT-FE-012 | CombatVictoryScreen.tsx | DEFERRED | Replaced by Phase 16 victory re-theme |
+| COMBAT-FE-013 | CombatDefeatScreen.tsx | DEFERRED | Replaced by Phase 16 defeat screen |
+| COMBAT-FE-014 | MobileCombatView.tsx | DEFERRED | Replaced by P16-MOB-001 mobile battle mirror |
+| COMBAT-FE-015 | CertificateScreen.tsx | DEFERRED | Replaced by P16-PG-011 (re-themed certificate) |
+
+### Part F — Game Flow Integration (DEFERRED — replaced by Phase 16 routing)
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| COMBAT-FLOW-001 | Minion trigger in mission page | DEFERRED | Phase 16 campaign route handles battle triggers |
+| COMBAT-FLOW-002 | Guardian trigger in zone page | DEFERRED | Phase 16 campaign/prepare page handles guardian flow |
+| COMBAT-FLOW-003 | Overlord trigger in world page | DEFERRED | Phase 16 dashboard page handles overlord flow |
+| COMBAT-FLOW-004 | Zone unlock on guardian victory | DEFERRED | Phase 16 dashboard handles realm unlocking |
+| COMBAT-FLOW-005 | Overlord victory → /g/victory | DEFERRED | Phase 16 victory page handles this |
+
+---
+
+## PHASE 16 — Gamified UI Redesign (Cinematic Fantasy)
+
+> **Plan:** [planning/phase-16-gamified-ui-redesign.md](phase-16-gamified-ui-redesign.md)
+> **Sprint plan:** [planning/sprint-p16.md](sprint-p16.md) — 4 sprints, 8 weeks estimated
+> **ADRs:** ADR-002 (paradigm), ADR-003 (KP economy), ADR-004 (UI mode), ADR-005 (narrative mapping)
+> **Branch:** `feature/phase-16-fantasy-ui`
+> **Status:** IN PROGRESS — Sprint C DONE (2026-04-29); Sprint D Wave 2 unblocked.
+> **Sprint C progress:** 15/15 DONE.
+> **Sprint D progress:** 5/13 READY (Wave 1 — DEVOPS+QA parallel-start) · 8/13 unblocked (Wave 2 — ready to start).
+
+### Part A — Foundation (Design Tokens, Flag, Shared Types)
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-FND-001 | Add fantasy design tokens (CSS vars under `[data-ui-mode="game"]`) to globals.css | DONE | FE 2026-04-27 |
+| P16-FND-002 | Load Cinzel display font via next/font/google in `(game)/layout.tsx` | DONE | FE 2026-04-27 |
+| P16-FND-003 | Extend Tailwind config: `font-display`, fantasy keyframes, animations | DONE | FE 2026-04-27 |
+| P16-FND-004 | Create `apps/web/src/styles/game-utilities.css` (panel, rune-ring, scanlines, glow utilities) | DONE | FE 2026-04-27 |
+| P16-FND-005 | Add `featureFlags.fantasyUi` to packages/shared-types | DONE | ARCH 2026-04-26 — `fantasyUi: boolean` added to `FeatureFlags` + `DEFAULT_FEATURE_FLAGS` (default `true`); shared-types built |
+| P16-FND-006 | Add Phase 16 shared types: `UiMode`, `FantasyClass`, mappings, `Inventory`, `ShopAbility`, `ShopWeapon` | DONE | ARCH 2026-04-26 — new file `packages/shared-types/src/phase16.types.ts`, re-exported from index; ADR-005 §2 corrected to 8-archetype mapping; API + web both lint clean |
+
+### Part B — Backend (Inventory, KP, Settings, Tenants)
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-BE-001 | New module `inventory/` — controller, service, DTOs, hardcoded shop catalog | DONE | BE 2026-04-27 — atomic buy txn, lazy init, starter items |
+| P16-BE-002 | `GET /api/v1/inventory` endpoint | DONE | BE 2026-04-27 |
+| P16-BE-003 | `GET /api/v1/shop/catalog` endpoint | DONE | BE 2026-04-27 |
+| P16-BE-004 | `POST /api/v1/inventory/buy` (atomic Firestore transaction) | DONE | BE 2026-04-27 |
+| P16-BE-005 | `POST /api/v1/inventory/equip` (weapon equip/unequip) | DONE | BE 2026-04-27 |
+| P16-BE-006 | Extend `users` module: `uiMode` field + `PUT /users/me/settings` extension | DONE | BE 2026-04-27 — UsersController created |
+| P16-BE-007 | New endpoints: `GET/PUT /api/v1/users/me/character` (FantasyCharacter) | DONE | BE 2026-04-27 |
+| P16-BE-008 | New module `tenants/` — `uiModeLock` field + admin endpoints | DONE | BE 2026-04-27 |
+| P16-BE-009 | `UiModeResolver` service — single source of truth for effective mode | DONE | BE 2026-04-27 — tenant lock > user pref > 'normal' |
+| P16-BE-010 | Hook KP earning into existing progress endpoints (mode-conditional) | DONE | BE 2026-04-27 — progress + combat controllers inject KP |
+| P16-BE-011 | Daily KP earn cap (sub-collection `inventories/{uid}/dailyEarn/{date}`) | DONE | BE 2026-04-27 — 100 KP/day |
+| P16-BE-012 | Firestore security rules for `inventories/{userId}` and `tenants` updates | DONE | BE 2026-04-27 — rules in firestore-rules-phase16.txt |
+| P16-BE-013 | Unit + integration tests for inventory module (atomicity, daily cap, mode-gating) | DONE | BE+QA 2026-04-27 — 41 tests, 257 total all passing |
+
+### Part C — Frontend State & Foundation
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-FE-001 | New Zustand store `inventory-store.ts` (KP, owned items, equipped weapon) | DONE | FE 2026-04-27 |
+| P16-FE-002 | New hook `useUiMode()` — reads effective mode, sets `<html data-ui-mode>` attr | DONE | FE 2026-04-27 |
+| P16-FE-003 | Extend `combat-store.ts` with `sparkCharges` field for KP-economy mechanic | DONE | FE 2026-04-27 |
+| P16-FE-004 | Park R3F components: move to `_legacy_r3f/`, update existing imports | DONE | FE 2026-04-27 — 15 R3F files moved, all imports updated |
+
+### Part D — Fantasy UI Components (Ports from ai-adventure-island)
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-FE-010 | Port `Scene` component — `components/game/fantasy/Scene.tsx` | DONE | FE 2026-04-27 |
+| P16-FE-011 | Port `Logo` component — Eureka brand ("EUREKA LAB / QUEST FOR AI MASTERY") | DONE | FE 2026-04-27 |
+| P16-FE-012 | Port `GameButton` (primary/gold/ghost/danger variants) | DONE | FE 2026-04-27 |
+| P16-FE-013 | Port `KpBadge` — wired to `inventory-store` | DONE | FE 2026-04-27 |
+| P16-FE-014 | Port `AiTutorChat` — mock mode (real AI gateway wiring Sprint C) | DONE | FE 2026-04-27 — no dangerouslySetInnerHTML, security notice added |
+| P16-FE-015 | Adapt `NavLink` — Next.js `<Link>` + `usePathname` | DONE | FE 2026-04-27 |
+| P16-FE-016 | Extract reusable `HpBar` component | DONE | FE 2026-04-27 — player/enemy variants, ARIA progressbar |
+
+### Part E — Page Ports (App Router)
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-PG-001 | `(game)/g/welcome/page.tsx` — Firebase auth (email + Google) | DONE | FE 2026-04-27 |
+| P16-PG-002 | `(game)/g/character/page.tsx` — fantasy class carousel, saves to API | DONE | FE 2026-04-27 |
+| P16-PG-003 | `(game)/g/dashboard/page.tsx` (Realm Map) — 4 isles, lock/unlock | DONE | FE 2026-04-27 |
+| P16-PG-004 | `(game)/g/campaign/[slug]/page.tsx` — mission list with placeholders | DONE | FE 2026-04-27 |
+| P16-PG-005 | `(game)/g/campaign/[slug]/prepare/page.tsx` (Academy hub: 4 tabs) | DONE | FE 2026-04-29, commit cf2402e |
+| P16-PG-006 | `(game)/g/campaign/[slug]/mission/[missionId]/prep/page.tsx` (warm-up quiz, KP award) | DONE | FE 2026-04-29, commit cf2402e |
+| P16-PG-007 | `(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` — wire to Phase 15 combat API | DONE | FE 2026-04-29, commit 8817718. Split: page.tsx + battle-stage.tsx + battle-quiz.tsx + battle-outcome.tsx |
+| P16-PG-008 | `(game)/g/campaign/[slug]/shop/page.tsx` (per-realm shop, zoneId filter) | DONE | FE 2026-04-29, commit af9d3ea |
+| P16-PG-009 | `(game)/g/shop/page.tsx` (global Grand Bazaar) | DONE | FE 2026-04-29, commit af9d3ea |
+| P16-PG-010 | `(game)/g/inventory/page.tsx` re-theme | DONE | FE 2026-04-29, commit 018a396 |
+| P16-PG-011 | `(game)/g/victory/page.tsx` re-theme (keep existing certificate logic) | DONE | FE 2026-04-29, commit 018a396 |
+| P16-PG-012 | `(game)/g/not-found.tsx` re-theme | DONE | FE 2026-04-29, commit 018a396 |
+
+### Part F — Mobile Mirror (`/m/*`)
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-MOB-001 | `(mobile)/m/welcome` etc — mirror all 11 game routes with `density="compact"` | BLOCKED | FE — Wave 2; blocked on Sprint C closure |
+| P16-MOB-002 | Mobile bottom-tab bar in game mode: Realm Map · Battle · Shop · Inventory · Profile | BLOCKED | FE — blocked on MOB-001 |
+| P16-MOB-003 | Asset script: generate 768×1024 mobile crops from desktop backgrounds | DONE | DEVOPS 2026-04-29 — scripts/generate-mobile-crops.sh; 5 mobile SVGs in assets/game/mobile/ |
+
+### Part G — UI Mode Settings
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-SET-001 | Settings page: B2C UI mode toggle (Normal / Gamified) | DONE | FE 2026-04-28, commit 70461cc |
+| P16-SET-002 | Tenant admin console: Default Learning Mode + lock toggle | DONE | FE 2026-04-28, commit 70461cc |
+| P16-SET-003 | Hide settings toggle when tenant locked, with informational message | DONE | FE 2026-04-28, commit 70461cc |
+| P16-SET-004 | Mode toggle disabled while combat in progress / AI mid-stream | DONE | FE 2026-04-28, commit 70461cc |
+
+### Part H — Routing & Migration
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-RTE-001 | next.config redirects: `/g/world → /g/dashboard`, `/g/zone/:id → /g/campaign/:slug`, etc. | DONE | FE 2026-04-28, commit 87f2463 |
+| P16-RTE-002 | (game) layout reads featureFlag and renders new vs legacy R3F | DONE | FE 2026-04-28, commit 87f2463 |
+| P16-RTE-003 | Dynamic-import the `_legacy_r3f/*` chunk so it tree-shakes when flag=false | DONE | FE 2026-04-28, commit 87f2463 |
+
+### Part I — Assets
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-AST-001 | Import 6 Lovable assets (world-map, island-1..4, zombie, hero-warrior/mage/rogue/engineer, logo) into `apps/web/public/assets/game/` | DONE | DEVOPS 2026-04-29 — 13 SVG placeholders + game-assets.ts manifest + Logo.tsx updated to .svg |
+| P16-AST-002 | Generate 4 zone-specific zombie variants (start with color-tinted base zombie) | DONE | DEVOPS 2026-04-29 — scripts/generate-zombie-variants.sh; 4 zone-tinted SVGs (violet/amber/cyan/crimson) |
+
+### Part J — QA & Rollout
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-QA-PLAN | Draft Playwright test plan (cases, fixtures, mock auth) into `apps/web/e2e/fantasy-flow.plan.md` | DONE | QA 2026-04-29 — 13 suites, 50+ test cases, mock auth + API strategy, flag matrix for QA-002 |
+| P16-QA-001 | Playwright suite: fantasy-mode end-to-end (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | BLOCKED | QA — Wave 2; blocked on Sprint C DONE + QA-PLAN |
+| P16-QA-002 | Playwright matrix: same flow runs with `featureFlags.fantasyUi` true and false | BLOCKED | QA — blocked on QA-001 |
+| P16-QA-003a | i18n extraction pass 1 (Sprint B+C pages already on disk) | READY | FE+QA — Sprint D Wave 1, dispatched 2026-04-28 |
+| P16-QA-003b | i18n extraction pass 2 (battle page strings) | DONE | QA 2026-05-06 — Phase16Battle namespace added to en/fr/ar.json, 6 files wired with useTranslations |
+| P16-QA-004 | Lighthouse mobile ≥90 perf for `/m/dashboard` | BLOCKED | QA — blocked on MOB-001 |
+| P16-QA-005 | iOS Safari + Android Chrome smoke tests before flag enablement | BLOCKED | QA — blocked on MOB-001 |
+| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | BLOCKED | DEVOPS — blocked on all Wave 1+2 done & OPEN-005 resolved |
+
+### Part K — Open Decisions Awaiting Confirmation
+
+| ID | Task | Status | Notes |
+|----|------|--------|-------|
+| P16-OPEN-001 | Confirm career→class default mapping (ADR-005 §2) | DONE | Product owner accepted 2026-04-26 — locked in ADR-005 |
+| P16-OPEN-002 | Confirm realm slugs `whispers/echoes/glitches/wraiths/void` (ADR-005 §1) | DONE | Product owner accepted 2026-04-26 — locked in ADR-005 |
+| P16-OPEN-003 | Confirm "Babble" boss naming | DONE | Product owner accepted 2026-04-26 — locked in ADR-005 |
+| P16-OPEN-004 | KP earn/spend tuning values (initial seed) | DONE | PM resolved 2026-04-26 — see sprint-p16.md §KP Tuning Values |
+| P16-OPEN-005 | Lovable-asset license / replacement plan | IN_PROGRESS | DEVOPS documented 2026-04-29 in docs/context/asset-licenses.md — 3 resolution paths outlined. PM decision pending. Pre-prod gate |
 
 ---
 
@@ -280,4 +417,4 @@
 
 ---
 
-*Last updated: 2026-03-07 | Phases 1–14 complete. Phase 15 (AI Zombie Combat) in progress — 26 tasks across 6 parts.*
+*Last updated: 2026-04-29 | Phases 1–14 complete. Phase 15 backend done, frontend deferred. Phase 16 Sprints A+B+C DONE (2026-04-29). Sprint D Wave 1 in progress (DEVOPS+QA), Wave 2 unblocked by Sprint C completion.*

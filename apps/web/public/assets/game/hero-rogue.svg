@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="384" viewBox="0 0 256 384">
+  <defs>
+    <linearGradient id="hr-tunic" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <filter id="hr-glow">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#34d399" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- Tunic -->
+  <rect x="86" y="140" width="84" height="105" rx="8" fill="url(#hr-tunic)" filter="url(#hr-glow)"/>
+  <!-- Hood -->
+  <path d="M88,110 Q88,58 128,52 Q168,58 168,110 Z" fill="#064e3b" stroke="#34d399" stroke-width="1"/>
+  <!-- Face (shadowed under hood) -->
+  <circle cx="128" cy="100" r="32" fill="#fef3c7"/>
+  <!-- Eyes -->
+  <ellipse cx="116" cy="96" rx="4" ry="3" fill="#065f46"/>
+  <ellipse cx="140" cy="96" rx="4" ry="3" fill="#065f46"/>
+  <!-- Mask/scarf -->
+  <rect x="100" y="108" width="56" height="12" rx="3" fill="#064e3b"/>
+  <!-- Daggers -->
+  <rect x="52" y="170" width="4" height="40" rx="2" fill="#e2e8f0" transform="rotate(-20 54 190)"/>
+  <rect x="200" y="170" width="4" height="40" rx="2" fill="#e2e8f0" transform="rotate(20 202 190)"/>
+  <!-- Belt -->
+  <rect x="86" y="225" width="84" height="8" rx="3" fill="#78350f"/>
+  <circle cx="128" cy="229" r="4" fill="#fbbf24"/>
+  <!-- Legs -->
+  <rect x="96" y="245" width="24" height="65" rx="6" fill="#064e3b"/>
+  <rect x="136" y="245" width="24" height="65" rx="6" fill="#064e3b"/>
+</svg>
