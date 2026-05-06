@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { GameButton } from '@/components/game/fantasy';
 import { Zap } from 'lucide-react';
@@ -53,6 +54,7 @@ export function BattleQuiz({
   onAnswer,
   onUseSparkCharge,
 }: BattleQuizProps) {
+  const t = useTranslations('Phase16Battle');
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIMER);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isLocked, setIsLocked] = useState(false);
@@ -113,7 +115,7 @@ export function BattleQuiz({
       {/* Header: question number + timer */}
       <div className="mb-4 flex items-center justify-between">
         <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Question {questionNumber}/{totalQuestions}
+          {t('questionProgress', { current: questionNumber, total: totalQuestions })}
         </span>
         <div className="flex items-center gap-2">
           {/* Spark charge button */}
@@ -122,10 +124,10 @@ export function BattleQuiz({
               variant="gold"
               size="sm"
               onClick={onUseSparkCharge}
-              aria-label={`Use spark charge (${sparkChargesAvailable} remaining)`}
+              aria-label={t('sparkChargeAria', { count: sparkChargesAvailable })}
             >
               <Zap className="h-3.5 w-3.5" aria-hidden />
-              Spark ({sparkChargesAvailable})
+              {t('sparkChargeLabel', { count: sparkChargesAvailable })}
             </GameButton>
           )}
           {/* Timer */}
@@ -202,7 +204,7 @@ export function BattleQuiz({
       {isLocked && (
         <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-lg border border-primary/10 bg-card/40 p-3">
           <p className="text-xs text-muted-foreground">
-            <span className="font-semibold text-primary">Explanation:</span>{' '}
+            <span className="font-semibold text-primary">{t('explanationPrefix')}</span>{' '}
             {question.explanation}
           </p>
         </div>

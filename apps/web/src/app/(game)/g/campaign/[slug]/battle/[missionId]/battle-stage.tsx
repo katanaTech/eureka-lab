@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { HpBar } from '@/components/game/fantasy';
 import { GameButton } from '@/components/game/fantasy';
@@ -35,11 +36,12 @@ interface IntroOverlayProps {
  * @returns Animated intro overlay
  */
 export function IntroOverlay({ zombieName, zombieDialogue, onStartFight }: IntroOverlayProps) {
+  const t = useTranslations('Phase16Battle');
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 px-4">
       <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 text-center max-w-md">
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
-          A challenger appears
+          {t('challengerAppears')}
         </p>
         <h2 className="font-display text-4xl uppercase tracking-widest text-glow-primary mb-4">
           {zombieName}
@@ -48,7 +50,7 @@ export function IntroOverlay({ zombieName, zombieDialogue, onStartFight }: Intro
           &ldquo;{zombieDialogue}&rdquo;
         </p>
         <GameButton variant="gold" size="lg" onClick={onStartFight}>
-          FIGHT!
+          {t('fightCta')}
         </GameButton>
       </div>
     </div>

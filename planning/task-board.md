@@ -385,7 +385,7 @@
 | P16-QA-001 | Playwright suite: fantasy-mode end-to-end (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | BLOCKED | QA — Wave 2; blocked on Sprint C DONE + QA-PLAN |
 | P16-QA-002 | Playwright matrix: same flow runs with `featureFlags.fantasyUi` true and false | BLOCKED | QA — blocked on QA-001 |
 | P16-QA-003a | i18n extraction pass 1 (Sprint B+C pages already on disk) | READY | FE+QA — Sprint D Wave 1, dispatched 2026-04-28 |
-| P16-QA-003b | i18n extraction pass 2 (battle page strings) | BLOCKED | FE+QA — blocked on P16-PG-007 DONE |
+| P16-QA-003b | i18n extraction pass 2 (battle page strings) | DONE | QA 2026-05-06 — Phase16Battle namespace added to en/fr/ar.json, 6 files wired with useTranslations |
 | P16-QA-004 | Lighthouse mobile ≥90 perf for `/m/dashboard` | BLOCKED | QA — blocked on MOB-001 |
 | P16-QA-005 | iOS Safari + Android Chrome smoke tests before flag enablement | BLOCKED | QA — blocked on MOB-001 |
 | P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | BLOCKED | DEVOPS — blocked on all Wave 1+2 done & OPEN-005 resolved |

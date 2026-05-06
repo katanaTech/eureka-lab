@@ -285,7 +285,7 @@ DONE (FE mobile mirror + QA Playwright impl + DEVOPS rollout).
 | P16-MOB-002 | Mobile bottom-tab bar in game mode (Realm Map · Battle · Shop · Inventory · Profile) | FE | MOB-001 | M | BLOCKED on MOB-001 |
 | P16-QA-001 | Playwright: fantasy-mode E2E (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | QA | Sprint C DONE, QA-PLAN | L | BLOCKED |
 | P16-QA-002 | Playwright matrix: same flow with `featureFlags.fantasyUi` true and false | QA | QA-001 | M | BLOCKED on QA-001 |
-| P16-QA-003b | i18n string extraction pass 2: battle-page strings | FE+QA | P16-PG-007 DONE | S | BLOCKED on PG-007 |
+| P16-QA-003b | i18n string extraction pass 2: battle-page strings | FE+QA | P16-PG-007 DONE | S | **DONE** (2026-05-06) |
 | P16-QA-004 | Lighthouse mobile ≥90 perf for /m/dashboard | QA | MOB-001 | M | BLOCKED on MOB-001 |
 | P16-QA-005 | iOS Safari + Android Chrome smoke tests | QA | MOB-001 | M | BLOCKED on MOB-001 |
 | P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | DEVOPS | All Wave 1+2 done, OPEN-005 resolved | — | BLOCKED |

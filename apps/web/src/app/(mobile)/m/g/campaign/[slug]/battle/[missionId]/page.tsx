@@ -8,6 +8,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import {
   ZONE_BY_CAMPAIGN_SLUG,
@@ -64,6 +65,7 @@ interface CompleteResult { xpAwarded: number; badgesUnlocked: string[]; kpAwarde
 export default function MobileBattlePage() {
   const params = useParams<{ slug: string; missionId: string }>();
   const router = useRouter();
+  const t = useTranslations('Phase16Battle');
   const { isGameMode } = useUiMode();
 
   const slug = params.slug ?? '';
@@ -111,8 +113,8 @@ export default function MobileBattlePage() {
 
   useEffect(() => {
     if (phase !== 'player_attack' && phase !== 'zombie_attack') return;
-    const t = setTimeout(advanceAfterAnimation, ATTACK_ANIMATION_MS);
-    return () => clearTimeout(t);
+    const timer = setTimeout(advanceAfterAnimation, ATTACK_ANIMATION_MS);
+    return () => clearTimeout(timer);
   }, [phase, advanceAfterAnimation]);
 
   useEffect(() => {
@@ -134,11 +136,11 @@ export default function MobileBattlePage() {
         setKpAwarded(result.kpAwarded);
         if (isGameMode && result.kpAwarded > 0) {
           addKp(result.kpAwarded);
-          toast.success(`+${result.kpAwarded} KP earned!`);
+          toast.success(t('kpToast', { kp: result.kpAwarded }));
         }
         fetch('/api/v1/inventory').then((r) => r.json()).then((inv) => setInventory(inv)).catch(() => null);
       })
-      .catch(() => toast.error('Failed to record battle result.'));
+      .catch(() => toast.error(t('recordFailed')));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, battleId]);
 
@@ -154,7 +156,7 @@ export default function MobileBattlePage() {
       const { certificateUrl } = await res.json() as { certificateUrl: string };
       setCertificateUrl(certificateUrl);
       router.push('/m/g/victory');
-    } catch { toast.error('Failed to generate certificate.'); }
+    } catch { toast.error(t('certificateFailed')); }
   }, [battleId, setCertificateUrl, router]);
 
   const handleRetry = useCallback(() => {
@@ -166,7 +168,7 @@ export default function MobileBattlePage() {
 
   const handleSparkCharge = useCallback(() => {
     useSparkCharge();
-    toast.success('Spark Charge activated! Bonus damage dealt.');
+    toast.success(t('sparkChargeToast'));
   }, [useSparkCharge]);
 
   if (!zoneId) return null;
@@ -179,8 +181,8 @@ export default function MobileBattlePage() {
     return (
       <Scene className="flex h-screen w-screen items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" role="status" aria-label="Initialising battle" />
-          <p className="mt-3 text-xs text-muted-foreground">Entering {realmName}...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" role="status" aria-label={t('loadingAria')} />
+          <p className="mt-3 text-xs text-muted-foreground">{t('enteringRealm', { realmName })}</p>
         </div>
       </Scene>
     );
@@ -191,7 +193,7 @@ export default function MobileBattlePage() {
       <Scene className="flex h-screen w-screen flex-col items-center justify-center px-4">
         <p className="text-xs text-destructive mb-3">{initError}</p>
         <button onClick={() => router.push(`/m/g/campaign/${slug}`)} className="text-xs text-primary underline">
-          Return to campaign
+          {t('returnToCampaign')}
         </button>
       </Scene>
     );
@@ -232,7 +234,7 @@ export default function MobileBattlePage() {
       {(phase === 'player_attack' || phase === 'zombie_attack') && (
         <div className="mx-auto mt-6 max-w-sm text-center">
           <p className="font-display text-base uppercase tracking-widest text-primary animate-pulse">
-            {phase === 'player_attack' ? 'Your attack lands!' : 'The enemy strikes!'}
+            {phase === 'player_attack' ? t('playerAttack') : t('enemyAttack')}
           </p>
         </div>
       )}

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Trophy, RotateCcw, Home, Sparkles } from 'lucide-react';
 import { GameButton } from '@/components/game/fantasy';
 
@@ -40,6 +41,7 @@ export function VictoryPanel({
   isGameMode,
   onViewCertificate,
 }: VictoryPanelProps) {
+  const t = useTranslations('Phase16Battle');
   return (
     <div className="mx-auto mt-8 max-w-md animate-in fade-in slide-in-from-bottom-6 duration-700 text-center">
       {/* Trophy icon */}
@@ -50,27 +52,29 @@ export function VictoryPanel({
       </div>
 
       <h2 className="font-display text-3xl uppercase tracking-widest text-glow-gold">
-        Victory!
+        {t('victoryHeading')}
       </h2>
 
       {/* Rewards */}
       <div className="mt-6 space-y-2">
         <div className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-card/60 px-4 py-2 text-sm">
           <Sparkles className="h-4 w-4 text-primary" aria-hidden />
-          <span className="text-foreground">{xpAwarded} XP earned</span>
+          <span className="text-foreground">{t('xpEarned', { xp: xpAwarded })}</span>
         </div>
 
         {isGameMode && kpAwarded > 0 && (
           <div className="inline-flex items-center gap-2 rounded-lg border border-accent/30 bg-accent/5 px-4 py-2 text-sm">
-            <span className="font-display text-accent">{kpAwarded} KP</span>
-            <span className="text-muted-foreground">earned</span>
+            <span className="font-display text-accent">{t('kpAmount', { kp: kpAwarded })}</span>
+            <span className="text-muted-foreground">{t('kpEarnedLabel')}</span>
           </div>
         )}
 
         {badgesUnlocked.length > 0 && (
           <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-2 text-sm">
             <span className="text-emerald-400">
-              {badgesUnlocked.length} badge{badgesUnlocked.length > 1 ? 's' : ''} unlocked!
+              {badgesUnlocked.length > 1
+                ? t('badgesUnlockedPlural', { count: badgesUnlocked.length })
+                : t('badgesUnlocked', { count: badgesUnlocked.length })}
             </span>
           </div>
         )}
@@ -81,20 +85,20 @@ export function VictoryPanel({
         {isOverlord ? (
           <GameButton variant="gold" size="lg" onClick={onViewCertificate}>
             <Trophy className="h-4 w-4" aria-hidden />
-            View Certificate
+            {t('viewCertificate')}
           </GameButton>
         ) : (
           <Link href={`/g/campaign/${slug}`}>
             <GameButton variant="primary" size="md">
               <Home className="h-4 w-4" aria-hidden />
-              Back to Campaign
+              {t('backToCampaign')}
             </GameButton>
           </Link>
         )}
 
         <Link href="/g/dashboard">
           <GameButton variant="ghost" size="md">
-            Realm Map
+            {t('realmMap')}
           </GameButton>
         </Link>
       </div>
@@ -120,6 +124,7 @@ interface DefeatPanelProps {
  * @returns Styled defeat panel with retry and exit CTAs
  */
 export function DefeatPanel({ slug, missionId, onRetry }: DefeatPanelProps) {
+  const t = useTranslations('Phase16Battle');
   return (
     <div className="mx-auto mt-8 max-w-md animate-in fade-in slide-in-from-bottom-6 duration-700 text-center">
       {/* Skull icon */}
@@ -132,23 +137,23 @@ export function DefeatPanel({ slug, missionId, onRetry }: DefeatPanelProps) {
       </div>
 
       <h2 className="font-display text-3xl uppercase tracking-widest text-red-400">
-        Defeated
+        {t('defeatedHeading')}
       </h2>
       <p className="mt-3 text-sm text-muted-foreground max-w-xs mx-auto">
-        The enemy was too strong this time. Study more at the Academy and try again.
+        {t('defeatedMessage')}
       </p>
 
       {/* CTAs */}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <GameButton variant="primary" size="md" onClick={onRetry}>
           <RotateCcw className="h-4 w-4" aria-hidden />
-          Try Again
+          {t('tryAgain')}
         </GameButton>
 
         <Link href={`/g/campaign/${slug}/prepare`}>
           <GameButton variant="ghost" size="md">
             <Home className="h-4 w-4" aria-hidden />
-            Return to Academy
+            {t('returnToAcademy')}
           </GameButton>
         </Link>
       </div>
