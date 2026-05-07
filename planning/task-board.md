@@ -273,10 +273,10 @@
 > **Plan:** [planning/phase-16-gamified-ui-redesign.md](phase-16-gamified-ui-redesign.md)
 > **Sprint plan:** [planning/sprint-p16.md](sprint-p16.md) — 4 sprints, 8 weeks estimated
 > **ADRs:** ADR-002 (paradigm), ADR-003 (KP economy), ADR-004 (UI mode), ADR-005 (narrative mapping)
-> **Branch:** `feature/phase-16-fantasy-ui`
-> **Status:** IN PROGRESS — Sprint C DONE (2026-04-29); Sprint D Wave 2 unblocked.
+> **Branch:** `feature/phase-16-fantasy-ui` — **merged to main via PR #7 (commit 58c9f25, 2026-05-07)**
+> **Status:** IN PROGRESS — Sprint C COMPLETE; Sprint D Wave 1 COMPLETE; Wave 2 in-flight (QA track unblocked as of 2026-05-07).
 > **Sprint C progress:** 15/15 DONE.
-> **Sprint D progress:** 5/13 READY (Wave 1 — DEVOPS+QA parallel-start) · 8/13 unblocked (Wave 2 — ready to start).
+> **Sprint D progress:** 8/13 DONE (Wave 1 all done; MOB-001/002/QA-003b done) · 3/13 READY (QA-001/004/005 — QA now unblocked) · 2/13 BLOCKED (QA-002 on QA-001; QA-006 on OPEN-005 + all done) · P16-OPEN-005 IN_PROGRESS (PM decision pending).
 
 ### Part A — Foundation (Design Tokens, Flag, Shared Types)
 
@@ -349,8 +349,8 @@
 
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
-| P16-MOB-001 | `(mobile)/m/welcome` etc — mirror all 11 game routes with `density="compact"` | BLOCKED | FE — Wave 2; blocked on Sprint C closure |
-| P16-MOB-002 | Mobile bottom-tab bar in game mode: Realm Map · Battle · Shop · Inventory · Profile | BLOCKED | FE — blocked on MOB-001 |
+| P16-MOB-001 | `(mobile)/m/welcome` etc — mirror all 11 game routes with `density="compact"` | DONE | FE — commits 9eae286, c450a25, 59af877; 11 routes + sub-pages in `(mobile)/m/g/**` |
+| P16-MOB-002 | Mobile bottom-tab bar in game mode: Realm Map · Battle · Shop · Inventory · Profile | DONE | FE — commit 9eae286; `GameBottomTabs` in `(mobile)/m/g/layout.tsx` |
 | P16-MOB-003 | Asset script: generate 768×1024 mobile crops from desktop backgrounds | DONE | DEVOPS 2026-04-29 — scripts/generate-mobile-crops.sh; 5 mobile SVGs in assets/game/mobile/ |
 
 ### Part G — UI Mode Settings
@@ -382,12 +382,12 @@
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | P16-QA-PLAN | Draft Playwright test plan (cases, fixtures, mock auth) into `apps/web/e2e/fantasy-flow.plan.md` | DONE | QA 2026-04-29 — 13 suites, 50+ test cases, mock auth + API strategy, flag matrix for QA-002 |
-| P16-QA-001 | Playwright suite: fantasy-mode end-to-end (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | BLOCKED | QA — Wave 2; blocked on Sprint C DONE + QA-PLAN |
-| P16-QA-002 | Playwright matrix: same flow runs with `featureFlags.fantasyUi` true and false | BLOCKED | QA — blocked on QA-001 |
-| P16-QA-003a | i18n extraction pass 1 (Sprint B+C pages already on disk) | READY | FE+QA — Sprint D Wave 1, dispatched 2026-04-28 |
+| P16-QA-001 | Playwright suite: fantasy-mode end-to-end (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | READY | QA — unblocked 2026-05-07 (Sprint C done + QA-PLAN done + MOB-001 done); awaiting QA pickup |
+| P16-QA-002 | Playwright matrix: same flow runs with `featureFlags.fantasyUi` true and false | BLOCKED | QA — blocked on QA-001 completing |
+| P16-QA-003a | i18n extraction pass 1 (Sprint B+C pages already on disk) | DONE | FE+QA — commits 06aac4a, a577f83, cb1bc31, afb1896; 12 Phase16 namespaces in en/fr/ar.json |
 | P16-QA-003b | i18n extraction pass 2 (battle page strings) | DONE | QA 2026-05-06 — Phase16Battle namespace added to en/fr/ar.json, 6 files wired with useTranslations |
-| P16-QA-004 | Lighthouse mobile ≥90 perf for `/m/dashboard` | BLOCKED | QA — blocked on MOB-001 |
-| P16-QA-005 | iOS Safari + Android Chrome smoke tests before flag enablement | BLOCKED | QA — blocked on MOB-001 |
+| P16-QA-004 | Lighthouse mobile ≥90 perf for `/m/dashboard` | READY | QA — unblocked 2026-05-07 (MOB-001 done); awaiting QA pickup |
+| P16-QA-005 | iOS Safari + Android Chrome smoke tests before flag enablement | READY | QA — unblocked 2026-05-07 (MOB-001 done); awaiting QA pickup |
 | P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | BLOCKED | DEVOPS — blocked on all Wave 1+2 done & OPEN-005 resolved |
 
 ### Part K — Open Decisions Awaiting Confirmation

@@ -275,20 +275,20 @@ DONE (FE mobile mirror + QA Playwright impl + DEVOPS rollout).
 | P16-MOB-003 | Asset script: generate 768×1024 mobile crops from desktop backgrounds; commit to `scripts/generate-mobile-crops.{ts,sh}` | DEVOPS | AST-001 | S | **DONE** (2026-04-29) — scripts/generate-mobile-crops.sh |
 | P16-OPEN-005 | Lovable asset license / replacement decision (commercial-use confirmation OR commission replacement) | PM+DEVOPS | — | — | **IN_PROGRESS** — docs/context/asset-licenses.md written; PM decision pending |
 | P16-QA-PLAN | Draft Playwright test plan for QA-001/QA-002 (test cases, fixtures, mock auth strategy); commit to `apps/web/e2e/fantasy-flow.plan.md` | QA | — | S | **DONE** (2026-04-29) — 13 test suites, 50+ cases, mock auth strategy, flag matrix |
-| P16-QA-003a | i18n string extraction pass 1: extract strings from already-landed Sprint B+C pages (welcome, character, dashboard, campaign, settings, prepare, prep, shop, inventory, victory, not-found) into `en.json`; stub `fr.json`/`ar.json` with TODO markers | FE+QA | — | M | **READY** — battle page strings deferred to QA-003b |
+| P16-QA-003a | i18n string extraction pass 1: extract strings from already-landed Sprint B+C pages (welcome, character, dashboard, campaign, settings, prepare, prep, shop, inventory, victory, not-found) into `en.json`; stub `fr.json`/`ar.json` with TODO markers | FE+QA | — | M | **DONE** (2026-05-04) — commits 06aac4a, a577f83, cb1bc31, afb1896; 12 Phase16 namespaces, real fr/ar translations |
 
 ### Wave 2 — Blocked on Sprint C closure
 
 | Task ID | Description | Owner | Depends On | Est | Status |
 |---------|-------------|-------|------------|-----|--------|
-| P16-MOB-001 | Mirror all 11 game routes to /m/* with `density="compact"` | FE | Sprint C DONE | L | BLOCKED |
-| P16-MOB-002 | Mobile bottom-tab bar in game mode (Realm Map · Battle · Shop · Inventory · Profile) | FE | MOB-001 | M | BLOCKED on MOB-001 |
-| P16-QA-001 | Playwright: fantasy-mode E2E (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | QA | Sprint C DONE, QA-PLAN | L | BLOCKED |
-| P16-QA-002 | Playwright matrix: same flow with `featureFlags.fantasyUi` true and false | QA | QA-001 | M | BLOCKED on QA-001 |
+| P16-MOB-001 | Mirror all 11 game routes to /m/* with `density="compact"` | FE | Sprint C DONE | L | **DONE** (commits 9eae286, c450a25, 59af877) — all 11 routes in `(mobile)/m/g/**` |
+| P16-MOB-002 | Mobile bottom-tab bar in game mode (Realm Map · Battle · Shop · Inventory · Profile) | FE | MOB-001 | M | **DONE** (commit 9eae286) — `GameBottomTabs` in mobile layout |
+| P16-QA-001 | Playwright: fantasy-mode E2E (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | QA | Sprint C DONE, QA-PLAN | L | **READY** — unblocked 2026-05-07 (all deps met); QA to pick up |
+| P16-QA-002 | Playwright matrix: same flow with `featureFlags.fantasyUi` true and false | QA | QA-001 | M | BLOCKED on QA-001 completing |
 | P16-QA-003b | i18n string extraction pass 2: battle-page strings | FE+QA | P16-PG-007 DONE | S | **DONE** (2026-05-06) |
-| P16-QA-004 | Lighthouse mobile ≥90 perf for /m/dashboard | QA | MOB-001 | M | BLOCKED on MOB-001 |
-| P16-QA-005 | iOS Safari + Android Chrome smoke tests | QA | MOB-001 | M | BLOCKED on MOB-001 |
-| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | DEVOPS | All Wave 1+2 done, OPEN-005 resolved | — | BLOCKED |
+| P16-QA-004 | Lighthouse mobile ≥90 perf for /m/dashboard | QA | MOB-001 | M | **READY** — unblocked 2026-05-07 (MOB-001 done); QA to pick up |
+| P16-QA-005 | iOS Safari + Android Chrome smoke tests | QA | MOB-001 | M | **READY** — unblocked 2026-05-07 (MOB-001 done); QA to pick up |
+| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | DEVOPS | All Wave 1+2 done, OPEN-005 resolved | — | BLOCKED — pending QA-001/002/004/005 + OPEN-005 PM decision |
 
 **Sprint D exit criteria:**
 - [ ] All 6 Lovable assets imported (or replacements commissioned per OPEN-005)
@@ -329,7 +329,11 @@ DONE (FE mobile mirror + QA Playwright impl + DEVOPS rollout).
 
 ---
 
-*Sprint plan v1.2 — PM agent — 2026-04-28*
+*Sprint plan v1.3 — PM agent — 2026-05-07*
+*Changelog v1.3: PM check-in 2026-05-07. Branch merged to main (PR #7, commit 58c9f25).*
+*Sprint D Wave 2 progress update: MOB-001 DONE (commits 9eae286/c450a25/59af877), MOB-002 DONE (commit 9eae286), QA-003a DONE (commits 06aac4a/a577f83/cb1bc31/afb1896).*
+*QA-001/004/005 unblocked and marked READY. QA-002 remains BLOCKED on QA-001. QA-006 BLOCKED on OPEN-005 + QA completion.*
+*PM → QA dispatch written in blockers.md to trigger Playwright + Lighthouse + smoke tracks.*
 *Changelog v1.2: Sprint D split into Wave 1 (parallel-start, 5 tasks) and Wave 2 (blocked-on-Sprint-C, 8 tasks).*
 *QA-003 split into 003a (existing pages, ready) and 003b (battle page, blocked on PG-007).*
 *Added P16-QA-PLAN (Playwright test-plan draft) so QA can start before Sprint C closes.*

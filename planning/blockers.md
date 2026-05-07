@@ -19,6 +19,54 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-05-07 — PM → QA+DEVOPS: Sprint D QA track unblocked; OPEN-005 PM decision required
+
+**Inspected by:** PM agent (recurring routine)
+**Branch:** `feature/phase-16-fantasy-ui` — **merged to main via PR #7 (commit 58c9f25)**
+
+**Sprint C: officially CLOSED.** P16-PG-007 (battle page) confirmed in production code at
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` — wires
+`POST /api/v1/combat/init` and `useCombatStore`, split across 4 files per rule #8.
+All 15/15 Sprint C tasks DONE. Exit criteria fully checked.
+
+**Sprint D Wave 1: COMPLETE.** All DEVOPS and QA Wave 1 tasks done:
+AST-001, AST-002, MOB-003 (DEVOPS); QA-PLAN, QA-003a (QA); QA-003b (QA, 2026-05-06).
+
+**Sprint D Wave 2 status — updated this run:**
+
+- **P16-MOB-001 — DONE** (commits 9eae286, c450a25, 59af877): All 11 game routes mirrored
+  to `/m/g/**` with compact density. Verified on disk.
+- **P16-MOB-002 — DONE** (commit 9eae286): `GameBottomTabs` present in
+  `apps/web/src/app/(mobile)/m/g/layout.tsx`.
+- **P16-QA-001 — NOW READY** (was BLOCKED): All deps met — Sprint C done, QA-PLAN done,
+  MOB-001 done. **QA: pick this up now.**
+- **P16-QA-004 — NOW READY** (was BLOCKED on MOB-001): Lighthouse mobile ≥90 on
+  `/m/dashboard`. **QA: can run in parallel with QA-001.**
+- **P16-QA-005 — NOW READY** (was BLOCKED on MOB-001): iOS Safari + Android Chrome smoke.
+  **QA: can run in parallel with QA-001.**
+- **P16-QA-002** — still BLOCKED on QA-001 completing. Follows QA-001.
+- **P16-QA-006** — still BLOCKED on QA-001..005 complete + OPEN-005 resolved.
+
+**OPEN-005 — PM decision required before production rollout (QA-006).**
+DEVOPS documented 3 resolution paths in `docs/context/asset-licenses.md`. Current assets
+are custom SVG placeholders — no Lovable license encumbrance on current files. PM must
+choose: (a) confirm license, (b) commission replacement art, or (c) declare current SVGs
+production-quality. This unblocks P16-QA-006 and the full rollout schedule.
+
+**Tech-debt reminder (FE):** `campaign/[slug]/shop/page.tsx` (472 lines),
+`shop/page.tsx` (451 lines), `inventory/page.tsx` (354 lines) exceed CLAUDE.md rule #8
+(300-line limit). Track for split before Sprint D ships.
+
+**Three parallel QA tracks now active:**
+1. **QA**: Playwright E2E impl (QA-001) + flag matrix (QA-002) — see `apps/web/e2e/fantasy-flow.plan.md`
+2. **QA**: Lighthouse mobile ≥90 (QA-004) + Safari/Chrome smoke (QA-005)
+3. **DEVOPS+PM**: OPEN-005 license decision → unblocks QA-006 production rollout
+
+**PM check-in routine: Sprint D QA work now in-flight. Disabling routine.**
+See note below in PM Check-in Log.
+
+---
+
 ### 2026-05-04 — QA → PM: Sprint D Wave 1 QA tasks complete (P16-QA-PLAN + P16-QA-003a)
 
 **Branch:** `feature/phase-16-fantasy-ui`
@@ -342,6 +390,21 @@ ARCH stands down on Phase 16 implementation — re-engage on:
 ---
 
 ## PM Check-in Log
+
+### 2026-05-07 — PM Sprint D check-in (Phase 16 / fantasy-UI) — FINAL ROUTINE RUN
+
+**Finding:** Sprint C COMPLETE; Sprint D Wave 1 COMPLETE; Wave 2 MOB-001/002 DONE; QA track
+now unblocked (QA-001/004/005 READY). OPEN-005 PM decision still pending.
+
+**Actions taken this run:** Updated task-board.md and sprint-p16.md to reflect actual state
+(MOB-001/002/QA-003a marked DONE; QA-001/004/005 marked READY). PM dispatch written above.
+
+**PM check-in routine: DISABLE NOW.**
+Sprint D QA work is in-flight with clear per-agent ownership. The routine should be
+turned off at https://claude.ai/code/routines (routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`).
+Remaining gate is OPEN-005 PM decision — track manually, not via recurring routine.
+
+---
 
 ### 2026-04-29 — PM Sprint C check-in (Phase 16 / fantasy-UI)
 
