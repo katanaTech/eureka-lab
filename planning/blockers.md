@@ -391,6 +391,35 @@ ARCH stands down on Phase 16 implementation — re-engage on:
 
 ## PM Check-in Log
 
+### 2026-05-09 — PM Sprint D nudge (Phase 16 / fantasy-UI) — ROUTINE STILL ACTIVE, PLEASE DISABLE
+
+**Inspected by:** PM agent (recurring routine — should have been disabled after 2026-05-07 run)
+**Branch:** `feature/phase-16-fantasy-ui` — **merged to main (PR #7, commit 58c9f25)**
+
+**No new commits since 2026-05-07.** HEAD is `5e5cf1d` (PM close Sprint C / advance Sprint D).
+All planning files are current as of last run.
+
+**Sprint D Wave 2 current status (no change):**
+- **QA-001 / QA-004 / QA-005** — still READY, not yet picked up by QA. These are the live
+  blockers for Sprint D completion. QA: please start Playwright E2E (QA-001) and run
+  Lighthouse + smoke in parallel (QA-004/005). No new blocking dependencies exist.
+- **QA-002** — BLOCKED on QA-001. Will unblock when QA-001 completes.
+- **P16-OPEN-005** — still IN_PROGRESS; PM decision still pending. PM must choose resolution
+  path (A/B/C per `docs/context/asset-licenses.md`) to unblock QA-006 production rollout.
+- **QA-006** — BLOCKED on QA-001..005 complete + OPEN-005 resolved.
+
+**Tech-debt reminder (FE):** Three page files still exceed 300-line rule #8 limit:
+`campaign/[slug]/shop/page.tsx` (472), `shop/page.tsx` (451), `inventory/page.tsx` (354).
+Must be split before Sprint D ships.
+
+**Action required from PM / product owner:**
+1. Resolve OPEN-005 (pick Path A, B, or C) to unblock production rollout.
+2. **Disable this routine** at https://claude.ai/code/routines
+   (routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). Sprint D has clear per-agent ownership;
+   a recurring PM check-in adds no value until QA completes and OPEN-005 is decided.
+
+---
+
 ### 2026-05-07 — PM Sprint D check-in (Phase 16 / fantasy-UI) — FINAL ROUTINE RUN
 
 **Finding:** Sprint C COMPLETE; Sprint D Wave 1 COMPLETE; Wave 2 MOB-001/002 DONE; QA track
