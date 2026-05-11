@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="384" viewBox="0 0 256 384">
+  <defs>
+    <linearGradient id="he-suit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+    <filter id="he-glow">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#38bdf8" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- Suit -->
+  <rect x="84" y="140" width="88" height="110" rx="10" fill="url(#he-suit)" filter="url(#he-glow)"/>
+  <!-- Head -->
+  <circle cx="128" cy="100" r="38" fill="#fef3c7"/>
+  <!-- Goggles -->
+  <rect x="100" y="88" width="56" height="20" rx="10" fill="#0c4a6e" stroke="#38bdf8" stroke-width="1"/>
+  <circle cx="116" cy="98" r="7" fill="#0ea5e9" opacity="0.7"/>
+  <circle cx="140" cy="98" r="7" fill="#0ea5e9" opacity="0.7"/>
+  <!-- Mouth -->
+  <path d="M118,118 Q128,124 138,118" fill="none" stroke="#92400e" stroke-width="1.5"/>
+  <!-- Wrench tool -->
+  <rect x="180" y="140" width="6" height="80" rx="3" fill="#94a3b8"/>
+  <circle cx="183" cy="135" r="10" fill="none" stroke="#94a3b8" stroke-width="4"/>
+  <!-- Gear on chest -->
+  <circle cx="128" cy="185" r="12" fill="none" stroke="#38bdf8" stroke-width="2"/>
+  <circle cx="128" cy="185" r="5" fill="#38bdf8" opacity="0.5"/>
+  <!-- Legs -->
+  <rect x="94" y="250" width="26" height="65" rx="6" fill="#0c4a6e"/>
+  <rect x="136" y="250" width="26" height="65" rx="6" fill="#0c4a6e"/>
+  <!-- Circuit lines on suit -->
+  <line x1="96" y1="165" x2="118" y2="165" stroke="#38bdf8" stroke-width="1" opacity="0.4"/>
+  <line x1="138" y1="165" x2="160" y2="165" stroke="#38bdf8" stroke-width="1" opacity="0.4"/>
+</svg>
