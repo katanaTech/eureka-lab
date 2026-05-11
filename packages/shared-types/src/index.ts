@@ -903,3 +903,9 @@ export const COMBAT_HP_CONFIG: Record<BattleType, { playerHp: number; zombieHp: 
   guardian: { playerHp: 100, zombieHp: 80  },
   overlord: { playerHp: 100, zombieHp: 200 },
 };
+
+// ── Phase 16 Gameplay Types (re-exported) ───────────────────────────────────
+// Fantasy class system, inventory/shop catalog, KP economy, UI mode, and
+// campaign/zone mappings. Will be renamed to gameplay.types.ts in a follow-up
+// task as part of the redesign cleanup.
+export * from './phase16.types';
