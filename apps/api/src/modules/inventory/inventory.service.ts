@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
-import type { Inventory, KpEarnEvent, ShopCatalog, UiMode } from '@eureka-lab/shared-types';
+import type { Inventory, KpEarnEvent, ShopCatalog } from '@eureka-lab/shared-types';
 import { PurchaseItemDto } from './dto/purchase-item.dto';
 import { EquipWeaponDto } from './dto/equip-weapon.dto';
 import { SHOP_CATALOG, findAbilityById, findWeaponById } from './shop-catalog';
@@ -204,23 +204,16 @@ export class InventoryService {
 
   /**
    * Award KP to a user for a game-mode event.
-   * Only awards KP when the user's effective UI mode is 'gamified'.
    * Enforces a daily KP cap of {@link DAILY_KP_CAP} per UTC calendar day.
    *
    * @param userId - Firebase UID
    * @param event - The KP earn event type
-   * @param effectiveUiMode - Resolved UI mode (from UiModeResolver)
-   * @returns KP actually awarded (0 if mode is normal or daily cap is reached)
+   * @returns KP actually awarded (0 if daily cap is reached)
    */
   async awardKp(
     userId: string,
     event: KpEarnEvent,
-    effectiveUiMode: UiMode,
   ): Promise<number> {
-    if (effectiveUiMode !== 'gamified') {
-      return 0;
-    }
-
     const requestedAmount = KP_REWARDS[event];
     const granted = await this.checkAndIncrementDailyCap(userId, requestedAmount);
 

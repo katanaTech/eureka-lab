@@ -14,11 +14,10 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/current-user.decorator';
 import { UsersRepository } from './users.repository';
-import { UpdateSettingsDto } from './dto/update-settings.dto';
 import { SaveCharacterDto } from './dto/save-character.dto';
 
 /**
- * Users controller — exposes settings and character management endpoints.
+ * Users controller — exposes character management endpoints.
  * All routes require a valid Firebase session and are accessible to any role.
  */
 @Controller('users')
@@ -26,22 +25,6 @@ import { SaveCharacterDto } from './dto/save-character.dto';
 @Roles('child', 'parent', 'teacher', 'admin')
 export class UsersController {
   constructor(private readonly usersRepository: UsersRepository) {}
-
-  /**
-   * Update the authenticated user's settings (currently uiMode only).
-   * @param user - Current authenticated user
-   * @param dto - Settings fields to update
-   */
-  @Put('me/settings')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updateSettings(
-    @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: UpdateSettingsDto,
-  ): Promise<void> {
-    if (dto.uiMode !== undefined) {
-      await this.usersRepository.setUiMode(user.uid, dto.uiMode);
-    }
-  }
 
   /**
    * Get the authenticated user's fantasy character.

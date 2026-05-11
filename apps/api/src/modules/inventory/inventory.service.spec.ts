@@ -430,30 +430,13 @@ describe('InventoryService', () => {
       );
     }
 
-    it('awards KP when effectiveUiMode is gamified', async () => {
+    it('awards KP for a lesson_completed event', async () => {
       const inventory = buildMockInventory({ kp: 50, totalKpEarned: 100 });
       setupAwardKpTransactions(0, { exists: true, data: () => inventory });
 
-      const awarded = await service.awardKp(
-        'user-1',
-        'lesson_completed',
-        'gamified',
-      );
+      const awarded = await service.awardKp('user-1', 'lesson_completed');
 
       expect(awarded).toBe(KP_REWARDS.lesson_completed);
-    });
-
-    it('awards ZERO KP when effectiveUiMode is normal (gameplay invariant)', async () => {
-      const awarded = await service.awardKp(
-        'user-1',
-        'lesson_completed',
-        'normal',
-      );
-
-      // CRITICAL: Must return 0 — KP is only a gamified-mode feature.
-      expect(awarded).toBe(0);
-      // No Firestore call should be made at all
-      expect(mockFirestore.runTransaction).not.toHaveBeenCalled();
     });
 
     it('respects the daily KP cap — only grants remaining headroom', async () => {
@@ -468,7 +451,6 @@ describe('InventoryService', () => {
       const awarded = await service.awardKp(
         'user-1',
         'minion_defeated', // worth 15 KP
-        'gamified',
       );
 
       // Only 10 KP of headroom remains before the 100-cap
@@ -491,11 +473,7 @@ describe('InventoryService', () => {
         },
       );
 
-      const awarded = await service.awardKp(
-        'user-1',
-        'guardian_defeated',
-        'gamified',
-      );
+      const awarded = await service.awardKp('user-1', 'guardian_defeated');
 
       expect(awarded).toBe(0);
       // 2nd transaction (inventory update) should NOT be called

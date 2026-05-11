@@ -1,40 +1,18 @@
 /**
- * Phase 16 — Gamified UI Redesign (Cinematic Fantasy)
+ * Gameplay Types — Cinematic Fantasy
  *
- * Authoritative shared types for the Phase 16 fantasy mode: UI mode resolution,
- * the fantasy class system, the KP economy + inventory, and zone↔realm
- * narrative mapping.
+ * Authoritative shared types for the fantasy game layer: the fantasy class
+ * system, the KP economy + inventory, and zone↔realm narrative mapping.
  *
  * Decisions captured in:
  *   - docs/context/ADR-002 (gamified UI paradigm — R3F parked, fantasy 2D adopted)
  *   - docs/context/ADR-003 (KP economy & inventory data model)
- *   - docs/context/ADR-004 (UI mode resolution: user pref vs tenant lock)
  *   - docs/context/ADR-005 (narrative & class mapping)
  *
  * Type-only imports from ./index avoid runtime circular dependency.
  */
 
 import type { CareerArchetype, ZoneId } from './index';
-
-// ── UI Mode ─────────────────────────────────────────────────────────────────
-
-/**
- * The two presentations of the same curriculum. Resolved server-side by
- * UiModeResolver (see ADR-004) — never trusted from the client.
- */
-export type UiMode = 'normal' | 'gamified';
-
-/**
- * Tenant-level UI-mode lock for B2B education clients.
- * When `locked === true` and `mode !== null`, all users in this tenant render
- * with the locked mode regardless of their personal preference (ADR-004 §1).
- */
-export interface TenantUiModeLock {
-  /** Locked-in mode, or null when no default is set */
-  mode: UiMode | null;
-  /** Whether the lock is active (true = users cannot override) */
-  locked: boolean;
-}
 
 // ── Fantasy Class System ────────────────────────────────────────────────────
 
