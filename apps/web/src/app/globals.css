@@ -2,67 +2,273 @@
 
 /*
  * Eureka Lab — Design Tokens
- * Based on shadcn/ui theming conventions.
- * Semantic color names used throughout all components.
+ * Ported from ai-adventure-island reference (cinematic dark-fantasy palette).
+ * All tokens use HSL channel triplets so consumers can compose alpha via
+ * `hsl(var(--token) / <alpha>)`. Single dark theme — no light variant.
+ *
+ * Fonts (Cinzel display, Inter sans, Amiri Arabic) are loaded via next/font
+ * in `src/app/layout.tsx` and exposed through CSS variables:
+ *   --font-display  (Cinzel)
+ *   --font-sans     (Inter)
+ *   --font-arabic   (Amiri)
  */
 
-@theme inline {
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.145 0 0);
-  --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.145 0 0);
-  --color-primary: oklch(0.553 0.195 255.1);
-  --color-primary-foreground: oklch(0.985 0.002 247.839);
-  --color-secondary: oklch(0.97 0 0);
-  --color-secondary-foreground: oklch(0.205 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-accent: oklch(0.97 0 0);
-  --color-accent-foreground: oklch(0.205 0 0);
-  --color-destructive: oklch(0.577 0.245 27.325);
-  --color-destructive-foreground: oklch(0.577 0.245 27.325);
-  --color-border: oklch(0.922 0 0);
-  --color-input: oklch(0.922 0 0);
-  --color-ring: oklch(0.553 0.195 255.1);
-  --color-chart-1: oklch(0.646 0.222 41.116);
-  --color-chart-2: oklch(0.6 0.118 184.714);
-  --color-chart-3: oklch(0.398 0.07 227.392);
-  --color-chart-4: oklch(0.828 0.189 84.429);
-  --color-chart-5: oklch(0.769 0.188 70.08);
-  --color-sidebar: oklch(0.985 0 0);
-  --color-sidebar-foreground: oklch(0.145 0 0);
-  --color-sidebar-primary: oklch(0.553 0.195 255.1);
-  --color-sidebar-primary-foreground: oklch(0.985 0.002 247.839);
-  --color-sidebar-accent: oklch(0.97 0 0);
-  --color-sidebar-accent-foreground: oklch(0.205 0 0);
-  --color-sidebar-border: oklch(0.922 0 0);
-  --color-sidebar-ring: oklch(0.553 0.195 255.1);
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+@layer base {
+  :root {
+    /* Dark fantasy default — single theme for the game */
+    --background: 230 40% 5%;
+    --foreground: 190 60% 95%;
+
+    --card: 230 35% 9%;
+    --card-foreground: 190 60% 95%;
+
+    --popover: 230 40% 7%;
+    --popover-foreground: 190 60% 95%;
+
+    /* Arcane cyan primary */
+    --primary: 188 95% 55%;
+    --primary-foreground: 230 50% 8%;
+    --primary-glow: 188 100% 70%;
+
+    /* Mystic violet secondary */
+    --secondary: 268 70% 55%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 280 90% 70%;
+
+    /* Quest gold accent */
+    --accent: 42 95% 60%;
+    --accent-foreground: 230 50% 8%;
+    --accent-glow: 42 100% 70%;
+
+    --muted: 230 25% 15%;
+    --muted-foreground: 215 25% 70%;
+
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 145 70% 50%;
+
+    --border: 200 50% 25%;
+    --input: 230 30% 14%;
+    --ring: 188 95% 55%;
+
+    --radius: 0.85rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(188 95% 55%), hsl(220 90% 60%));
+    --gradient-secondary: linear-gradient(135deg, hsl(268 70% 55%), hsl(310 80% 60%));
+    --gradient-gold: linear-gradient(135deg, hsl(42 95% 60%), hsl(28 95% 55%));
+    --gradient-bg: radial-gradient(ellipse at top, hsl(230 50% 12%) 0%, hsl(230 40% 4%) 60%);
+    --gradient-card: linear-gradient(160deg, hsl(230 35% 12% / 0.85), hsl(230 40% 7% / 0.85));
+    --gradient-rune: conic-gradient(from 0deg, hsl(188 95% 55% / 0.4), hsl(268 70% 55% / 0.4), hsl(42 95% 60% / 0.4), hsl(188 95% 55% / 0.4));
+
+    /* Shadows / glows */
+    --glow-primary: 0 0 30px hsl(188 100% 60% / 0.55), 0 0 60px hsl(188 100% 60% / 0.3);
+    --glow-secondary: 0 0 30px hsl(280 90% 65% / 0.55), 0 0 60px hsl(280 90% 65% / 0.3);
+    --glow-gold: 0 0 30px hsl(42 100% 60% / 0.55), 0 0 60px hsl(42 100% 60% / 0.3);
+    --shadow-elevated: 0 20px 60px -10px hsl(230 80% 2% / 0.8);
+
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Sidebar tokens */
+    --sidebar-background: 230 40% 6%;
+    --sidebar-foreground: 190 60% 90%;
+    --sidebar-primary: 188 95% 55%;
+    --sidebar-primary-foreground: 230 50% 8%;
+    --sidebar-accent: 230 30% 12%;
+    --sidebar-accent-foreground: 188 95% 75%;
+    --sidebar-border: 200 50% 20%;
+    --sidebar-ring: 188 95% 55%;
+  }
+
+  .dark {
+    /* same — game is always dark */
+    --background: 230 40% 5%;
+    --foreground: 190 60% 95%;
+  }
 }
 
 /*
- * Base layer: global resets and defaults
+ * Tailwind v4 theme inline — bridges the HSL variables above into
+ * the utility classes (bg-primary, text-foreground, font-display,
+ * animate-pulse-glow, etc.). Equivalent to v3's tailwind.config.ts
+ * `theme.extend`.
+ */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-success: hsl(var(--success));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-display: var(--font-display), Cinzel, serif;
+  --font-sans: var(--font-sans), Inter, system-ui, sans-serif;
+  --font-arabic: var(--font-arabic), Amiri, serif;
+
+  /* Animation tokens — Tailwind v4 generates `animate-<name>` utilities
+   * from `--animate-<name>`. Keyframes themselves are defined at the
+   * bottom of this file (raw @keyframes blocks). */
+  --animate-float-slow: float-slow 5s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 2.5s ease-in-out infinite;
+  --animate-fade-in-up: fade-in-up 0.6s ease-out both;
+  --animate-flicker: flicker 4s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-shake: shake 0.45s ease-in-out;
+  --animate-hit-flash: hit-flash 0.4s ease-out;
+  --animate-slash: slash 0.5s ease-out forwards;
+  --animate-damage-pop: damage-pop 0.9s ease-out forwards;
+  --animate-victory-burst: victory-burst 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+/*
+ * Base layer: global resets, body background, font defaults, RTL display font swap.
  */
 @layer base {
-  *,
-  *::before,
-  *::after {
+  * {
     @apply border-border;
   }
 
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image: var(--gradient-bg);
+    background-attachment: fixed;
+    font-family: var(--font-sans), "Inter", system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display), "Cinzel", serif;
+    letter-spacing: 0.02em;
+  }
+
+  html[dir="rtl"] .font-display,
+  html[dir="rtl"] h1,
+  html[dir="rtl"] h2,
+  html[dir="rtl"] h3,
+  html[dir="rtl"] h4 {
+    font-family: var(--font-arabic), "Amiri", serif;
   }
 }
 
 /*
- * Mobile gamification animations (CSS-only, zero bundle cost)
+ * Utility layer — porthole into reference's bespoke effects.
+ * Text glows, gradient backgrounds, box-glows, the panel surface,
+ * rune-ring orbital halo, and CRT scanlines overlay.
+ */
+@layer utilities {
+  .text-glow-primary {
+    text-shadow:
+      0 0 20px hsl(var(--primary) / 0.7),
+      0 0 40px hsl(var(--primary) / 0.4);
+  }
+  .text-glow-gold {
+    text-shadow:
+      0 0 20px hsl(var(--accent) / 0.7),
+      0 0 40px hsl(var(--accent) / 0.4);
+  }
+  .text-glow-violet {
+    text-shadow:
+      0 0 20px hsl(var(--secondary) / 0.7),
+      0 0 40px hsl(var(--secondary) / 0.4);
+  }
+
+  .bg-gradient-primary {
+    background-image: var(--gradient-primary);
+  }
+  .bg-gradient-secondary {
+    background-image: var(--gradient-secondary);
+  }
+  .bg-gradient-gold {
+    background-image: var(--gradient-gold);
+  }
+  .bg-gradient-card {
+    background-image: var(--gradient-card);
+  }
+
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+  .glow-secondary {
+    box-shadow: var(--glow-secondary);
+  }
+  .glow-gold {
+    box-shadow: var(--glow-gold);
+  }
+
+  .panel {
+    background-image: var(--gradient-card);
+    @apply backdrop-blur-xl border border-border/60 rounded-2xl;
+    box-shadow:
+      var(--shadow-elevated),
+      inset 0 1px 0 hsl(var(--primary) / 0.1);
+  }
+
+  .rune-ring {
+    position: relative;
+  }
+  .rune-ring::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: var(--gradient-rune);
+    z-index: -1;
+    filter: blur(8px);
+    opacity: 0.7;
+    animation: rune-spin 12s linear infinite;
+  }
+
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      hsl(var(--primary) / 0.04) 3px,
+      transparent 4px
+    );
+  }
+}
+
+/*
+ * Pre-existing Eureka utilities (mobile gamification + scroll/safe-area).
+ * Kept verbatim — these are referenced by mobile components.
  */
 @keyframes xp-float {
   0% {
@@ -79,9 +285,6 @@
   animation: xp-float 1.5s ease-out forwards;
 }
 
-/*
- * Hide scrollbars for horizontal scroll containers
- */
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -90,9 +293,147 @@
   display: none;
 }
 
-/*
- * iOS safe area padding for bottom elements
- */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/*
+ * Keyframes for the design-system animations declared in @theme.
+ * Tailwind v4 generates `animate-<name>` utilities from --animate-<name>
+ * but the @keyframes themselves must exist somewhere reachable; raw CSS
+ * here keeps them available for both Tailwind utilities and plain
+ * `animation:` declarations (e.g. .rune-ring::before above).
+ */
+@keyframes rune-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px hsl(var(--primary) / 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 28px hsl(var(--primary) / 0.95));
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.85;
+  }
+  55% {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-10px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(10px) rotate(2deg);
+  }
+  60% {
+    transform: translateX(-8px);
+  }
+  80% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes hit-flash {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(2.4) hue-rotate(-20deg)
+      drop-shadow(0 0 25px hsl(var(--destructive)));
+  }
+}
+
+@keyframes slash {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-30deg);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4) rotate(20deg);
+  }
+}
+
+@keyframes damage-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-30px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-70px) scale(1);
+  }
+}
+
+@keyframes victory-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

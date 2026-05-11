@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Cinzel, Amiri } from 'next/font/google';
 import { getMessages, getLocale } from 'next-intl/server';
 import { Providers } from '@/components/shared/Providers';
 import './globals.css';
@@ -7,6 +7,21 @@ import './globals.css';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
+});
+
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['500', '700', '900'],
+  variable: '--font-display',
+  display: 'swap',
+});
+
+const amiri = Amiri({
+  subsets: ['arabic'],
+  weight: ['400', '700'],
+  variable: '--font-arabic',
+  display: 'swap',
 });
 
 /** PWA-enabled metadata including manifest and Apple Web App config */
@@ -41,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${cinzel.variable} ${amiri.variable} font-sans antialiased`}>
         <Providers locale={locale} messages={messages}>
           {children}
         </Providers>
