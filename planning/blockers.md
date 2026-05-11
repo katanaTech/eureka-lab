@@ -391,6 +391,25 @@ ARCH stands down on Phase 16 implementation — re-engage on:
 
 ## PM Check-in Log
 
+### 2026-05-11 — PM Sprint D check-in (Phase 16 / fantasy-UI)
+
+**Inspected by:** PM agent (recurring routine — still firing despite DISABLE NOW notice in 2026-05-07 entry)
+**Branch:** `feature/phase-16-fantasy-ui` — merged to main (PR #7). No local branch; `main` HEAD = `5e5cf1d`.
+
+**No commits since 2026-05-07.** Sprint C closed. Sprint D Wave 1 complete. Wave 2 MOB-001/002/QA-003b done.
+
+**QA track stale — 4 days since unblocking:**
+- QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90), QA-005 (Safari/Chrome smoke) have all been READY since 2026-05-07. No QA commits have landed.
+- QA-002 and QA-006 remain BLOCKED pending their respective dependencies.
+
+**P16-OPEN-005 — PM decision still outstanding.** This is the sole remaining gate on QA-006 and the full production rollout. See `docs/context/asset-licenses.md` for 3 resolution paths (confirm license / commission art / declare SVGs production-quality). No code work needed; PM action only.
+
+**Tech-debt (FE, pre-ship):** `campaign/[slug]/shop/page.tsx` (472 lines), `shop/page.tsx` (451 lines), `inventory/page.tsx` (354 lines) still exceed rule #8 (300-line limit).
+
+**Routine disable — 2nd notice.** Please disable at https://claude.ai/code/routines (routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). Sprint D has clear per-agent ownership; no further PM check-ins are useful until OPEN-005 is resolved.
+
+---
+
 ### 2026-05-07 — PM Sprint D check-in (Phase 16 / fantasy-UI) — FINAL ROUTINE RUN
 
 **Finding:** Sprint C COMPLETE; Sprint D Wave 1 COMPLETE; Wave 2 MOB-001/002 DONE; QA track
