@@ -20,7 +20,7 @@ import {
 
 /** Dynamically import the R3F arena — Three.js requires the browser environment */
 const CombatArena = dynamic(
-  () => import('@/components/game/_legacy_r3f/CombatArena').then((m) => m.CombatArena),
+  () => import('@/components/game/CombatArena').then((m) => m.CombatArena),
   { ssr: false, loading: () => <div className="flex-1 bg-gray-950" /> },
 );
 

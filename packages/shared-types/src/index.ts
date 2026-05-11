@@ -145,12 +145,6 @@ export interface FeatureFlags {
   enableGamification: boolean;
   enableMobileExperience: boolean;
   enableGameMode: boolean;
-  /**
-   * Phase 16 — when true, `(game)` route group renders the cinematic 2D
-   * fantasy UI. When false, falls back to the legacy R3F implementation
-   * parked under `_legacy_r3f/`. See ADR-002.
-   */
-  fantasyUi: boolean;
 }
 
 /** Default feature flag values for MVP */
@@ -164,7 +158,6 @@ export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
   enableGamification: true,
   enableMobileExperience: true,
   enableGameMode: true,
-  fantasyUi: true,
 };
 
 // ── Game Types (Phase 15) ─────────────────────────────────────────────────────
@@ -685,33 +678,6 @@ export interface AgentChatChunk {
 
 // ── Agent Templates (re-exported) ───────────────────────────────────────────
 export { AGENT_TEMPLATES, findAgentTemplateById } from './agent-templates';
-
-// ── Phase 16: Fantasy UI types (re-exported) ────────────────────────────────
-export type {
-  UiMode,
-  TenantUiModeLock,
-  FantasyClass,
-  FantasyCharacter,
-  Inventory,
-  ShopAbility,
-  ShopAbilityIcon,
-  ShopWeapon,
-  ShopCatalog,
-  ShopItemType,
-  KpEarnEvent,
-} from './phase16.types';
-
-export {
-  FANTASY_CLASS_BY_CAREER,
-  FANTASY_CLASS_DEFAULT_AURA_HSL,
-  CAMPAIGN_SLUG_BY_ZONE,
-  ZONE_BY_CAMPAIGN_SLUG,
-  REALM_NAME_BY_ZONE,
-  REALM_BOSS_NAME_BY_ZONE,
-  FINAL_BOSS_REALM_NAME,
-  FINAL_BOSS_REALM_SLUG,
-  FINAL_BOSS_GAME_NAME,
-} from './phase16.types';
 
 // ── Teacher & Classrooms (B2B) ──────────────────────────────────────────────
 

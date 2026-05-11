@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CombatController } from './combat.controller';
 import { CombatService } from './combat.service';
-import { InventoryService } from '../inventory/inventory.service';
-import { UiModeResolver } from '../tenants/ui-mode-resolver.service';
 import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import type { BattleConfig } from '@eureka-lab/shared-types';
@@ -29,16 +27,8 @@ const mockBattleConfig: BattleConfig = {
 
 const mockCombatService = {
   initBattle: jest.fn().mockResolvedValue(mockBattleConfig),
-  completeBattle: jest.fn().mockResolvedValue({ xpAwarded: 25, badgesUnlocked: [], battleType: 'minion' }),
+  completeBattle: jest.fn().mockResolvedValue({ xpAwarded: 25, badgesUnlocked: [] }),
   generateCertificate: jest.fn().mockResolvedValue({ certificateUrl: 'https://example.com/cert.svg' }),
-};
-
-const mockInventoryService = {
-  awardKp: jest.fn().mockResolvedValue(15),
-};
-
-const mockUiModeResolver = {
-  resolve: jest.fn().mockResolvedValue('gamified'),
 };
 
 describe('CombatController', () => {
@@ -49,11 +39,7 @@ describe('CombatController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CombatController],
-      providers: [
-        { provide: CombatService, useValue: mockCombatService },
-        { provide: InventoryService, useValue: mockInventoryService },
-        { provide: UiModeResolver, useValue: mockUiModeResolver },
-      ],
+      providers: [{ provide: CombatService, useValue: mockCombatService }],
     })
       .overrideGuard(FirebaseAuthGuard)
       .useValue(mockGuard)
@@ -93,7 +79,6 @@ describe('CombatController', () => {
         { outcome: 'victory', correctAnswers: 5, totalQuestions: 5 },
       );
       expect(result.xpAwarded).toBe(25);
-      expect(result.kpAwarded).toBe(15);
     });
   });
 

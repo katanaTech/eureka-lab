@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Timestamp } from 'firebase-admin/firestore';
-import type { SubscriptionData, PlanType, UiMode, FantasyCharacter } from '@eureka-lab/shared-types';
+import type { SubscriptionData, PlanType } from '@eureka-lab/shared-types';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 
 /**
@@ -18,8 +18,6 @@ export interface UserDoc {
   birthYear?: number;
   children?: string[];
   subscription?: SubscriptionData;
-  uiMode?: UiMode;
-  character?: FantasyCharacter;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -205,57 +203,5 @@ export class UsersRepository {
 
     if (snapshot.empty) return null;
     return snapshot.docs[0].data() as UserDoc;
-  }
-
-  /**
-   * Get the user's UI mode preference.
-   * @param uid - Firebase UID
-   * @returns The user's UiMode or null if not set
-   */
-  async getUiMode(uid: string): Promise<UiMode | null> {
-    const doc = await this.firebase.firestore.collection(this.collection).doc(uid).get();
-    if (!doc.exists) return null;
-    const data = doc.data() as UserDoc;
-    return data.uiMode ?? null;
-  }
-
-  /**
-   * Update the user's UI mode preference.
-   * @param uid - Firebase UID
-   * @param uiMode - New UI mode
-   */
-  async setUiMode(uid: string, uiMode: UiMode): Promise<void> {
-    const { FieldValue } = await import('firebase-admin/firestore');
-    await this.firebase.firestore
-      .collection(this.collection)
-      .doc(uid)
-      .update({ uiMode, updatedAt: FieldValue.serverTimestamp() });
-    this.logger.log({ event: 'ui_mode_updated', uid, uiMode });
-  }
-
-  /**
-   * Get the user's fantasy character.
-   * @param uid - Firebase UID
-   * @returns FantasyCharacter or null
-   */
-  async getCharacter(uid: string): Promise<FantasyCharacter | null> {
-    const doc = await this.firebase.firestore.collection(this.collection).doc(uid).get();
-    if (!doc.exists) return null;
-    const data = doc.data() as UserDoc;
-    return data.character ?? null;
-  }
-
-  /**
-   * Create or update the user's fantasy character.
-   * @param uid - Firebase UID
-   * @param character - Character data to save
-   */
-  async setCharacter(uid: string, character: FantasyCharacter): Promise<void> {
-    const { FieldValue } = await import('firebase-admin/firestore');
-    await this.firebase.firestore
-      .collection(this.collection)
-      .doc(uid)
-      .update({ character, updatedAt: FieldValue.serverTimestamp() });
-    this.logger.log({ event: 'character_saved', uid, characterName: character.name });
   }
 }

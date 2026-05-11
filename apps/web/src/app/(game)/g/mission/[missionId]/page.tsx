@@ -10,7 +10,7 @@ import { combatApi } from '@/lib/api-client';
 import { LearningOverlay } from '@/components/game/LearningOverlay';
 import { MissionCompleteScreen } from '@/components/game/MissionCompleteScreen';
 import { GameHUD } from '@/components/game/GameHUD';
-import { ZONE_CONFIGS } from '@/components/game/zone-configs';
+import { ZONE_CONFIGS } from '@/components/game/ZoneIsland';
 import type { ZoneId, MissionReward } from '@eureka-lab/shared-types';
 
 /** Map zone ID to learning level (mirrors ZonePage) */
@@ -22,7 +22,7 @@ const ZONE_LEVEL: Record<ZoneId, number> = {
 };
 
 const MissionRoom = dynamic(
-  () => import('@/components/game/_legacy_r3f/MissionRoom').then((m) => m.MissionRoom),
+  () => import('@/components/game/MissionRoom').then((m) => m.MissionRoom),
   { ssr: false, loading: () => <div className="h-screen w-screen bg-gray-950" /> },
 );
 
