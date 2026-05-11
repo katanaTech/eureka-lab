@@ -20,7 +20,7 @@ export function Logo({ className, withText = true }: LogoProps) {
   return (
     <div className={cn('flex items-center gap-3', className)}>
       <Image
-        src="/assets/game/logo.svg"
+        src="/assets/game/logo.png"
         alt="Eureka Lab emblem"
         width={48}
         height={48}
