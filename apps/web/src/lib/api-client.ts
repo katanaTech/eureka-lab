@@ -32,6 +32,9 @@ import type {
   BattleOutcome,
   BattleType,
   ZoneId,
+  Inventory,
+  FantasyCharacter,
+  FantasyClass,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -865,6 +868,59 @@ export async function* streamAgentChat(
   }
 }
 
+/* ── Inventory API ─────────────────────────────────────────────── */
+
+/** Inventory API endpoints — read the user's KP economy snapshot. */
+export const inventoryApi = {
+  /**
+   * Fetch the authenticated user's full inventory (kp, owned items, equipped weapon).
+   * @returns The Inventory document from `inventories/{uid}`.
+   */
+  getMine: () => request<Inventory>('/inventory'),
+};
+
+/* ── Character API ─────────────────────────────────────────────── */
+
+/**
+ * Lightweight Character shape used by the frontend `character-store`.
+ * Backend's {@link FantasyCharacter} includes `createdAt` and uses `classColorHsl`;
+ * this client adapts both ways so callers can stay in the frontend vocabulary.
+ */
+interface CharacterClientShape {
+  name: string;
+  class: FantasyClass;
+  color: string;
+  weaponName: string;
+}
+
+/** Character API endpoints — manages the player's fantasy character. */
+export const characterApi = {
+  /**
+   * Fetch the authenticated user's character. Throws `ApiError` with status 404
+   * when no character has been created yet (callers should swallow that).
+   * @returns The character with frontend field names (`color`, not `classColorHsl`).
+   */
+  async get(): Promise<CharacterClientShape> {
+    const c = await request<FantasyCharacter>('/users/me/character');
+    return { name: c.name, class: c.class, color: c.classColorHsl, weaponName: c.weaponName };
+  },
+  /**
+   * Upsert the authenticated user's character.
+   * @param c - Frontend Character shape (will be mapped to backend FantasyCharacter).
+   */
+  async put(c: CharacterClientShape): Promise<void> {
+    await request<FantasyCharacter>('/users/me/character', {
+      method: 'PUT',
+      body: JSON.stringify({
+        name: c.name,
+        class: c.class,
+        classColorHsl: c.color,
+        weaponName: c.weaponName,
+      }),
+    });
+  },
+};
+
 export type {
   SignupResponse,
   LoginResponse,
@@ -909,4 +965,7 @@ export type {
   BattleOutcome,
   BattleType,
   ZoneId,
+  Inventory,
+  FantasyCharacter,
+  FantasyClass,
 };

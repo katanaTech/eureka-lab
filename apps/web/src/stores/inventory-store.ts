@@ -73,6 +73,13 @@ interface InventoryState {
   setLoading: (loading: boolean) => void;
 
   /**
+   * Fetch the authoritative inventory from the backend and replace local state.
+   * Called after auth resolves and after KP-affecting backend operations.
+   * Silently ignores errors (e.g. offline) — local state is preserved.
+   */
+  hydrate: () => Promise<void>;
+
+  /**
    * Reset all inventory state to initial defaults.
    * Called on logout or when the user switches accounts.
    */
@@ -125,6 +132,24 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   equipWeapon: (weaponId) => set({ equippedWeaponId: weaponId }),
 
   setLoading: (loading) => set({ isLoading: loading }),
+
+  hydrate: async () => {
+    set({ isLoading: true });
+    try {
+      const { inventoryApi } = await import('@/lib/api-client');
+      const inv = await inventoryApi.getMine();
+      set({
+        kp: inv.kp,
+        totalKpEarned: inv.totalKpEarned,
+        ownedAbilityIds: inv.ownedAbilityIds,
+        ownedWeaponIds: inv.ownedWeaponIds,
+        equippedWeaponId: inv.equippedWeaponId,
+        isLoading: false,
+      });
+    } catch {
+      set({ isLoading: false });
+    }
+  },
 
   reset: () => set(initialState),
 }));
