@@ -281,24 +281,24 @@ DONE (FE mobile mirror + QA Playwright impl + DEVOPS rollout).
 
 | Task ID | Description | Owner | Depends On | Est | Status |
 |---------|-------------|-------|------------|-----|--------|
-| P16-MOB-001 | Mirror all 11 game routes to /m/* with `density="compact"` | FE | Sprint C DONE | L | BLOCKED |
-| P16-MOB-002 | Mobile bottom-tab bar in game mode (Realm Map · Battle · Shop · Inventory · Profile) | FE | MOB-001 | M | BLOCKED on MOB-001 |
-| P16-QA-001 | Playwright: fantasy-mode E2E (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | QA | Sprint C DONE, QA-PLAN | L | BLOCKED |
+| P16-MOB-001 | Mirror all 11 game routes to /m/* with `density="compact"` | FE | Sprint C DONE | L | **DONE** (2026-05-06, commits 9591ea1, c450a25, 59af877) |
+| P16-MOB-002 | Mobile bottom-tab bar in game mode (Realm Map · Battle · Shop · Inventory · Profile) | FE | MOB-001 | M | **DONE** (2026-05-06, commit 9591ea1 — GameBottomTabs.tsx) |
+| P16-QA-001 | Playwright: fantasy-mode E2E (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | QA | Sprint C DONE, QA-PLAN | L | READY (all blockers cleared; no impl yet) |
 | P16-QA-002 | Playwright matrix: same flow with `featureFlags.fantasyUi` true and false | QA | QA-001 | M | BLOCKED on QA-001 |
-| P16-QA-003b | i18n string extraction pass 2: battle-page strings | FE+QA | P16-PG-007 DONE | S | **DONE** (2026-05-06) |
-| P16-QA-004 | Lighthouse mobile ≥90 perf for /m/dashboard | QA | MOB-001 | M | BLOCKED on MOB-001 |
-| P16-QA-005 | iOS Safari + Android Chrome smoke tests | QA | MOB-001 | M | BLOCKED on MOB-001 |
-| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | DEVOPS | All Wave 1+2 done, OPEN-005 resolved | — | BLOCKED |
+| P16-QA-003b | i18n string extraction pass 2: battle-page strings | FE+QA | P16-PG-007 DONE | S | **DONE** (2026-05-06, commit 21fcaf7) |
+| P16-QA-004 | Lighthouse mobile ≥90 perf for /m/dashboard | QA | MOB-001 | M | READY (MOB-001 done; not yet run) |
+| P16-QA-005 | iOS Safari + Android Chrome smoke tests | QA | MOB-001 | M | READY (MOB-001 done; not yet executed) |
+| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | DEVOPS | All Wave 1+2 done, OPEN-005 resolved | — | BLOCKED (pending OPEN-005 decision + QA-001/002/004/005) |
 
 **Sprint D exit criteria:**
-- [ ] All 6 Lovable assets imported (or replacements commissioned per OPEN-005)
-- [ ] Mobile crop script runs cleanly and outputs 768×1024 variants
-- [ ] All 11 mobile routes functional; bottom-tab nav works
-- [ ] Playwright passes in both flag states (fantasyUi=true/false)
-- [ ] All new strings in `en.json`; `fr.json`/`ar.json` have TODO stubs (both passes done)
-- [ ] Lighthouse mobile ≥90 on /m/dashboard
-- [ ] iOS Safari + Android Chrome smoke pass
-- [ ] OPEN-005 resolved (license confirmed OR replacement art committed)
+- [ ] All 6 Lovable assets imported (or replacements commissioned per OPEN-005) — current SVG placeholders in place; license decision pending
+- [x] Mobile crop script runs cleanly and outputs 768×1024 variants (MOB-003, scripts/generate-mobile-crops.sh)
+- [x] All 11 mobile routes functional; bottom-tab nav works (MOB-001/002 DONE 2026-05-06)
+- [ ] Playwright passes in both flag states (fantasyUi=true/false) — QA-001/002 READY, not yet implemented
+- [x] All new strings in `en.json`; `fr.json`/`ar.json` have real translations (QA-003a+003b both DONE 2026-05-04/06)
+- [ ] Lighthouse mobile ≥90 on /m/dashboard — READY, not yet run
+- [ ] iOS Safari + Android Chrome smoke pass — READY, not yet executed
+- [ ] OPEN-005 resolved (license confirmed OR replacement art committed) — IN_PROGRESS, PM decision pending
 - [ ] Feature flag enabled at 5% in production with rollout schedule queued
 
 **Size:** 13 tasks (split from 12 — QA-003 split into 003a/003b, added QA-PLAN draft).

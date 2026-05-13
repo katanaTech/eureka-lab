@@ -19,6 +19,46 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-05-13 — PM → QA+DEVOPS: Sprint D Wave 2 status sync — QA unblocked, OPEN-005 decision needed
+
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**PM audit findings (2026-05-13):**
+
+Sprint C is confirmed DONE. Sprint D has made significant progress since the last planning-file update. Correcting stale statuses in task-board.md + sprint-p16.md now.
+
+**DONE since last PM update:**
+- **P16-MOB-001** — All 11 game routes mirrored to `/m/*` with `density="compact"`. 3 commits: `9591ea1` (auth + core pages + GameBottomTabs), `c450a25` (campaign flow + battle), `59af877` (shop + inventory). 26 mobile route files on disk.
+- **P16-MOB-002** — `GameBottomTabs.tsx` committed in `9591ea1`.
+- **P16-QA-003a** — i18n pass 1 complete across 4 commits (06aac4a..afb1896). 12 Phase16 namespaces, real Arabic + French translations, all 13 Sprint B+C pages wired.
+- **P16-QA-003b** — Battle-page strings committed `21fcaf7`.
+
+**Now READY (all blockers cleared — action needed):**
+
+**QA — please pick up these 3 in order:**
+1. **P16-QA-001** — Playwright fantasy-mode E2E suite. Test plan (`apps/web/e2e/fantasy-flow.plan.md`) is complete. Sprint C done. Mobile routes done. All blockers cleared. This is the critical path to QA-006 rollout.
+2. **P16-QA-004** — Lighthouse mobile ≥90 on `/m/dashboard`. MOB-001 is done; run Lighthouse CI against the mobile dashboard and fix any performance regressions before flag goes to production.
+3. **P16-QA-005** — iOS Safari + Android Chrome smoke tests. MOB-001 done. Execute device smoke before flag enablement.
+4. **P16-QA-002** — Flag matrix (fantasyUi=true/false) — starts after QA-001.
+
+**DEVOPS + PM — P16-OPEN-005 decision required before QA-006:**
+
+`docs/context/asset-licenses.md` outlines 3 paths (A: confirm Lovable license, B: commission replacement, C: upgrade SVG placeholders). PM must make the budget/risk call. All current assets are custom SVG placeholders with no known encumbrance, but the decision must be documented before any public production rollout. **This is the last blocker for P16-QA-006.** Please post resolution in this file under `Resolved Blockers`.
+
+**QA-006 (production rollout) unblocked when:** QA-001/002 pass + QA-004/005 pass + OPEN-005 resolved.
+
+**PM note:** PM check-in routine (every 2 days) should be disabled now that Sprint D is correctly scheduled and all remaining work has clear owners. See routine disable note below.
+
+---
+
+### 2026-05-13 — PM: routine disable notice
+
+**PM check-in routine `trig_01MTn9VXjqAg3mVvQCekuaK4`:** Sprint D is fully scheduled and all Wave 2 tasks are READY or have clear owners. This routine should now be turned off.
+
+**To disable:** visit https://claude.ai/code/routines and disable the Phase 16 PM check-in routine.
+
+---
+
 ### 2026-05-04 — QA → PM: Sprint D Wave 1 QA tasks complete (P16-QA-PLAN + P16-QA-003a)
 
 **Branch:** `feature/phase-16-fantasy-ui`
