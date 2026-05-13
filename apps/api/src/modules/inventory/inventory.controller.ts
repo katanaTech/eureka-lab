@@ -30,7 +30,10 @@ import type { Inventory, ShopCatalog } from '@eureka-lab/shared-types';
  */
 @Controller()
 @UseGuards(FirebaseAuthGuard, RolesGuard)
-@Roles('child')
+// TODO(plan-2): tighten to 'child' once minor-account signup flow exists.
+// Plan 1's Welcome creates parent accounts that still need to see the learner
+// dashboard, so the role gate is temporarily broadened.
+@Roles('child', 'parent')
 export class InventoryController {
   private readonly logger = new Logger(InventoryController.name);
 

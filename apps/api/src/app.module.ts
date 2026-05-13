@@ -16,6 +16,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { ClassroomsModule } from './modules/classrooms/classrooms.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { CombatModule } from './modules/combat/combat.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 /**
  * Root application module.
@@ -42,6 +43,7 @@ import { CombatModule } from './modules/combat/combat.module';
     ClassroomsModule,
     NotificationsModule,
     CombatModule,
+    InventoryModule,
   ],
 })
 export class AppModule {}
