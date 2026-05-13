@@ -4,7 +4,8 @@ import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { Group } from 'three';
 import type { CombatPhase, CareerArchetype } from '@eureka-lab/shared-types';
-import { useGameStore } from '@/stores/game-store';
+// TODO(phase-r3f-resume): re-point to `@/stores/game-store` when the 3D phase resumes (see _future_r3f/README.md).
+import { useGameStore } from '@/stores/_future_r3f/game-store';
 
 interface CareerAttackEffectProps {
   /** Current combat phase — effect is visible only on 'player_attack' */

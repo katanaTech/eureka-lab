@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useGameStore } from '@/stores/game-store';
+// TODO(phase-r3f-resume): re-point to `@/stores/game-store` when the 3D phase resumes (see _future_r3f/README.md).
+import { useGameStore } from '@/stores/_future_r3f/game-store';
 import { CAREER_OPTIONS } from './CareerPicker';
 
 interface GameHUDProps {
