@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
@@ -15,6 +13,7 @@ import { Logo } from '@/components/game/Logo';
 import { GameButton } from '@/components/game/GameButton';
 import { useAuth } from '@/hooks/useAuth';
 import { auth } from '@/lib/firebase';
+import { authApi } from '@/lib/api-client';
 
 const worldBg = '/assets/game/world-map.jpg';
 
@@ -48,8 +47,17 @@ export default function WelcomePage() {
         if (!username.trim() || !email.trim() || !password) {
           return toast.error('Fill in all the runes, hero.');
         }
-        const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-        await updateProfile(cred.user, { displayName: username.trim() });
+        // Backend signup creates the Firebase user (Admin SDK) + Firestore
+        // profile + custom claims. Doing this client-side via
+        // createUserWithEmailAndPassword skips the Firestore doc and breaks
+        // useAuth's authApi.getMe() lookup.
+        await authApi.signup({
+          email: email.trim(),
+          password,
+          displayName: username.trim(),
+          role: 'parent',
+        });
+        await signInWithEmailAndPassword(auth, email.trim(), password);
         toast.success(`Welcome to the realm, ${username.trim()}!`);
         router.push('/character');
       } else {
