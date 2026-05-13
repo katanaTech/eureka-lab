@@ -1,23 +1,30 @@
-import { Button } from '@/components/ui/button';
+'use client';
 
-/**
- * Custom 404 page — shown when a route doesn't exist.
- */
+import Link from 'next/link';
+import { Scene } from '@/components/game/Scene';
+import { Logo } from '@/components/game/Logo';
+import { GameButton } from '@/components/game/GameButton';
+
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-primary">404</h1>
-        <p className="mt-2 text-xl font-semibold text-foreground">
-          Page Not Found
+    <Scene>
+      <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-10 text-center">
+        <Logo className="mb-10" />
+        <p className="text-xs tracking-[0.5em] text-primary/80">CONSUMED BY THE VOID</p>
+        <h1 className="font-display text-6xl text-glow-primary mt-3 animate-flicker">404</h1>
+        <p className="max-w-md mx-auto text-muted-foreground text-sm mt-4">
+          The path you sought no longer exists. The Babble Zombies must have
+          erased it from the Realm.
         </p>
-        <p className="mt-1 text-muted-foreground">
-          The page you&apos;re looking for doesn&apos;t exist or has been moved.
-        </p>
-      </div>
-      <a href="/">
-        <Button>Go Home</Button>
-      </a>
-    </div>
+        <div className="mt-8 flex gap-3">
+          <Link href="/">
+            <GameButton variant="ghost" size="md">Return to the Awakening</GameButton>
+          </Link>
+          <Link href="/dashboard">
+            <GameButton variant="primary" size="md">Realm Map</GameButton>
+          </Link>
+        </div>
+      </main>
+    </Scene>
   );
 }
