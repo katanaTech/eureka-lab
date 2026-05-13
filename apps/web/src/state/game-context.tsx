@@ -41,7 +41,7 @@ export interface GameStateActions {
   buyWeapon: (id: string, cost: number) => boolean;
   /** Equip a weapon, or unequip when passed null. */
   equipWeapon: (id: string | null) => void;
-  /** Sign out of Firebase and clear the local character snapshot. */
+  /** Sign out of Firebase and clear local character + inventory snapshots. */
   reset: () => Promise<void>;
 }
 
@@ -61,6 +61,7 @@ export function useGame(): GameStateView & GameStateActions {
   const character = useCharacterStore((s) => s.character);
   const setCharacterStore = useCharacterStore((s) => s.setCharacter);
   const resetCharacter = useCharacterStore((s) => s.reset);
+  const resetInventory = useInventoryStore((s) => s.reset);
   const { logout } = useAuth();
 
   const userView = authUser
@@ -102,8 +103,11 @@ export function useGame(): GameStateView & GameStateActions {
     },
     equipWeapon: (id) => inv.equipWeapon(id),
     reset: async () => {
-      await logout();
+      // Reset local snapshots BEFORE Firebase signOut so a fast re-login
+      // can't briefly see the previous user's KP / character.
       resetCharacter();
+      resetInventory();
+      await logout();
     },
   };
 }
