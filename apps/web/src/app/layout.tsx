@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Cinzel, Amiri } from 'next/font/google';
 import { getMessages, getLocale } from 'next-intl/server';
+import { Toaster as SonnerToaster } from 'sonner';
 import { Providers } from '@/components/shared/Providers';
 import './globals.css';
 
@@ -59,6 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={`${inter.variable} ${cinzel.variable} ${amiri.variable} font-sans antialiased`}>
         <Providers locale={locale} messages={messages}>
           {children}
+          <SonnerToaster theme="dark" position="top-center" richColors />
         </Providers>
       </body>
     </html>
