@@ -36,6 +36,15 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@anthropic-ai/sdk'],
   },
+
+  async redirects() {
+    return [
+      // All Phase 16 game-mode routes collapse to the dashboard.
+      { source: '/g/:path*', destination: '/dashboard', permanent: true },
+      // Phase 16 mobile mirror routes also collapse to dashboard (responsive UI now).
+      { source: '/m/:path*', destination: '/dashboard', permanent: true },
+    ];
+  },
 };
 
 module.exports = withPWA(withNextIntl(nextConfig));
