@@ -2,11 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { toast } from 'sonner';
 import { Scene } from '@/components/game/Scene';
 import { Logo } from '@/components/game/Logo';
 import { GameButton } from '@/components/game/GameButton';
 import { useAuth } from '@/hooks/useAuth';
+import { auth } from '@/lib/firebase';
 
 const worldBg = '/assets/game/world-map.jpg';
 
@@ -33,8 +41,43 @@ export default function WelcomePage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO(Task 2.3): wire Firebase Auth
-    toast.error('Auth not wired yet — see Task 2.3');
+    if (!auth) return toast.error('Auth is not available.');
+
+    try {
+      if (mode === 'register') {
+        if (!username.trim() || !email.trim() || !password) {
+          return toast.error('Fill in all the runes, hero.');
+        }
+        const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
+        await updateProfile(cred.user, { displayName: username.trim() });
+        toast.success(`Welcome to the realm, ${username.trim()}!`);
+        router.push('/character');
+      } else {
+        if (!email.trim() || !password) {
+          return toast.error('Email and password required.');
+        }
+        await signInWithEmailAndPassword(auth, email.trim(), password);
+        const displayName = email.trim().split('@')[0];
+        toast.success(`Welcome back, ${displayName}.`);
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      const msg = (err as { message?: string })?.message ?? 'Auth failed.';
+      toast.error(msg);
+    }
+  };
+
+  const handleGoogle = async () => {
+    if (!auth) return toast.error('Auth is not available.');
+    try {
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      toast.success(`Welcome, ${cred.user.displayName ?? 'Hero'}.`);
+      router.push('/character');
+    } catch (err) {
+      const msg = (err as { message?: string })?.message ?? 'Google sign-in failed.';
+      toast.error(msg);
+    }
   };
 
   return (
@@ -87,6 +130,16 @@ export default function WelcomePage() {
                 By entering, you swear to fight zombies with curiosity, not cheats.
               </p>
             </form>
+
+            <GameButton
+              type="button"
+              variant="ghost"
+              size="lg"
+              className="w-full mt-3"
+              onClick={handleGoogle}
+            >
+              Sign in with the Google Sigil
+            </GameButton>
           </div>
         </section>
       </main>
