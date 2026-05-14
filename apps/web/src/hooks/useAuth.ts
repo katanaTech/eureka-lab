@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { authApi, ApiError } from '@/lib/api-client';
@@ -13,24 +13,34 @@ import { useAuthStore } from '@/stores/auth-store';
  *
  * Gracefully handles missing Firebase config (returns unauthenticated state).
  *
+ * Mount-safety: an internal `mountedRef` skips setUser/clearUser after the
+ * hook unmounts so an in-flight authApi.getMe() can't update an unmounted
+ * consumer. Resolves Plan 1 review finding R4.
+ *
  * @returns Auth state and actions
  */
 export function useAuth() {
   const { user, isLoading, setUser, clearUser } = useAuthStore();
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
     /* If Firebase is not configured, mark as loaded and unauthenticated */
     if (!auth) {
       clearUser();
-      return;
+      return () => {
+        mountedRef.current = false;
+      };
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
           const profile = await authApi.getMe();
+          if (!mountedRef.current) return;
           setUser(profile);
         } catch (err) {
+          if (!mountedRef.current) return;
           clearUser();
           // Orphan Firebase session (auth user exists but Firestore profile
           // doesn't): sign out so subsequent reloads don't replay the 404.
@@ -41,11 +51,15 @@ export function useAuth() {
           }
         }
       } else {
+        if (!mountedRef.current) return;
         clearUser();
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      mountedRef.current = false;
+      unsubscribe();
+    };
   }, [setUser, clearUser]);
 
   /**
