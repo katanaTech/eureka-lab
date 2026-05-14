@@ -3,7 +3,9 @@
 import { useAuthStore } from '@/stores/auth-store';
 import { useInventoryStore } from '@/stores/inventory-store';
 import { useCharacterStore, type Character } from '@/stores/character-store';
+import { useAcademyProgressStore } from '@/stores/academy-progress-store';
 import { useAuth } from '@/hooks/useAuth';
+import { inventoryApi } from '@/lib/api-client';
 
 export type { Character };
 
@@ -16,6 +18,10 @@ export interface GameStateView {
   ownedAbilities: string[];
   ownedWeapons: string[];
   equippedWeapon: string | null;
+  /** Lesson IDs the user has completed in this session. */
+  completedLessons: string[];
+  /** Video IDs the user has watched in this session. */
+  watchedVideos: string[];
 }
 
 /** Actions exposed by {@link useGame}. */
@@ -30,18 +36,38 @@ export interface GameStateActions {
    */
   spendKnowledge: (amount: number) => boolean;
   /**
-   * Buy an ability if the user can afford it. No-op when already owned.
-   * @returns true when the user now owns the ability (already owned or just bought).
+   * Mark a lesson as completed and credit KP optimistically.
+   * Backend persistence is deferred to Plan 3 — KP delta will not survive
+   * a hydrate from `inventoryApi.getMine()` until then.
+   */
+  completeLesson: (lessonId: string, kp: number) => void;
+  /**
+   * Mark a video as watched and credit KP optimistically.
+   * Same Plan 3 caveat as completeLesson.
+   */
+  watchVideo: (videoId: string, kp: number) => void;
+  /**
+   * Buy an ability if the user can afford it. Issues a backend
+   * `POST /inventory/buy` then re-hydrates from `inventoryApi.getMine()`.
+   * The optimistic-local mutation runs first so the UI updates immediately.
+   *
+   * @returns true when the user now owns the ability (already-owned counts).
    */
   buyAbility: (id: string, cost: number) => boolean;
   /**
-   * Buy a weapon if the user can afford it. Auto-equips the first weapon owned.
+   * Buy a weapon if the user can afford it. Issues a backend
+   * `POST /inventory/buy`. Auto-equips the first weapon owned via
+   * a follow-up `POST /inventory/equip`.
+   *
    * @returns true when the user now owns the weapon.
    */
   buyWeapon: (id: string, cost: number) => boolean;
-  /** Equip a weapon, or unequip when passed null. */
+  /**
+   * Equip a weapon (or unequip with `null`). Issues a backend
+   * `POST /inventory/equip` after the optimistic-local update.
+   */
   equipWeapon: (id: string | null) => void;
-  /** Sign out of Firebase and clear local character + inventory snapshots. */
+  /** Sign out of Firebase and clear local character + inventory + academy snapshots. */
   reset: () => Promise<void>;
 }
 
@@ -49,9 +75,13 @@ export interface GameStateActions {
  * Aggregated hook matching ai-adventure-island's `useGame()` API surface, backed by
  * the Zustand stores + Firebase auth. Lets ported reference page code work unchanged.
  *
- * Server persistence is handled by the stores themselves where applicable —
- * `character.setCharacter` calls `PUT /users/me/character`; inventory mutations are
- * optimistic-local and are reconciled by `useInventoryStore.hydrate()`.
+ * Server persistence:
+ * - `character.setCharacter` calls `PUT /users/me/character`
+ * - `buyAbility` / `buyWeapon` / `equipWeapon` call `POST /inventory/buy` and
+ *   `/inventory/equip` after the optimistic-local mutation, then reconcile
+ *   with the authoritative Inventory the server returns.
+ * - `completeLesson` / `watchVideo` are optimistic-local for Plan 2 — Plan 3
+ *   will add backend KP-credit endpoints.
  *
  * @returns The combined view + actions object consumed by reference pages.
  */
@@ -62,11 +92,21 @@ export function useGame(): GameStateView & GameStateActions {
   const setCharacterStore = useCharacterStore((s) => s.setCharacter);
   const resetCharacter = useCharacterStore((s) => s.reset);
   const resetInventory = useInventoryStore((s) => s.reset);
+  const academy = useAcademyProgressStore();
+  const resetAcademy = useAcademyProgressStore((s) => s.reset);
   const { logout } = useAuth();
 
   const userView = authUser
     ? { username: authUser.displayName ?? authUser.email ?? 'Hero', email: authUser.email ?? '' }
     : null;
+
+  /**
+   * Fire-and-forget backend hydrate after a mutation. Swallows errors so a
+   * transient network failure doesn't trigger an unhandled rejection.
+   */
+  const hydrateInventoryFireAndForget = () => {
+    void inv.hydrate().catch(() => { /* offline tolerance */ });
+  };
 
   return {
     // ── View ─────────────────────────────────────────────
@@ -77,6 +117,8 @@ export function useGame(): GameStateView & GameStateActions {
     ownedAbilities: inv.ownedAbilityIds,
     ownedWeapons: inv.ownedWeaponIds,
     equippedWeapon: inv.equippedWeaponId,
+    completedLessons: academy.completedLessonIds,
+    watchedVideos: academy.watchedVideoIds,
 
     // ── Actions ──────────────────────────────────────────
     setCharacter: (c) => { void setCharacterStore(c); },
@@ -86,27 +128,65 @@ export function useGame(): GameStateView & GameStateActions {
       inv.spendKp(amount);
       return true;
     },
+    completeLesson: (lessonId, kp) => {
+      if (academy.completedLessonIds.includes(lessonId)) return;
+      academy.completeLesson(lessonId);
+      inv.addKp(kp);
+      // TODO(plan-3): POST /api/v1/academy/lesson-complete to persist server-side.
+    },
+    watchVideo: (videoId, kp) => {
+      if (academy.watchedVideoIds.includes(videoId)) return;
+      academy.watchVideo(videoId);
+      inv.addKp(kp);
+      // TODO(plan-3): POST /api/v1/academy/video-watched to persist server-side.
+    },
     buyAbility: (id, cost) => {
       if (inv.ownedAbilityIds.includes(id)) return true;
       if (inv.kp < cost) return false;
+      // Optimistic-local first so the UI updates immediately.
       inv.spendKp(cost);
       inv.addAbility(id);
+      // Authoritative server mutation + reconciling hydrate.
+      void inventoryApi
+        .purchaseItem({ itemId: id, itemType: 'ability' })
+        .then((updated) => inv.setInventory(updated))
+        .catch(() => hydrateInventoryFireAndForget());
       return true;
     },
     buyWeapon: (id, cost) => {
       if (inv.ownedWeaponIds.includes(id)) return true;
       if (inv.kp < cost) return false;
+      const shouldAutoEquip = inv.equippedWeaponId === null;
       inv.spendKp(cost);
       inv.addWeapon(id);
-      if (inv.equippedWeaponId === null) inv.equipWeapon(id);
+      if (shouldAutoEquip) inv.equipWeapon(id);
+      void inventoryApi
+        .purchaseItem({ itemId: id, itemType: 'weapon' })
+        .then((updated) => inv.setInventory(updated))
+        .then(() => {
+          if (shouldAutoEquip) {
+            return inventoryApi
+              .equipWeapon({ weaponId: id })
+              .then((updated) => inv.setInventory(updated));
+          }
+          return undefined;
+        })
+        .catch(() => hydrateInventoryFireAndForget());
       return true;
     },
-    equipWeapon: (id) => inv.equipWeapon(id),
+    equipWeapon: (id) => {
+      inv.equipWeapon(id);
+      void inventoryApi
+        .equipWeapon({ weaponId: id })
+        .then((updated) => inv.setInventory(updated))
+        .catch(() => hydrateInventoryFireAndForget());
+    },
     reset: async () => {
       // Reset local snapshots BEFORE Firebase signOut so a fast re-login
-      // can't briefly see the previous user's KP / character.
+      // can't briefly see the previous user's KP / character / academy state.
       resetCharacter();
       resetInventory();
+      resetAcademy();
       await logout();
     },
   };
