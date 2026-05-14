@@ -19,16 +19,27 @@ const worldBg = '/assets/game/world-map.jpg';
 
 type Mode = 'login' | 'register';
 
+/** Minimum and maximum playable age. Under-13 is gated pending Plan 3 COPPA pipeline (ADR-006). */
+const MIN_AGE = 13;
+const MAX_AGE = 16;
+const CURRENT_YEAR = new Date().getFullYear();
+
 /**
  * Welcome / landing page — fantasy "Awakening" entry point.
+ *
  * Auth-gated: redirects authenticated users to /dashboard.
- * Submit handler is currently a stub; Firebase wiring lands in Task 2.3.
+ *
+ * Per ADR-006, the "Begin Quest" tab is the **kid signup** surface (ages
+ * 13–16, role 'child'). Under-13 is blocked with a "parent confirmation
+ * coming soon" message until Plan 3 ships the COPPA pipeline. Adult/parent
+ * accounts sign up via the standalone /signup route.
  */
 export default function WelcomePage() {
   const [mode, setMode] = useState<Mode>('register');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [birthYear, setBirthYear] = useState('');
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
@@ -44,18 +55,33 @@ export default function WelcomePage() {
 
     try {
       if (mode === 'register') {
-        if (!username.trim() || !email.trim() || !password) {
+        if (!username.trim() || !email.trim() || !password || !birthYear.trim()) {
           return toast.error('Fill in all the runes, hero.');
+        }
+        const year = Number(birthYear);
+        if (!Number.isInteger(year) || year < 1900 || year > CURRENT_YEAR) {
+          return toast.error('Year of birth looks odd, hero.');
+        }
+        const age = CURRENT_YEAR - year;
+        if (age < MIN_AGE) {
+          return toast.error(
+            `Hero too young — parent confirmation coming soon. (Heroes ${MIN_AGE}+ may enter today.)`,
+          );
+        }
+        if (age > MAX_AGE) {
+          return toast.error(`Heroes are ${MIN_AGE}–${MAX_AGE}. Adults — try the standalone Sign Up page.`);
         }
         // Backend signup creates the Firebase user (Admin SDK) + Firestore
         // profile + custom claims. Doing this client-side via
         // createUserWithEmailAndPassword skips the Firestore doc and breaks
         // useAuth's authApi.getMe() lookup.
+        // TODO(plan-3): pass birthYear so backend can validate role assignment
+        // server-side instead of trusting the client (ADR-006 known gap).
         await authApi.signup({
           email: email.trim(),
           password,
           displayName: username.trim(),
-          role: 'parent',
+          role: 'child',
         });
         await signInWithEmailAndPassword(auth, email.trim(), password);
         toast.success(`Welcome to the realm, ${username.trim()}!`);
@@ -77,6 +103,8 @@ export default function WelcomePage() {
 
   const handleGoogle = async () => {
     if (!auth) return toast.error('Auth is not available.');
+    // TODO(plan-3): collect birthYear before Google OAuth so we can age-gate
+    // the kid sign-up path. Today Google OAuth users skip the age gate (ADR-006).
     try {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
@@ -125,7 +153,16 @@ export default function WelcomePage() {
 
             <form className="space-y-4" onSubmit={submit}>
               {mode === 'register' && (
-                <Field label="Hero Name" value={username} onChange={setUsername} placeholder="e.g. Stormrider" />
+                <>
+                  <Field label="Hero Name" value={username} onChange={setUsername} placeholder="e.g. Stormrider" />
+                  <Field
+                    label={`Year of Birth (${MIN_AGE}–${MAX_AGE} only)`}
+                    value={birthYear}
+                    onChange={setBirthYear}
+                    placeholder={`${CURRENT_YEAR - MAX_AGE}–${CURRENT_YEAR - MIN_AGE}`}
+                    type="number"
+                  />
+                </>
               )}
               <Field label="Email Sigil" value={email} onChange={setEmail} placeholder="hero@realm.io" type="email" />
               <Field label="Secret Rune" value={password} onChange={setPassword} placeholder="••••••••" type="password" />
@@ -164,7 +201,7 @@ interface FieldProps {
   onChange: (v: string) => void;
   /** Placeholder text */
   placeholder?: string;
-  /** Input type (text | email | password) */
+  /** Input type (text | email | password | number) */
   type?: string;
 }
 

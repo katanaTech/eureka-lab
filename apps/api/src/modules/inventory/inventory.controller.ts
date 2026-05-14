@@ -30,10 +30,10 @@ import type { Inventory, ShopCatalog } from '@eureka-lab/shared-types';
  */
 @Controller()
 @UseGuards(FirebaseAuthGuard, RolesGuard)
-// TODO(plan-2): tighten to 'child' once minor-account signup flow exists.
-// Plan 1's Welcome creates parent accounts that still need to see the learner
-// dashboard, so the role gate is temporarily broadened.
-@Roles('child', 'parent')
+// Plan 2 (ADR-006) tightened this back to 'child' only. Welcome's "Begin Quest"
+// tab now creates child-role accounts (ages 13–16); adults sign up via /signup
+// and stay as 'parent' role (which doesn't need inventory access).
+@Roles('child')
 export class InventoryController {
   private readonly logger = new Logger(InventoryController.name);
 
