@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { authApi } from '@/lib/api-client';
+import { authApi, ApiError } from '@/lib/api-client';
 import { useAuthStore } from '@/stores/auth-store';
 
 /**
@@ -30,8 +30,15 @@ export function useAuth() {
         try {
           const profile = await authApi.getMe();
           setUser(profile);
-        } catch {
+        } catch (err) {
           clearUser();
+          // Orphan Firebase session (auth user exists but Firestore profile
+          // doesn't): sign out so subsequent reloads don't replay the 404.
+          // Network errors leave the session intact so a transient blip
+          // doesn't log a legitimate user out.
+          if (err instanceof ApiError && err.statusCode === 404 && auth) {
+            await signOut(auth).catch(() => {});
+          }
         }
       } else {
         clearUser();
