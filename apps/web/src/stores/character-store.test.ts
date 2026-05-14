@@ -34,4 +34,23 @@ describe('character-store', () => {
     useCharacterStore.getState().reset();
     expect(useCharacterStore.getState().character).toBeNull();
   });
+
+  it('starts with hasHydrated=false', () => {
+    expect(useCharacterStore.getState().hasHydrated).toBe(false);
+  });
+
+  it('setCharacter flips hasHydrated to true', async () => {
+    await useCharacterStore.getState().setCharacter({
+      name: 'Riven', class: 'warrior', color: '188 95% 60%', weaponName: 'Runeblade',
+    });
+    expect(useCharacterStore.getState().hasHydrated).toBe(true);
+  });
+
+  it('reset clears hasHydrated', async () => {
+    await useCharacterStore.getState().setCharacter({
+      name: 'X', class: 'mage', color: '0 0% 0%', weaponName: 'Y',
+    });
+    useCharacterStore.getState().reset();
+    expect(useCharacterStore.getState().hasHydrated).toBe(false);
+  });
 });

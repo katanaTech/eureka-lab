@@ -16,38 +16,24 @@ export interface Character {
   weaponName: string;
 }
 
-/** Internal Zustand state + actions for the character store. */
 interface CharacterState {
-  /** Currently loaded character, or null if not yet hydrated/created */
   character: Character | null;
-  /** True while a server request (get/put) is in flight */
   isLoading: boolean;
-  /**
-   * Persist the character to the backend and update local state optimistically.
-   *
-   * @param c - Character to save
-   */
+  /** True after the first hydrate() resolves (success or 404). Prevents the
+   *  (learner)/layout.tsx character-gate from racing with in-flight hydrate. */
+  hasHydrated: boolean;
   setCharacter: (c: Character) => Promise<void>;
-  /**
-   * Fetch the character from the backend and populate local state.
-   * Silently no-ops when the user has not yet created one (HTTP 404).
-   */
   hydrate: () => Promise<void>;
-  /** Clear local state — typically called on logout. */
   reset: () => void;
 }
 
-/**
- * Zustand store for the player's fantasy character.
- * NOT persisted to localStorage — the backend is the source of truth.
- * Hydrate via `hydrate()` after auth resolves.
- */
 export const useCharacterStore = create<CharacterState>((set) => ({
   character: null,
   isLoading: false,
+  hasHydrated: false,
 
   setCharacter: async (c) => {
-    set({ character: c, isLoading: true });
+    set({ character: c, isLoading: true, hasHydrated: true });
     try {
       await characterApi.put(c);
     } finally {
@@ -63,9 +49,9 @@ export const useCharacterStore = create<CharacterState>((set) => ({
     } catch {
       /* 404 is expected when the user has not created a character yet. */
     } finally {
-      set({ isLoading: false });
+      set({ isLoading: false, hasHydrated: true });
     }
   },
 
-  reset: () => set({ character: null, isLoading: false }),
+  reset: () => set({ character: null, isLoading: false, hasHydrated: false }),
 }));
