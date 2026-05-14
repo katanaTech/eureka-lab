@@ -33,6 +33,7 @@ import type {
   BattleType,
   ZoneId,
   Inventory,
+  ShopCatalog,
   FantasyCharacter,
   FantasyClass,
 } from '@eureka-lab/shared-types';
@@ -870,13 +871,48 @@ export async function* streamAgentChat(
 
 /* ── Inventory API ─────────────────────────────────────────────── */
 
-/** Inventory API endpoints — read the user's KP economy snapshot. */
+/** Body shape for `POST /inventory/buy`. Mirrors the backend `PurchaseItemDto`. */
+interface PurchaseItemBody {
+  itemId: string;
+  itemType: 'ability' | 'weapon';
+}
+
+/** Body shape for `POST /inventory/equip`. `weaponId: null` unequips. */
+interface EquipWeaponBody {
+  weaponId: string | null;
+}
+
+/** Inventory + shop API endpoints. */
 export const inventoryApi = {
   /**
    * Fetch the authenticated user's full inventory (kp, owned items, equipped weapon).
    * @returns The Inventory document from `inventories/{uid}`.
    */
   getMine: () => request<Inventory>('/inventory'),
+
+  /**
+   * Fetch the hardcoded shop catalog (abilities + weapons).
+   * @returns The full ShopCatalog the backend exposes.
+   */
+  getCatalog: () => request<ShopCatalog>('/shop/catalog'),
+
+  /**
+   * Purchase an ability or weapon. Backend runs an atomic Firestore transaction
+   * that deducts KP, appends to the owned list, and returns the new inventory.
+   * @param body - itemId + itemType ('ability' | 'weapon')
+   * @returns Updated Inventory (use to call `setInventory` on the store).
+   */
+  purchaseItem: (body: PurchaseItemBody) =>
+    request<Inventory>('/inventory/buy', { method: 'POST', body: JSON.stringify(body) }),
+
+  /**
+   * Equip a weapon (or unequip with `weaponId: null`). Backend validates
+   * ownership before mutating.
+   * @param body - weaponId to equip, or null to unequip
+   * @returns Updated Inventory.
+   */
+  equipWeapon: (body: EquipWeaponBody) =>
+    request<Inventory>('/inventory/equip', { method: 'POST', body: JSON.stringify(body) }),
 };
 
 /* ── Character API ─────────────────────────────────────────────── */
@@ -966,6 +1002,7 @@ export type {
   BattleType,
   ZoneId,
   Inventory,
+  ShopCatalog,
   FantasyCharacter,
   FantasyClass,
 };
