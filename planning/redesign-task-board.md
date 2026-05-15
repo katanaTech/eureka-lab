@@ -5,7 +5,7 @@
 > **Spec:** [`docs/superpowers/specs/2026-05-09-redesign-from-reference-design.md`](../docs/superpowers/specs/2026-05-09-redesign-from-reference-design.md)
 > **Reference project:** `C:\Eureka-lab-app\Dev\ai-adventure-island`
 > **Supersedes:** Phase 16 sprint (`planning/sprint-p16.md` — removed by revert). Original platform phases 1–15 ([`task-board.md`](task-board.md), [`sprint-01.md`](sprint-01.md)) remain authoritative for the pre-Phase-16 product baseline.
-> **Last verified:** 2026-05-14
+> **Last verified:** 2026-05-15
 
 ---
 
@@ -15,7 +15,9 @@
 |---|---|---|---|
 | 1 | Foundation + Learner Shell (revert, salvage, design tokens, Welcome / Character / Dashboard) | **DONE** | [plan-1](../docs/superpowers/plans/2026-05-11-redesign-plan-1-foundation-and-learner-shell.md) |
 | 2 | Learner loop completion (campaign, prepare, mission-prep, battle, inventory, shop, victory) | **DONE** | [plan-2](../docs/superpowers/plans/2026-05-14-redesign-plan-2-campaign-and-combat.md) |
-| 3+ | Adult-facing re-skin, backend hybrid combat validation, i18n re-key, RTL fonts, E2E rewrite, R5 COPPA pipeline | TODO | not yet written |
+| 3a | Adult-facing pages re-skin (parent / teacher / settings / pricing / achievements / checkout) | **DONE** | [plan-3a](../docs/superpowers/plans/2026-05-15-redesign-plan-3a-adult-pages-reskin.md) |
+| 3b | Backend persistence + R5 follow-ups (combat validation, KP-credit, COPPA, server role derivation) | TODO | not yet written |
+| 3c | Platform polish (i18n re-key, RTL fonts, E2E rewrite, PWA/Sentry, feature-component re-skin) | TODO | not yet written |
 
 ---
 
@@ -162,29 +164,75 @@ Phase G.1 (manual end-to-end smoke) is driven by the user, not auto-executed. Un
 
 ---
 
-## Plan 3+ — Adult re-skin, infra, validation, R5 follow-up (TODO — plan not yet written)
+## Plan 3a — Adult-facing pages re-skin (DONE)
+
+12 commits on `redesign/v2-from-reference`. Resolves P3-01..06. No backend changes. Nested feature components (PricingCard, BadgeGrid, SubscriptionCard, ClassroomCard, etc.) explicitly deferred to Plan 3c. Plan: [plan-3a](../docs/superpowers/plans/2026-05-15-redesign-plan-3a-adult-pages-reskin.md).
+
+### Phase A — Layout chrome swap
+
+| ID | Task | Status | Commit |
+|---|---|---|---|
+| A.1 | `<UserMenu />` component for adult HUD | DONE | `40ca57b` |
+| A.2 | Rewrite `(dashboard)/layout.tsx` in fantasy chrome | DONE | `1083f53` |
+| A.3 | Delete legacy Navbar/Sidebar/ProtectedRoute/MobileRedirect | DONE | `b26398b` |
+
+### Phase B — Page re-skins (one task per route)
+
+| ID | Route | Status | Commit |
+|---|---|---|---|
+| B.1 | `/parent` | DONE | `58de9dc` |
+| B.2 | `/teacher` | DONE | `6124bb4` |
+| B.3 | `/teacher/[classroomId]` | DONE | `1f7a1db` |
+| B.4 | `/settings` | DONE | `41825e2` |
+| B.5 | `/pricing` | DONE | `b19360b` |
+| B.6 | `/achievements` | DONE | `f5b3b4d` |
+| B.7 | `/checkout/success` | DONE | `d99ff10` |
+| B.8 | `/checkout/cancel` | DONE | `e628dbb` |
+
+### Phase C — Acceptance
+
+| ID | Task | Status |
+|---|---|---|
+| C.1 | End-to-end smoke (parent + teacher walk-through, anonymous redirect, /learn regression) | PROVISIONAL — user-driven |
+| C.2 | Full tsc clean (web 24 pre-existing, api 0) + lint (2 pre-existing Plan-2 errors discovered, see P3a-N5/N6 below) | DONE |
+| C.3 | Task-board update (this section) | DONE |
+
+### Plan 3a follow-ups for Plan 3c polish
+
+| ID | Item | Severity | Notes |
+|---|---|---|---|
+| P3a-N1 | Inner feature components still on shadcn-light: `PricingCard`, `BadgeGrid`, `XpBar`, `StreakCounter`, `ActivityCalendar`, `LevelBadge`, `JoinCodeDisplay`, `StudentProgressTable`, `SubscriptionCard`, `ClassroomCard`, `CreateClassroomDialog` | Nit | Visual polish only — they function correctly inside the new fantasy chrome |
+| P3a-N2 | Hardcoded English strings introduced by Plan 3a (e.g. "No children added yet…" empty state in `/parent`) marked with `TODO(plan-3c-i18n)` | Nit | Plan 3c i18n re-key sweep (P3-09) picks these up |
+| P3a-N3 | `(dashboard)/learn/page.tsx` + `(dashboard)/learn/[moduleId]/page.tsx` still on pre-redesign internal styling | Important | Inherits new fantasy chrome from `(dashboard)/layout.tsx` so it functions, but looks mismatched. Decide in Plan 3c: re-skin, redirect to `/dashboard`, or own plan |
+| P3a-N4 | `ui-store` still exports `sidebarOpen` / `toggleSidebar` state — dead after Phase A.3 deleted the Sidebar | Nit | Can be pruned in Plan 3c |
+| P3a-N5 | **Pre-existing lint error** in `apps/web/src/app/(learner)/campaign/[slug]/battle/[missionId]/page.tsx:315` — `react-hooks/rules-of-hooks` (`useAbility` inside callback). Last touched by Plan 2 commit `ef4752a`. | Important | PR #8 CI will fail lint if enabled; fix before marking ready-for-review |
+| P3a-N6 | **Pre-existing lint error** in `apps/web/src/app/(learner)/inventory/page.tsx:56` — `react/no-unescaped-entities` (apostrophe). Last touched by Plan 2 commit `acb286d`. | Nit | Same CI concern as P3a-N5 |
+
+---
+
+## Plan 3+ — Adult re-skin, infra, validation, R5 follow-up
 
 | ID | Area | Status | Notes |
 |---|---|---|---|
-| P3-01 | Re-skin `/parent` | TODO | spec §6 recipe |
-| P3-02 | Re-skin `/teacher` + `/teacher/[classroomId]` | TODO | |
-| P3-03 | Re-skin `/settings` | TODO | merge `Phase16Settings` namespace |
-| P3-04 | Re-skin `/pricing` | TODO | |
-| P3-05 | Re-skin `/achievements` | TODO | |
-| P3-06 | Re-skin `/checkout/{success,cancel}` | TODO | path decision in spec §9.1 |
-| P3-07 | Backend hybrid combat validation (server replays play-log against seeded RNG) | TODO | spec §5.6, ~1 sprint |
-| P3-08 | i18n re-key (`Phase16*` → flat namespaces) across en/fr/ar | TODO | spec §7 table |
-| P3-09 | Add new Plan-1/2 strings to all locale files | TODO | hunts `TODO(plan-3-i18n)` markers |
-| P3-10 | RTL Arabic display font — apply Amiri to `html[dir="rtl"] .font-display` | TODO | spec §7 |
-| P3-11 | E2E suite rewrite — `apps/web/e2e/learner-flow.spec.ts` (chromium + mobile-chrome) | TODO | replaces deleted Phase 16 specs |
-| P3-12 | Retire `useMobileDetect` hook if responsive utilities suffice | TODO | spec §9.2 |
-| P3-13 | Verify PWA + Sentry source maps post-redesign | TODO | spec §9.3, §9.4 |
-| P3-14 | **R5 follow-up:** server-side `role` derivation from `birthYear` | TODO | ADR-006 / P2-N2 |
-| P3-15 | **R5 follow-up:** Google OAuth age gate | TODO | ADR-006 / P2-N3 |
-| P3-16 | **R5 follow-up:** under-13 COPPA confirmation pipeline (parent email + audit) | TODO | ADR-006 / P2-N4, ~1 sprint |
-| P3-17 | Backend KP-credit endpoints for lessons / videos / battle XP | TODO | P2-N5; `TODO(plan-3)` markers in `useGame()` |
-| P3-18 | Persistent academy progress (lesson/video completion across sessions) | TODO | P2-N6 |
-| P3-19 | `AiTutorChat` accepts `chapterName` for chapter-specific intro | TODO | P2-N1, polish |
+| P3-01 | Re-skin `/parent` | **DONE** | Plan 3a B.1 |
+| P3-02 | Re-skin `/teacher` + `/teacher/[classroomId]` | **DONE** | Plan 3a B.2 + B.3 |
+| P3-03 | Re-skin `/settings` | **DONE** | Plan 3a B.4 (Phase16Settings i18n merge remains Plan 3c) |
+| P3-04 | Re-skin `/pricing` | **DONE** | Plan 3a B.5 |
+| P3-05 | Re-skin `/achievements` | **DONE** | Plan 3a B.6 |
+| P3-06 | Re-skin `/checkout/{success,cancel}` | **DONE** | Plan 3a B.7 + B.8 (paths kept per spec §9.1) |
+| P3-07 | Backend hybrid combat validation (server replays play-log against seeded RNG) | TODO → Plan 3b | spec §5.6, ~1 sprint |
+| P3-08 | i18n re-key (`Phase16*` → flat namespaces) across en/fr/ar | TODO → Plan 3c | spec §7 table |
+| P3-09 | Add new Plan-1/2/3a strings to all locale files | TODO → Plan 3c | hunts `TODO(plan-3-i18n)` + `TODO(plan-3c-i18n)` markers |
+| P3-10 | RTL Arabic display font — apply Amiri to `html[dir="rtl"] .font-display` | TODO → Plan 3c | spec §7 |
+| P3-11 | E2E suite rewrite — `apps/web/e2e/learner-flow.spec.ts` (chromium + mobile-chrome) | TODO → Plan 3c | replaces deleted Phase 16 specs |
+| P3-12 | Retire `useMobileDetect` hook if responsive utilities suffice | TODO → Plan 3c | spec §9.2. Plan 3a deleted the only page-level caller (`MobileRedirect`); the hook is now orphaned |
+| P3-13 | Verify PWA + Sentry source maps post-redesign | TODO → Plan 3c | spec §9.3, §9.4 |
+| P3-14 | **R5 follow-up:** server-side `role` derivation from `birthYear` | TODO → Plan 3b | ADR-006 / P2-N2 |
+| P3-15 | **R5 follow-up:** Google OAuth age gate | TODO → Plan 3b | ADR-006 / P2-N3 |
+| P3-16 | **R5 follow-up:** under-13 COPPA confirmation pipeline (parent email + audit) | TODO → Plan 3b | ADR-006 / P2-N4, ~1 sprint |
+| P3-17 | Backend KP-credit endpoints for lessons / videos / battle XP | TODO → Plan 3b | P2-N5; `TODO(plan-3)` markers in `useGame()` |
+| P3-18 | Persistent academy progress (lesson/video completion across sessions) | TODO → Plan 3b | P2-N6 |
+| P3-19 | `AiTutorChat` accepts `chapterName` for chapter-specific intro | TODO → Plan 3c | P2-N1, polish |
 
 ---
 
