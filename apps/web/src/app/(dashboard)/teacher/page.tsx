@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { GameButton } from '@/components/game/GameButton';
 import { ClassroomCard } from '@/components/features/teacher/ClassroomCard';
 import { CreateClassroomDialog } from '@/components/features/teacher/CreateClassroomDialog';
 import { classroomsApi } from '@/lib/api-client';
@@ -14,8 +14,9 @@ import type { ClassroomSummary } from '@/lib/api-client';
 export const dynamic = 'force-dynamic';
 
 /**
- * Teacher dashboard — lists all classrooms with create button.
- * Teachers can click into a classroom to see student progress.
+ * Teacher dashboard — classrooms list + create.
+ * Re-skinned for the fantasy chrome. ClassroomCard / CreateClassroomDialog
+ * keep their current styling (Plan 3c polish).
  */
 export default function TeacherDashboardPage() {
   const t = useTranslations('Teacher');
@@ -26,9 +27,7 @@ export default function TeacherDashboardPage() {
   const [error, setError] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  /**
-   * Fetch all classrooms for the authenticated teacher.
-   */
+  /** Fetch all classrooms for the authenticated teacher. */
   const fetchClassrooms = useCallback(async () => {
     try {
       setLoading(true);
@@ -57,20 +56,20 @@ export default function TeacherDashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">
+    <div className="space-y-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h1 className="font-display text-3xl text-glow-primary">
           {t('dashboardTitle')}
         </h1>
-        <Button onClick={() => setDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+        <GameButton variant="primary" size="sm" onClick={() => setDialogOpen(true)}>
+          <Plus className="h-4 w-4" aria-hidden="true" />
           {t('createClassroom')}
-        </Button>
+        </GameButton>
       </div>
 
       {error && (
         <div
-          className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950 dark:text-red-300"
+          className="panel border-destructive/60 p-4 text-sm text-destructive"
           role="alert"
         >
           {error}
@@ -82,7 +81,7 @@ export default function TeacherDashboardPage() {
           <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       ) : classrooms.length === 0 ? (
-        <div className="rounded-lg border border-border p-8 text-center">
+        <div className="panel p-8 text-center">
           <p className="text-muted-foreground">{t('noClassrooms')}</p>
         </div>
       ) : (
