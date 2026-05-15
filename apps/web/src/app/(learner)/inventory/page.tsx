@@ -53,7 +53,7 @@ export default function InventoryPage() {
         <section className="max-w-5xl mx-auto mt-8 text-center animate-fade-in-up">
           <p className="text-xs tracking-[0.5em] text-primary/80">INVENTORY</p>
           <h1 className="font-display text-3xl sm:text-5xl text-glow-primary mt-2">
-            <Package className="inline h-8 w-8 mb-2" /> Hero's Vault
+            <Package className="inline h-8 w-8 mb-2" /> Hero&apos;s Vault
           </h1>
         </section>
 
