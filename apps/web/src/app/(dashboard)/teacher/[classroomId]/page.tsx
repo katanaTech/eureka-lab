@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, RefreshCw, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GameButton } from '@/components/game/GameButton';
 import { JoinCodeDisplay } from '@/components/features/teacher/JoinCodeDisplay';
 import { StudentProgressTable } from '@/components/features/teacher/StudentProgressTable';
 import { classroomsApi } from '@/lib/api-client';
@@ -14,8 +15,9 @@ import type { ClassroomDetailView } from '@/lib/api-client';
 export const dynamic = 'force-dynamic';
 
 /**
- * Classroom detail page — shows join code, student progress table,
- * and management actions (regenerate code, remove students, delete).
+ * Classroom detail page — join code, student progress, danger-zone delete.
+ * Re-skinned for the fantasy chrome. Nested JoinCodeDisplay and
+ * StudentProgressTable keep their current styling (Plan 3c polish).
  */
 export default function ClassroomDetailPage() {
   const t = useTranslations('Teacher');
@@ -29,9 +31,7 @@ export default function ClassroomDetailPage() {
   const [regenerating, setRegenerating] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  /**
-   * Fetch classroom detail with student progress.
-   */
+  /** Fetch classroom detail with student progress. */
   const fetchDetail = useCallback(async () => {
     try {
       setLoading(true);
@@ -51,9 +51,7 @@ export default function ClassroomDetailPage() {
     fetchDetail();
   }, [fetchDetail]);
 
-  /**
-   * Regenerate the classroom join code.
-   */
+  /** Regenerate the classroom join code. */
   const handleRegenerateCode = async () => {
     if (!window.confirm(t('regenerateCodeConfirm'))) return;
 
@@ -61,12 +59,7 @@ export default function ClassroomDetailPage() {
       setRegenerating(true);
       const { joinCode } = await classroomsApi.regenerateCode(classroomId);
       setDetail((prev) =>
-        prev
-          ? {
-              ...prev,
-              classroom: { ...prev.classroom, joinCode },
-            }
-          : prev,
+        prev ? { ...prev, classroom: { ...prev.classroom, joinCode } } : prev,
       );
     } catch (err: unknown) {
       const message =
@@ -93,9 +86,7 @@ export default function ClassroomDetailPage() {
               students: prev.students.filter((s) => s.uid !== studentId),
               classroom: {
                 ...prev.classroom,
-                studentIds: prev.classroom.studentIds.filter(
-                  (id) => id !== studentId,
-                ),
+                studentIds: prev.classroom.studentIds.filter((id) => id !== studentId),
               },
             }
           : prev,
@@ -107,9 +98,7 @@ export default function ClassroomDetailPage() {
     }
   };
 
-  /**
-   * Delete the entire classroom and navigate back.
-   */
+  /** Delete the entire classroom and navigate back. */
   const handleDeleteClassroom = async () => {
     if (!window.confirm(t('deleteClassroomConfirm'))) return;
 
@@ -135,9 +124,10 @@ export default function ClassroomDetailPage() {
 
   if (error && !detail) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-7xl mx-auto">
         <Button
           variant="ghost"
+          size="sm"
           onClick={() => router.push('/teacher')}
           className="gap-2"
         >
@@ -145,7 +135,7 @@ export default function ClassroomDetailPage() {
           {t('backToDashboard')}
         </Button>
         <div
-          className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950 dark:text-red-300"
+          className="panel border-destructive/60 p-4 text-sm text-destructive"
           role="alert"
         >
           {error}
@@ -157,8 +147,8 @@ export default function ClassroomDetailPage() {
   if (!detail) return null;
 
   return (
-    <div className="space-y-6">
-      {/* Header with back button */}
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Header with back button — keep shadcn icon button (tertiary per recipe) */}
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -168,7 +158,7 @@ export default function ClassroomDetailPage() {
         >
           <ArrowLeft className="h-5 w-5" aria-hidden="true" />
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="font-display text-3xl text-glow-primary">
           {detail.classroom.name}
         </h1>
       </div>
@@ -176,7 +166,7 @@ export default function ClassroomDetailPage() {
       {/* Error banner */}
       {error && (
         <div
-          className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950 dark:text-red-300"
+          className="panel border-destructive/60 p-4 text-sm text-destructive"
           role="alert"
         >
           {error}
@@ -184,55 +174,54 @@ export default function ClassroomDetailPage() {
       )}
 
       {/* Join code section */}
-      <div className="flex flex-wrap items-center gap-4 rounded-lg border border-border p-4">
+      <div className="panel flex flex-wrap items-center gap-4 p-4">
         <div className="flex-1">
-          <p className="mb-2 text-sm font-medium text-muted-foreground">
+          <p className="mb-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
             {t('joinCode')}
           </p>
           <JoinCodeDisplay code={detail.classroom.joinCode} />
         </div>
-        <Button
-          variant="outline"
+        <GameButton
+          variant="ghost"
+          size="sm"
           onClick={handleRegenerateCode}
           disabled={regenerating}
-          className="gap-2"
         >
           <RefreshCw
             className={`h-4 w-4 ${regenerating ? 'animate-spin' : ''}`}
             aria-hidden="true"
           />
           {t('regenerateCode')}
-        </Button>
+        </GameButton>
       </div>
 
       {/* Student count */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">
-          {t('studentCount')}: {detail.students.length}/
-          {detail.classroom.maxStudents}
+        <h2 className="font-display text-lg">
+          {t('studentCount')}: {detail.students.length}/{detail.classroom.maxStudents}
         </h2>
       </div>
 
-      {/* Student progress table */}
+      {/* Student progress table — nested component, keeps current styling */}
       <StudentProgressTable
         students={detail.students}
         onRemoveStudent={handleRemoveStudent}
       />
 
-      {/* Danger zone — delete classroom */}
-      <div className="rounded-lg border border-red-200 p-4 dark:border-red-900">
-        <h3 className="mb-2 text-sm font-semibold text-red-700 dark:text-red-400">
+      {/* Danger zone */}
+      <div className="panel border-destructive/60 p-4">
+        <h3 className="mb-3 text-[10px] tracking-[0.3em] uppercase text-destructive">
           {t('dangerZone')}
         </h3>
-        <Button
-          variant="destructive"
+        <GameButton
+          variant="danger"
+          size="sm"
           onClick={handleDeleteClassroom}
           disabled={deleting}
-          className="gap-2"
         >
           <Trash2 className="h-4 w-4" aria-hidden="true" />
           {t('deleteClassroom')}
-        </Button>
+        </GameButton>
       </div>
     </div>
   );
