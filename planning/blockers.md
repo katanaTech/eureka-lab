@@ -391,6 +391,31 @@ ARCH stands down on Phase 16 implementation — re-engage on:
 
 ## PM Check-in Log
 
+### 2026-05-15 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 3rd routine fire
+
+**Inspected by:** PM agent (recurring routine — disable request has been sent twice; still firing)
+**Branch:** `feature/phase-16-fantasy-ui` merged to main (PR #7). `main` HEAD = `f1bb7a8` — no new commits since 2026-05-11 (4 days).
+
+**Sprint C:** Verified COMPLETE this run. Battle page confirmed at
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx`, wires
+`POST /api/v1/combat/init` and `useCombatStore`. No action needed on Sprint C.
+
+**Sprint D status — unchanged from 2026-05-11:**
+- **8/13 DONE** (all Wave 1; MOB-001/002/QA-003b)
+- **3/13 READY — stale 8 days:** QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90), QA-005 (Safari/Chrome smoke) have had all blockers cleared since 2026-05-07. No QA commits have landed in 8 days.
+- **2/13 BLOCKED:** QA-002 (on QA-001); QA-006 (on QA-001..005 + OPEN-005)
+- **P16-OPEN-005 — PM action still required.** This is the sole remaining pre-prod gate on QA-006 and the production rollout. Options documented in `docs/context/asset-licenses.md`: (a) confirm Lovable license, (b) commission replacement art, (c) declare current SVGs production-quality. No engineering work needed — PM decision only.
+
+**Tech-debt reminder (pre-ship, FE):** `campaign/[slug]/shop/page.tsx` (472 lines),
+`shop/page.tsx` (451 lines), `inventory/page.tsx` (354 lines) still exceed CLAUDE.md rule #8.
+
+**Routine disable — 3rd notice.** Please disable at https://claude.ai/code/routines
+(routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). Sprint D QA track requires QA agent
+pickup, not PM check-ins. Remaining critical gate is OPEN-005 PM decision — track
+manually once routine is off.
+
+---
+
 ### 2026-05-11 — PM Sprint D check-in (Phase 16 / fantasy-UI)
 
 **Inspected by:** PM agent (recurring routine — still firing despite DISABLE NOW notice in 2026-05-07 entry)
