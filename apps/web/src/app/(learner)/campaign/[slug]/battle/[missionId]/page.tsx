@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, use } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Brain, Wand2, Sparkles, ShieldAlert, Shield, Swords, Zap } from 'lucide-react';
 import { toast } from 'sonner';
@@ -33,8 +33,8 @@ import { BattleOutcome } from './_battle-outcome';
  */
 export default function BattlePage({
   params,
-}: { params: Promise<{ slug: string; missionId: string }> }) {
-  const { slug, missionId } = use(params);
+}: { params: { slug: string; missionId: string } }) {
+  const { slug, missionId } = params;
   const router = useRouter();
   const { character, totalKnowledgeEarned, ownedAbilities, equippedWeapon, addKnowledge } = useGame();
 
@@ -221,11 +221,13 @@ export default function BattlePage({
   }, [ownedAbilities]);
 
   // Guards AFTER all hooks so React's rules-of-hooks holds.
+  // Use useEffect for the redirect so we don't call setState during render.
+  useEffect(() => {
+    if (character && (!campaign || !mission || !klass)) router.replace('/dashboard');
+  }, [character, campaign, mission, klass, router]);
+
   if (!character) return null;
-  if (!campaign || !mission || !klass) {
-    router.replace('/dashboard');
-    return null;
-  }
+  if (!campaign || !mission || !klass) return null;
 
   return (
     <Scene background={campaign.image}>

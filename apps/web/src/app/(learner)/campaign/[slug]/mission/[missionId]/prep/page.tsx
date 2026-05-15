@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { use, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Brain, Check, ShieldAlert, Sparkles, Swords, Trophy } from 'lucide-react';
 import { Scene } from '@/components/game/Scene';
@@ -20,22 +20,23 @@ import { cn } from '@/lib/utils';
  */
 export default function MissionPrepPage({
   params,
-}: { params: Promise<{ slug: string; missionId: string }> }) {
-  const { slug, missionId } = use(params);
+}: { params: { slug: string; missionId: string } }) {
+  const { slug, missionId } = params;
   const router = useRouter();
   const game = useGame();
   const [picks, setPicks] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [earned, setEarned] = useState(0);
 
-  if (!game.character) return null;
-
   const campaign = CAMPAIGNS.find((c) => c.slug === slug);
   const mission = campaign?.missions.find((m) => m.id === missionId);
-  if (!campaign || !mission) {
-    router.replace('/dashboard');
-    return null;
-  }
+
+  useEffect(() => {
+    if (game.character && (!campaign || !mission)) router.replace('/dashboard');
+  }, [game.character, campaign, mission, router]);
+
+  if (!game.character) return null;
+  if (!campaign || !mission) return null;
 
   const prep = MISSION_PREPS[mission.id];
   const enemyStrength = ENEMY_STRENGTH[mission.id] ?? 100;

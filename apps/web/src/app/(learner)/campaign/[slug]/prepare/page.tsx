@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { use, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import {
   ArrowLeft, BookOpen, Play, ShoppingBag, Check, Lock, Sword,
@@ -28,8 +28,8 @@ type Tab = 'lessons' | 'videos' | 'tutor' | 'shop';
  * Plan 3 will add backend persistence). Shop tab buy/equip route through
  * real backend `inventoryApi.purchaseItem` / `equipWeapon`.
  */
-export default function PreparePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function PreparePage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const router = useRouter();
   const game = useGame();
   const [tab, setTab] = useState<Tab>('lessons');
@@ -37,13 +37,14 @@ export default function PreparePage({ params }: { params: Promise<{ slug: string
   const [lessonAnswer, setLessonAnswer] = useState<number | null>(null);
   const [openVideo, setOpenVideo] = useState<string | null>(null);
 
-  if (!game.character) return null;
-
   const campaign = CAMPAIGNS.find((c) => c.slug === slug);
-  if (!campaign) {
-    router.replace('/dashboard');
-    return null;
-  }
+
+  useEffect(() => {
+    if (game.character && !campaign) router.replace('/dashboard');
+  }, [game.character, campaign, router]);
+
+  if (!game.character) return null;
+  if (!campaign) return null;
 
   const lessons = LESSONS.filter((l) => l.chapterSlug === campaign.slug);
   const videos = VIDEOS.filter((v) => v.chapterSlug === campaign.slug);

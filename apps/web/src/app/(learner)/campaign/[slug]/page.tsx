@@ -1,7 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { use } from 'react';
 import Image from 'next/image';
 import { ArrowLeft, Skull, Star, Crown, Swords, Brain, ShieldAlert } from 'lucide-react';
 import { Scene } from '@/components/game/Scene';
@@ -28,18 +28,19 @@ const diffStyles: Record<Mission['difficulty'], string> = {
  * Auth + character gating handled by `(learner)/layout.tsx`. We still defensively
  * return null if `character` is briefly absent (between hydrate and layout redirect).
  */
-export default function CampaignPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function CampaignPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const router = useRouter();
   const { character, totalKnowledgeEarned } = useGame();
 
-  if (!character) return null;
-
   const campaign = CAMPAIGNS.find((c) => c.slug === slug);
-  if (!campaign) {
-    router.replace('/dashboard');
-    return null;
-  }
+
+  useEffect(() => {
+    if (character && !campaign) router.replace('/dashboard');
+  }, [character, campaign, router]);
+
+  if (!character) return null;
+  if (!campaign) return null;
 
   const klass = CLASSES.find((c) => c.id === character.class);
   if (!klass) return null;
