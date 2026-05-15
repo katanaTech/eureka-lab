@@ -1,8 +1,6 @@
 /**
- * Pricing page — displays available subscription plans.
- * Parents can upgrade from Free to Explorer or Creator plans.
- *
- * @module pricing/page
+ * Pricing page — available subscription plans.
+ * Re-skinned for fantasy chrome. PricingCard component unchanged (Plan 3c).
  */
 
 'use client';
@@ -12,10 +10,10 @@ export const dynamic = 'force-dynamic';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { PRICING_PLANS } from '@eureka-lab/shared-types';
-import { useAuthStore } from '../../../stores/auth-store';
-import { paymentsApi } from '../../../lib/api-client';
-import { PricingCard } from '../../../components/features/payments/PricingCard';
-import { Skeleton } from '../../../components/ui/skeleton';
+import { useAuthStore } from '@/stores/auth-store';
+import { paymentsApi } from '@/lib/api-client';
+import { PricingCard } from '@/components/features/payments/PricingCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /**
  * Pricing page component.
@@ -48,7 +46,7 @@ export default function PricingPage() {
 
   if (authLoading) {
     return (
-      <div className="max-w-5xl mx-auto p-6 space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
         <Skeleton className="h-8 w-48" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Skeleton className="h-80" />
@@ -62,28 +60,18 @@ export default function PricingPage() {
   const currentPlan = user?.plan ?? 'free';
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-8">
-      {/* Page header */}
+    <div className="max-w-5xl mx-auto space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {t('title')}
-        </h1>
-        <p className="mt-2 text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-          {t('subtitle')}
-        </p>
+        <h1 className="font-display text-3xl text-glow-primary">{t('title')}</h1>
+        <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">{t('subtitle')}</p>
       </div>
 
-      {/* Error banner */}
       {error && (
-        <div
-          className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-4 text-sm text-red-700 dark:text-red-300"
-          role="alert"
-        >
+        <div className="panel border-destructive/60 p-4 text-sm text-destructive" role="alert">
           {error}
         </div>
       )}
 
-      {/* Plan cards grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {PRICING_PLANS.map((plan) => (
           <PricingCard
@@ -96,8 +84,7 @@ export default function PricingPage() {
         ))}
       </div>
 
-      {/* Footer note */}
-      <p className="text-center text-xs text-gray-400 dark:text-gray-500">
+      <p className="text-center text-[11px] tracking-[0.3em] uppercase text-muted-foreground">
         {t('footerNote')}
       </p>
     </div>
