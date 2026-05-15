@@ -133,7 +133,7 @@ export default function BattlePage({
     }
   }, [enemyHp, heroHp, outcome, mission, addKnowledge]);
 
-  function useAbility(ability: Ability) {
+  function triggerAbility(ability: Ability) {
     if (turn !== 'hero' || outcome) return;
     if ((cooldowns[ability.id] ?? 0) > 0) return;
     if (ability.special) {
@@ -312,7 +312,7 @@ export default function BattlePage({
                 return (
                   <button
                     key={a.id}
-                    onClick={() => useAbility(a)}
+                    onClick={() => triggerAbility(a)}
                     disabled={disabled}
                     className={cn(
                       'relative panel p-3 text-left transition-all hover:-translate-y-0.5 hover:border-primary/60',
