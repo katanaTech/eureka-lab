@@ -1,8 +1,6 @@
 /**
  * Checkout success page — shown after a successful Stripe payment.
- * Refetches user profile to reflect the updated plan.
- *
- * @module checkout/success/page
+ * Re-skinned for fantasy chrome.
  */
 
 'use client';
@@ -12,9 +10,10 @@ export const dynamic = 'force-dynamic';
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { CheckCircle } from 'lucide-react';
-import { Button } from '../../../../components/ui/button';
-import { useAuthStore } from '../../../../stores/auth-store';
-import { authApi } from '../../../../lib/api-client';
+import Link from 'next/link';
+import { GameButton } from '@/components/game/GameButton';
+import { useAuthStore } from '@/stores/auth-store';
+import { authApi } from '@/lib/api-client';
 
 /**
  * Checkout success page component.
@@ -40,22 +39,16 @@ export default function CheckoutSuccessPage() {
   }, [setUser]);
 
   return (
-    <div className="flex min-h-[60vh] items-center justify-center p-6">
-      <div className="text-center max-w-md space-y-6">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-          <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" aria-hidden="true" />
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="panel text-center max-w-md p-8 space-y-6 animate-fade-in-up">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15 border border-success/40">
+          <CheckCircle className="h-8 w-8 text-success" aria-hidden="true" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {t('successTitle')}
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          {t('successMessage')}
-        </p>
-        <a href="/learn">
-          <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600">
-            {t('successCta')}
-          </Button>
-        </a>
+        <h1 className="font-display text-2xl text-glow-primary">{t('successTitle')}</h1>
+        <p className="text-muted-foreground">{t('successMessage')}</p>
+        <Link href="/learn">
+          <GameButton variant="primary">{t('successCta')}</GameButton>
+        </Link>
       </div>
     </div>
   );
