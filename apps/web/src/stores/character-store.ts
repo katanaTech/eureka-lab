@@ -27,15 +27,19 @@ interface CharacterState {
   reset: () => void;
 }
 
-export const useCharacterStore = create<CharacterState>((set) => ({
+export const useCharacterStore = create<CharacterState>((set, get) => ({
   character: null,
   isLoading: false,
   hasHydrated: false,
 
   setCharacter: async (c) => {
+    const previous = get().character;
     set({ character: c, isLoading: true, hasHydrated: true });
     try {
       await characterApi.put(c);
+    } catch (err) {
+      set({ character: previous });
+      throw err;
     } finally {
       set({ isLoading: false });
     }
