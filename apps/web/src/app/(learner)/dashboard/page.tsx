@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Lock, Skull, Star, LogOut, Sparkles, Brain } from 'lucide-react';
@@ -9,6 +10,7 @@ import { GameButton } from '@/components/game/GameButton';
 import { KpBadge } from '@/components/game/KpBadge';
 import { CAMPAIGNS, CLASSES } from '@/data/game';
 import { useGame } from '@/state/game-context';
+import { useGamificationStore } from '@/stores/gamification-store';
 
 const worldBg = '/assets/game/world-map.jpg';
 const zombie = '/assets/game/zombie.png';
@@ -23,6 +25,13 @@ const zombie = '/assets/game/zombie.png';
 export default function DashboardPage() {
   const { character, reset } = useGame();
   const router = useRouter();
+  const xp = useGamificationStore((s) => s.xp);
+  const level = useGamificationStore((s) => s.level);
+  const refreshProfile = useGamificationStore((s) => s.refreshProfile);
+
+  useEffect(() => {
+    refreshProfile();
+  }, [refreshProfile]);
 
   // The (learner) layout guards anonymous and characterless users; render nothing
   // for the brief moment before the redirect fires.
@@ -31,8 +40,13 @@ export default function DashboardPage() {
   const klass = CLASSES.find((c) => c.id === character.class);
   if (!klass) return null;
 
-  const xp = 320;
-  const xpMax = 1000;
+  // Pre-hydration fallback: 0 XP, Level 1, span = 100 (first tier's maxXp).
+  // Once refreshProfile() resolves, level.minXp/maxXp define the current tier.
+  const levelNum = level?.level ?? 1;
+  const tierMin = level?.minXp ?? 0;
+  const tierMax = level?.maxXp ?? 99;
+  const tierSpan = Math.max(1, tierMax - tierMin + 1);
+  const tierProgress = Math.min(1, Math.max(0, (xp - tierMin) / tierSpan));
 
   const handleSignOut = async () => {
     await reset();
@@ -59,12 +73,19 @@ export default function DashboardPage() {
               <div className="leading-tight">
                 <div className="font-display text-sm text-glow-primary">{character.name}</div>
                 <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
-                  {klass.title} · LV 3
+                  {klass.title} · LV {levelNum}
                 </div>
-                <div className="mt-1 w-40 h-1.5 rounded-full bg-background overflow-hidden">
+                <div
+                  className="mt-1 w-40 h-1.5 rounded-full bg-background overflow-hidden"
+                  role="progressbar"
+                  aria-valuenow={xp}
+                  aria-valuemin={tierMin}
+                  aria-valuemax={tierMax}
+                  aria-label={`XP progress: ${xp} of ${tierMax}`}
+                >
                   <div
                     className="h-full bg-gradient-primary"
-                    style={{ width: `${(xp / xpMax) * 100}%` }}
+                    style={{ width: `${tierProgress * 100}%` }}
                   />
                 </div>
               </div>
