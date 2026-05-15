@@ -83,9 +83,9 @@
 | R3 | `useGame().buyAbility/buyWeapon` are optimistic-local; JSDoc misleading | Important | DEFERRED → Plan 2 | |
 | R4 | `useAuth` lacks unmount guard for async `onAuthStateChanged` | Important | DEFERRED → Plan 2 | predates branch |
 | R5 | Welcome hardcodes `role:'parent'`; inventory `@Roles` broadened with TODO | Important | DEFERRED → Plan 2 | needs minor-account signup flow |
-| N1 | Dashboard hardcodes `xp=320`, `xpMax=1000`, `LV 3` | Nit | TODO | wire via gamification-store |
-| N2 | Campaign-card `next/image` dims (1024×768) over-sized for rendered ~400×176 | Nit | TODO | tighten dims or use `fill` |
-| N3 | `character-store.setCharacter` doesn't roll back on PUT failure | Nit | TODO | snapshot+restore in catch |
+| N1 | Dashboard hardcodes `xp=320`, `xpMax=1000`, `LV 3` | Nit | **DONE** | `c9e6f1a` — wired to gamification-store with `refreshProfile()` on mount, fallback for null level |
+| N2 | Campaign-card `next/image` dims (1024×768) over-sized for rendered ~400×176 | Nit | **DONE** | `675b472` — switched to `fill` + `sizes` (25vw/50vw/100vw breakpoints) |
+| N3 | `character-store.setCharacter` doesn't roll back on PUT failure | Nit | **DONE** | `1de3248` — snapshot via `get().character`, restore in catch, re-throw |
 | N4 | 6+ ported pages use hardcoded English strings | Nit (deferred-by-design) | TODO → Plan 3 | mark with `TODO(plan-3-i18n)` |
 | N5 | `i18n/request.ts` hardcodes `locale='en'` | Nit | TODO → Plan 3 | read from cookie/header |
 
@@ -194,19 +194,19 @@ Phase G.1 (manual end-to-end smoke) is driven by the user, not auto-executed. Un
 | ID | Task | Status |
 |---|---|---|
 | C.1 | End-to-end smoke (parent + teacher walk-through, anonymous redirect, /learn regression) | PROVISIONAL — user-driven |
-| C.2 | Full tsc clean (web 24 pre-existing, api 0) + lint (2 pre-existing Plan-2 errors discovered, see P3a-N5/N6 below) | DONE |
+| C.2 | Full tsc clean (web 24 pre-existing, api 0) + lint (**now fully clean** after P3a-N5/N6 fixes below) | DONE |
 | C.3 | Task-board update (this section) | DONE |
 
-### Plan 3a follow-ups for Plan 3c polish
+### Plan 3a follow-ups
 
-| ID | Item | Severity | Notes |
-|---|---|---|---|
-| P3a-N1 | Inner feature components still on shadcn-light: `PricingCard`, `BadgeGrid`, `XpBar`, `StreakCounter`, `ActivityCalendar`, `LevelBadge`, `JoinCodeDisplay`, `StudentProgressTable`, `SubscriptionCard`, `ClassroomCard`, `CreateClassroomDialog` | Nit | Visual polish only — they function correctly inside the new fantasy chrome |
-| P3a-N2 | Hardcoded English strings introduced by Plan 3a (e.g. "No children added yet…" empty state in `/parent`) marked with `TODO(plan-3c-i18n)` | Nit | Plan 3c i18n re-key sweep (P3-09) picks these up |
-| P3a-N3 | `(dashboard)/learn/page.tsx` + `(dashboard)/learn/[moduleId]/page.tsx` still on pre-redesign internal styling | Important | Inherits new fantasy chrome from `(dashboard)/layout.tsx` so it functions, but looks mismatched. Decide in Plan 3c: re-skin, redirect to `/dashboard`, or own plan |
-| P3a-N4 | `ui-store` still exports `sidebarOpen` / `toggleSidebar` state — dead after Phase A.3 deleted the Sidebar | Nit | Can be pruned in Plan 3c |
-| P3a-N5 | **Pre-existing lint error** in `apps/web/src/app/(learner)/campaign/[slug]/battle/[missionId]/page.tsx:315` — `react-hooks/rules-of-hooks` (`useAbility` inside callback). Last touched by Plan 2 commit `ef4752a`. | Important | PR #8 CI will fail lint if enabled; fix before marking ready-for-review |
-| P3a-N6 | **Pre-existing lint error** in `apps/web/src/app/(learner)/inventory/page.tsx:56` — `react/no-unescaped-entities` (apostrophe). Last touched by Plan 2 commit `acb286d`. | Nit | Same CI concern as P3a-N5 |
+| ID | Item | Severity | Status | Notes |
+|---|---|---|---|---|
+| P3a-N1 | Inner feature components still on shadcn-light: `PricingCard`, `BadgeGrid`, `XpBar`, `StreakCounter`, `ActivityCalendar`, `LevelBadge`, `JoinCodeDisplay`, `StudentProgressTable`, `SubscriptionCard`, `ClassroomCard`, `CreateClassroomDialog` | Nit | TODO → Plan 3c | Visual polish only — they function correctly inside the new fantasy chrome |
+| P3a-N2 | Hardcoded English strings introduced by Plan 3a (e.g. "No children added yet…" empty state in `/parent`) marked with `TODO(plan-3c-i18n)` | Nit | TODO → Plan 3c | Plan 3c i18n re-key sweep (P3-09) picks these up |
+| P3a-N3 | `(dashboard)/learn/page.tsx` + `(dashboard)/learn/[moduleId]/page.tsx` still on pre-redesign internal styling | Important | TODO → Plan 3c | Inherits new fantasy chrome from `(dashboard)/layout.tsx` so it functions, but looks mismatched. Decide in Plan 3c: re-skin, redirect to `/dashboard`, or own plan |
+| P3a-N4 | `ui-store` still exports `sidebarOpen` / `toggleSidebar` state — dead after Phase A.3 deleted the Sidebar | Nit | TODO → Plan 3c | Can be pruned in Plan 3c |
+| P3a-N5 | Pre-existing lint error in `apps/web/src/app/(learner)/campaign/[slug]/battle/[missionId]/page.tsx:315` — `react-hooks/rules-of-hooks` (`useAbility` inside callback) | Important | **DONE** | `cd46e4a` — renamed local `useAbility` → `triggerAbility` (it's a game-action, not a hook; ESLint false-positive on the `use*` prefix) |
+| P3a-N6 | Pre-existing lint error in `apps/web/src/app/(learner)/inventory/page.tsx:56` — `react/no-unescaped-entities` (apostrophe) | Nit | **DONE** | `c3b0fc5` — `Hero's Vault` → `Hero&apos;s Vault` |
 
 ---
 
