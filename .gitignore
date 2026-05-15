@@ -40,3 +40,13 @@ public/workbox-*.js
 public/sw.js.map
 public/workbox-*.js.map
 public/fallback-*.js
+
+# Smoke test artifacts (Playwright MCP runs)
+smoke-*.png
+.playwright-mcp/
+
+# Claude Code per-machine settings
+.claude/settings.json
+
+# Office temp/lock files
+~$*
