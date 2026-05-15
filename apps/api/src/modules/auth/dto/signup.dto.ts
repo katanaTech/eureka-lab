@@ -22,9 +22,18 @@ export class SignupDto {
   @MaxLength(50)
   displayName!: string;
 
-  /** Account role — 'parent' or 'teacher'. Child accounts use /auth/add-child */
-  @IsIn(['parent', 'teacher'], {
-    message: "Role must be 'parent' or 'teacher'",
+  /**
+   * Account role — 'parent', 'teacher', or 'child'.
+   *
+   * Per ADR-006 (kid signup flow), 'child' is now also accepted via
+   * /auth/signup so Welcome's "Begin Quest" tab (ages 13–16) can self-onboard.
+   * The /auth/add-child path remains for parent-driven account creation.
+   *
+   * Known gap (Plan 3 P3-14): the role is currently client-trusted. The Plan 3
+   * COPPA work will move role derivation server-side from a `birthYear` field.
+   */
+  @IsIn(['parent', 'teacher', 'child'], {
+    message: "Role must be 'parent', 'teacher', or 'child'",
   })
-  role!: 'parent' | 'teacher';
+  role!: 'parent' | 'teacher' | 'child';
 }
