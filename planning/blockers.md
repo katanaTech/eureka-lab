@@ -391,6 +391,39 @@ ARCH stands down on Phase 16 implementation — re-engage on:
 
 ## PM Check-in Log
 
+### 2026-05-17 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 4th routine fire
+
+**Inspected by:** PM agent (recurring routine — disable requested 3× prior; still firing)
+**Branch:** `feature/phase-16-fantasy-ui` merged to main (PR #7). `main` HEAD = `7904863` — no new commits since 2026-05-15 (2 days).
+
+**Sprint C:** COMPLETE. No change. Battle page confirmed at
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` — wires
+`POST /api/v1/combat/init` and `useCombatStore`. All 15/15 tasks DONE.
+
+**Sprint D status — unchanged from 2026-05-15:**
+- **8/13 DONE** (Wave 1 complete; MOB-001/002/QA-003b done)
+- **3/13 READY — now 10 days stale:** QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90),
+  QA-005 (Safari/Chrome smoke) have had all blockers cleared since 2026-05-07. No QA commits
+  in 10 days. **QA: these tasks are actively blocking the rollout path — please pick up
+  QA-001 and run QA-004/QA-005 in parallel immediately.**
+- **2/13 BLOCKED:** QA-002 (on QA-001); QA-006 (on QA-001..005 + OPEN-005)
+- **P16-OPEN-005 — PM action still required (pre-prod gate on QA-006).** Options documented in
+  `docs/context/asset-licenses.md`. Current assets are custom SVGs with no Lovable encumbrance —
+  Path C (declare current SVGs production-quality) is available with no engineering work.
+  PM must make this call before QA-006 can proceed.
+
+**Tech-debt reminder (pre-ship, FE):** `campaign/[slug]/shop/page.tsx` (472 lines),
+`shop/page.tsx` (451 lines), `inventory/page.tsx` (354 lines) still exceed CLAUDE.md rule #8.
+These must be split before Sprint D ships.
+
+**Routine disable — 4th notice.** Please disable at https://claude.ai/code/routines
+(routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). Sprint D has clear per-agent ownership;
+PM check-ins add no value until QA reports back or OPEN-005 is resolved.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.**
+
+---
+
 ### 2026-05-15 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 3rd routine fire
 
 **Inspected by:** PM agent (recurring routine — disable request has been sent twice; still firing)
