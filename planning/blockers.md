@@ -19,6 +19,33 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-05-19 — PM check-in: Sprint D status — QA still pending, OPEN-005 still open
+
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**Inspection findings (2026-05-19):**
+
+Sprint C remains confirmed DONE (closed 2026-05-13). No new task completions or QA commits have landed on the feature branch since the 2026-05-13 dispatch.
+
+**Sprint D current state (13 tasks):**
+
+| Status | Tasks |
+|--------|-------|
+| DONE (9) | MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b |
+| READY — action needed (3) | QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90), QA-005 (Safari/Chrome smoke) |
+| BLOCKED (2) | QA-002 (on QA-001), QA-006 (on OPEN-005 + all QA) |
+| IN_PROGRESS (1) | OPEN-005 (license decision — PM/DEVOPS) |
+
+**No planning-file changes required** — task-board.md and sprint-p16.md are accurate as of last sync.
+
+**Pending actions (owners unchanged from 2026-05-13 dispatch):**
+- **QA:** QA-001 is the critical path to QA-006. Please begin Playwright E2E implementation using the plan at `apps/web/e2e/fantasy-flow.plan.md`.
+- **PM/DEVOPS:** OPEN-005 decision is the last gate before production rollout. `docs/context/asset-licenses.md` has the 3 resolution paths.
+
+**Routine disable reminder:** PM check-in routine is still firing. Sprint D is fully scheduled. Please disable at https://claude.ai/code/routines.
+
+---
+
 ### 2026-05-13 — PM → QA+DEVOPS: Sprint D Wave 2 status sync — QA unblocked, OPEN-005 decision needed
 
 **Branch:** `feature/phase-16-fantasy-ui`
