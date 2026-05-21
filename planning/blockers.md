@@ -19,6 +19,34 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-05-21 — PM check-in: Sprint D status — QA-001 critical path still unstarted, OPEN-005 still open
+
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**Inspection findings (2026-05-21):**
+
+No new commits have landed since the 2026-05-19 check-in. Sprint C remains confirmed DONE (closed 2026-04-29). Sprint D status is unchanged at 9/13 DONE.
+
+**Sprint D current state (13 tasks):**
+
+| Status | Tasks |
+|--------|-------|
+| DONE (9) | MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b |
+| READY — action needed (3) | QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90), QA-005 (Safari/Chrome smoke) |
+| BLOCKED (2) | QA-002 (on QA-001), QA-006 (on OPEN-005 + all QA) |
+| IN_PROGRESS (1) | OPEN-005 (license decision — PM/DEVOPS) |
+
+**Critical path alert — QA-001 is now the single blocking task for the entire Sprint D exit.** Test plan (`apps/web/e2e/fantasy-flow.plan.md`) is complete, mobile routes are done, Sprint C is done. All blockers cleared. Playwright implementation has not yet started.
+
+**Pending actions (owners unchanged):**
+- **QA:** Begin P16-QA-001 Playwright E2E implementation immediately. This unblocks QA-002 (flag matrix) and is required before QA-006 production rollout.
+- **QA:** After QA-001 is underway, run P16-QA-004 (Lighthouse mobile ≥90 on `/m/dashboard`) and P16-QA-005 (iOS Safari + Android Chrome smoke) in parallel — both are READY.
+- **PM/DEVOPS:** P16-OPEN-005 decision is the last non-QA gate before production rollout. Three resolution paths are documented in `docs/context/asset-licenses.md`. Please post resolution under `Resolved Blockers`.
+
+**PM check-in routine: Sprint D fully scheduled, routine should be disabled.** Please visit https://claude.ai/code/routines to turn off the Phase 16 PM check-in routine.
+
+---
+
 ### 2026-05-19 — PM check-in: Sprint D status — QA still pending, OPEN-005 still open
 
 **Branch:** `feature/phase-16-fantasy-ui`
