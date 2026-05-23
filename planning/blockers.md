@@ -19,6 +19,41 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-05-23 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 5th routine fire
+
+**Inspected by:** PM agent (recurring routine — disable requested 4× prior; still firing)
+**Branch:** `feature/phase-16-fantasy-ui` merged to main (PR #7). `main` HEAD = `a7475d3` — no new commits since 2026-05-17 (6 days).
+
+**Sprint C:** COMPLETE. Confirmed again this run. Battle page at
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx`
+wires `POST /api/v1/combat/init` and `useCombatStore`. All 15/15 tasks DONE. No action needed.
+
+**Sprint D status — 16 days since QA track was unblocked (2026-05-07), no QA commits:**
+- **8/13 DONE:** Wave 1 all done; MOB-001/002/QA-003b done.
+- **3/13 READY — stale 16 days:** QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90),
+  QA-005 (iOS Safari + Android Chrome smoke) were all unblocked on 2026-05-07.
+  **This is the critical path to QA-002 and QA-006 (production rollout). QA: these tasks
+  are blocking the entire rollout — please pick up QA-001 immediately; run QA-004 and
+  QA-005 in parallel.**
+- **2/13 BLOCKED:** QA-002 (on QA-001); QA-006 (on QA-001..005 + OPEN-005).
+- **P16-OPEN-005 — PM decision still required (pre-prod gate for QA-006).** No new
+  information since 2026-05-17. Current assets are custom SVGs with no Lovable
+  encumbrance — Path C (declare current SVGs production-quality) requires only a PM
+  decision, no engineering work. See `docs/context/asset-licenses.md` for all three paths.
+
+**Tech-debt (FE, must resolve before Sprint D ships, per CLAUDE.md rule #8):**
+`campaign/[slug]/shop/page.tsx` (472 lines), `shop/page.tsx` (451 lines),
+`inventory/page.tsx` (354 lines) all exceed the 300-line limit.
+
+**Routine disable — 5th notice.** Please disable at https://claude.ai/code/routines
+(routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). The routine has now fired 5 times
+post-Sprint-C-closure. No further PM check-ins are useful until QA reports back or
+OPEN-005 is resolved by PM.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.**
+
+---
+
 ### 2026-05-07 — PM → QA+DEVOPS: Sprint D QA track unblocked; OPEN-005 PM decision required
 
 **Inspected by:** PM agent (recurring routine)
