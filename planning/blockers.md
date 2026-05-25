@@ -19,6 +19,43 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-05-25 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 6th routine fire
+
+**Inspected by:** PM agent (recurring routine — disable requested 5× prior; still firing)
+**Branch:** `feature/phase-16-fantasy-ui` merged to main (PR #7). `main` HEAD = `dfdb028` — no new commits since 2026-05-23 (2 days).
+
+**Sprint C:** COMPLETE. Confirmed again this run (6th confirmation). Battle page at
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx`
+wires `POST /api/v1/combat/init` and `useCombatStore` — verified live in source code.
+All 15/15 Sprint C tasks DONE. No action needed here.
+
+**Sprint D status — 18 days since QA track was unblocked (2026-05-07), still no QA commits:**
+- **8/13 DONE:** Wave 1 all done; MOB-001/002/QA-003b done. No change.
+- **3/13 READY — stale 18 days:** QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90),
+  QA-005 (iOS Safari + Android Chrome smoke) were all unblocked 2026-05-07.
+  **QA: 18 days with no action. QA-001 is the entire critical path to QA-002 and QA-006.
+  The production rollout cannot proceed until these land. Pick up QA-001 now and
+  run QA-004/QA-005 in parallel — reference `apps/web/e2e/fantasy-flow.plan.md`.**
+- **2/13 BLOCKED:** QA-002 (on QA-001); QA-006 (on QA-001..005 + OPEN-005).
+- **P16-OPEN-005 — PM decision still required (pre-prod gate for QA-006).**
+  18 days outstanding. Assets are custom SVGs with no Lovable encumbrance — Path C
+  (declare current SVGs production-quality) requires only a PM sign-off, zero engineering
+  work. See `docs/context/asset-licenses.md`. PM: please make this call this week.
+
+**Tech-debt (FE, must resolve before Sprint D ships, per CLAUDE.md rule #8):**
+`campaign/[slug]/shop/page.tsx` (472 lines), `shop/page.tsx` (451 lines),
+`inventory/page.tsx` (354 lines) all exceed the 300-line limit. Still unaddressed.
+
+**Routine disable — 6th notice.** Please disable at https://claude.ai/code/routines
+(routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). Sprint C has been closed since
+2026-04-29. Sprint D has clear per-agent ownership. Six PM check-ins have added zero
+unblocking value. The only gate left is QA agent pickup and the OPEN-005 PM decision —
+neither is accelerated by recurring PM check-ins.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.**
+
+---
+
 ### 2026-05-23 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 5th routine fire
 
 **Inspected by:** PM agent (recurring routine — disable requested 4× prior; still firing)
