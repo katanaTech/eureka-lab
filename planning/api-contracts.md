@@ -1,7 +1,7 @@
 # API Contracts — Eureka-Lab Platform
 
 > **Maintained by ARCH agent. FE and BE agents must not deviate from these contracts.**
-> When a contract changes, ARCH increments the version and notifies both FE and BE via a note in planning/blockers.md.
+> When a contract changes, ARCH increments the version and notifies both FE and BE via a note in ROADMAP.md Stream 5.
 
 ---
 
@@ -770,4 +770,4 @@ All error responses follow this structure:
 ---
 
 *Version: 1.0 (ARCH-001 complete) | Maintained by: ARCH agent*
-*Changes require ARCH approval and must notify FE + BE agents via planning/blockers.md*
+*Changes require ARCH approval and must notify FE + BE agents via ROADMAP.md Stream 5*

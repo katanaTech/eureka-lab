@@ -360,7 +360,7 @@ Lighthouse CI enforces these on every PR to `develop`:
 
 ## 8. Bug Report Format
 
-When QA agent finds a bug, file it in `planning/bugs.md`:
+When QA agent finds a bug, surface it to the user and add a row to [ROADMAP.md](../ROADMAP.md) Stream 4 (architectural gaps with no plan). If/when a dedicated `planning/bugs.md` is reintroduced, use this format:
 
 ```markdown
 ## BUG-[number]: [Short title]

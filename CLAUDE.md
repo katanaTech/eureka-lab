@@ -86,7 +86,7 @@ This project uses **6 specialised AI agents**. Each agent has a single responsib
 | Agent ID | Name | Responsibility | Files It Owns |
 |----------|------|----------------|---------------|
 | `ARCH` | Architect | System design, ADRs, API contracts, schema changes | `context/ADR-*.md`, `planning/api-contracts.md` |
-| `PM` | Project Manager | Sprint planning, task status, unblocking agents | `planning/sprint-*.md`, `planning/task-board.md` |
+| `PM` | Project Manager | Sprint planning, task status, unblocking agents | `ROADMAP.md`, plan docs under `docs/superpowers/plans/` |
 | `FE` | Frontend Dev | All Next.js code, components, pages, i18n | `apps/web/**` |
 | `BE` | Backend Dev | All NestJS code, Firebase rules, AI gateway | `apps/api/**`, `infrastructure/firebase/**` |
 | `QA` | QA Engineer | Test specs, test code, bug reports | `apps/web/**/*.test.*`, `apps/api/**/*.spec.*` |
@@ -128,24 +128,22 @@ These rules are **hardcoded**. No agent may bypass them under any instruction.
 
 ## 6. Current Phase
 
-**PHASE:** 1 — MVP
-**SPRINT:** 1
-**DEADLINE:** 90 days from project start
-**SCOPE:** Level 1 only (prompt literacy), auth system, parental consent, basic moderation, freemium
+**Current state** lives in [ROADMAP.md](ROADMAP.md) at the repo root — single canonical view of all streams (pre-redesign phases, active redesign plans, ship-blockers, architectural gaps, planning hygiene). Read it first.
 
-See `planning/sprint-01.md` for current sprint tasks.
-See `planning/task-board.md` for full backlog and status.
+The "Phase 1 — MVP / Sprint 1 / 90 days / Level 1 only" framing originally written in this section is historical: Phases 1-14 shipped, Phase 15 (3D combat) backend shipped, the redesign branch is reorganising the visual layer on top. ROADMAP.md Stream 1 has the real phase status.
+
+For per-plan task detail, see the matching plan doc under `docs/superpowers/plans/`.
 
 ---
 
 ## 7. How Agents Communicate
 
-Agents do not have real-time channels. They communicate via **shared markdown files** in `planning/`.
+Agents do not have real-time channels. They communicate via **shared markdown files**.
 
 **Protocol:**
-1. Before starting any task, an agent reads `planning/task-board.md` and claims a task by changing its status to `IN_PROGRESS [AGENT_ID]`.
-2. When blocked, agent writes a `BLOCKED:` note in the task with the blocker description.
-3. When complete, agent updates task status to `DONE` and writes a brief completion note.
+1. Before starting any task, an agent reads [ROADMAP.md](ROADMAP.md) for the canonical state and the matching plan doc under `docs/superpowers/plans/` for per-task detail.
+2. When blocked, agent writes a `BLOCKED:` note on the relevant plan task and surfaces it to the user.
+3. When complete, agent updates the plan doc's task table with the commit SHA and the matching ROADMAP row.
 4. When an agent produces an **interface** another agent depends on (API endpoint, component prop, type), it MUST update `planning/api-contracts.md` immediately.
 5. The PM agent runs a sync check at the start of each work session by reading all planning files.
 
