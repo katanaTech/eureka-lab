@@ -8,6 +8,7 @@ import { authApi } from '@/lib/api-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { homeForRole } from '@/lib/auth-redirects';
 
 /**
  * Signup form for parent accounts.
@@ -61,7 +62,7 @@ export const SignupForm: FC = () => {
         level: 1,
       });
 
-      router.push('/learn');
+      router.push(homeForRole(result.role));
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Signup failed';
       setError(message);

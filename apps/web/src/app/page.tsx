@@ -14,6 +14,7 @@ import { GameButton } from '@/components/game/GameButton';
 import { useAuth } from '@/hooks/useAuth';
 import { auth } from '@/lib/firebase';
 import { authApi } from '@/lib/api-client';
+import { homeForRole } from '@/lib/auth-redirects';
 
 const worldBg = '/assets/game/world-map.jpg';
 
@@ -40,12 +41,14 @@ export default function WelcomePage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [birthYear, setBirthYear] = useState('');
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) router.replace('/dashboard');
-  }, [isAuthenticated, isLoading, router]);
+    if (!isLoading && isAuthenticated && user) {
+      router.replace(homeForRole(user.role));
+    }
+  }, [isAuthenticated, isLoading, user, router]);
 
   if (isLoading) return null;
 
@@ -91,9 +94,13 @@ export default function WelcomePage() {
           return toast.error('Email and password required.');
         }
         await signInWithEmailAndPassword(auth, email.trim(), password);
-        const displayName = email.trim().split('@')[0];
+        // Fetch profile now so we can route by role; useAuth will also pick it
+        // up via onAuthStateChanged, but we don't want to flash /dashboard on
+        // the way to /parent or /teacher.
+        const profile = await authApi.getMe();
+        const displayName = profile.displayName || email.trim().split('@')[0];
         toast.success(`Welcome back, ${displayName}.`);
-        router.push('/dashboard');
+        router.push(homeForRole(profile.role));
       }
     } catch (err) {
       const msg = (err as { message?: string })?.message ?? 'Auth failed.';
@@ -103,13 +110,21 @@ export default function WelcomePage() {
 
   const handleGoogle = async () => {
     if (!auth) return toast.error('Auth is not available.');
-    // TODO(plan-3): collect birthYear before Google OAuth so we can age-gate
-    // the kid sign-up path. Today Google OAuth users skip the age gate (ADR-006).
+    // TODO(plan-3b): collect birthYear before Google OAuth so we can age-gate
+    // the kid sign-up path. Today Google OAuth users skip the age gate (ADR-006 / P3-15).
     try {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
       toast.success(`Welcome, ${cred.user.displayName ?? 'Hero'}.`);
-      router.push('/character');
+      // Best-effort role lookup: an orphan Google session (auth user exists
+      // but no Firestore profile) returns 404; useAuth signs that out and
+      // bounces back to /. For valid sessions, route by role.
+      try {
+        const profile = await authApi.getMe();
+        router.push(homeForRole(profile.role));
+      } catch {
+        router.push('/');
+      }
     } catch (err) {
       const msg = (err as { message?: string })?.message ?? 'Google sign-in failed.';
       toast.error(msg);
