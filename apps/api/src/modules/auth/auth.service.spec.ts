@@ -54,7 +54,7 @@ describe('AuthService', () => {
         email: 'parent@test.com',
         password: 'SecurePass1',
         displayName: 'Test Parent',
-        role: 'parent',
+        birthYear: new Date().getFullYear() - 30,
       });
 
       expect(result.uid).toBe('uid-123');
@@ -75,9 +75,74 @@ describe('AuthService', () => {
           email: 'existing@test.com',
           password: 'SecurePass1',
           displayName: 'Test',
-          role: 'parent',
+          birthYear: new Date().getFullYear() - 30,
         }),
       ).rejects.toThrow(ConflictException);
+    });
+  });
+
+  describe('signup role derivation (P3-14)', () => {
+    const currentYear = new Date().getFullYear();
+
+    const baseDto = (birthYear: number) => ({
+      email: 'hero@realm.io',
+      password: 'Sword123',
+      displayName: 'Test Hero',
+      birthYear,
+    });
+
+    it('derives role child for age 16 (lower bound of child band)', async () => {
+      mockFirebaseAuth.createUser.mockResolvedValue({ uid: 'uid-child-16' });
+      mockFirebaseAuth.setCustomUserClaims.mockResolvedValue(undefined);
+      mockFirebaseAuth.createCustomToken.mockResolvedValue('tok');
+      mockUsersRepository.create.mockResolvedValue(undefined);
+
+      const result = await service.signup(baseDto(currentYear - 16));
+      expect(result.role).toBe('child');
+      expect(mockUsersRepository.create).toHaveBeenCalledWith(
+        'uid-child-16',
+        expect.objectContaining({ role: 'child', birthYear: currentYear - 16 }),
+      );
+    });
+
+    it('derives role child for age 13 (upper bound of child band)', async () => {
+      mockFirebaseAuth.createUser.mockResolvedValue({ uid: 'uid-child-13' });
+      mockFirebaseAuth.setCustomUserClaims.mockResolvedValue(undefined);
+      mockFirebaseAuth.createCustomToken.mockResolvedValue('tok');
+      mockUsersRepository.create.mockResolvedValue(undefined);
+
+      const result = await service.signup(baseDto(currentYear - 13));
+      expect(result.role).toBe('child');
+    });
+
+    it('derives role parent for age 18', async () => {
+      mockFirebaseAuth.createUser.mockResolvedValue({ uid: 'uid-parent-18' });
+      mockFirebaseAuth.setCustomUserClaims.mockResolvedValue(undefined);
+      mockFirebaseAuth.createCustomToken.mockResolvedValue('tok');
+      mockUsersRepository.create.mockResolvedValue(undefined);
+
+      const result = await service.signup(baseDto(currentYear - 18));
+      expect(result.role).toBe('parent');
+    });
+
+    it('rejects age 17 with AGE_GAP', async () => {
+      await expect(service.signup(baseDto(currentYear - 17))).rejects.toMatchObject({
+        response: { code: 'AGE_GAP' },
+      });
+      expect(mockFirebaseAuth.createUser).not.toHaveBeenCalled();
+    });
+
+    it('rejects age 12 with UNDER_13_PIPELINE_REQUIRED', async () => {
+      await expect(service.signup(baseDto(currentYear - 12))).rejects.toMatchObject({
+        response: { code: 'UNDER_13_PIPELINE_REQUIRED' },
+      });
+      expect(mockFirebaseAuth.createUser).not.toHaveBeenCalled();
+    });
+
+    it('rejects age 8 with UNDER_13_PIPELINE_REQUIRED (under bound check)', async () => {
+      await expect(service.signup(baseDto(currentYear - 8))).rejects.toMatchObject({
+        response: { code: 'UNDER_13_PIPELINE_REQUIRED' },
+      });
     });
   });
 
