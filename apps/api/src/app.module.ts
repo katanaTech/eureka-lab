@@ -17,6 +17,7 @@ import { ClassroomsModule } from './modules/classrooms/classrooms.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { CombatModule } from './modules/combat/combat.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { CoppaModule } from './modules/coppa/coppa.module';
 
 /**
  * Root application module.
@@ -44,6 +45,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
     NotificationsModule,
     CombatModule,
     InventoryModule,
+    CoppaModule,
   ],
 })
 export class AppModule {}
