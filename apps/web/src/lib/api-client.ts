@@ -199,8 +199,8 @@ export interface AiStreamChunk {
 
 /** Auth API endpoints */
 export const authApi = {
-  /** Create a parent account */
-  signup: (data: { email: string; password: string; displayName: string; role: string }) =>
+  /** Create an account; server derives role from birthYear (P3-14). */
+  signup: (data: { email: string; password: string; displayName: string; birthYear: number }) =>
     request<SignupResponse>('/auth/signup', { method: 'POST', body: JSON.stringify(data) }),
 
   /** Exchange Firebase ID token for enriched profile */

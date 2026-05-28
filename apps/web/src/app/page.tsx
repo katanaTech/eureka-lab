@@ -65,27 +65,29 @@ export default function WelcomePage() {
         if (!Number.isInteger(year) || year < 1900 || year > CURRENT_YEAR) {
           return toast.error('Year of birth looks odd, hero.');
         }
-        const age = CURRENT_YEAR - year;
-        if (age < MIN_AGE) {
-          return toast.error(
-            `Hero too young — parent confirmation coming soon. (Heroes ${MIN_AGE}+ may enter today.)`,
-          );
-        }
-        if (age > MAX_AGE) {
-          return toast.error(`Heroes are ${MIN_AGE}–${MAX_AGE}. Adults — try the standalone Sign Up page.`);
-        }
         // Backend signup creates the Firebase user (Admin SDK) + Firestore
-        // profile + custom claims. Doing this client-side via
-        // createUserWithEmailAndPassword skips the Firestore doc and breaks
-        // useAuth's authApi.getMe() lookup.
-        // TODO(plan-3): pass birthYear so backend can validate role assignment
-        // server-side instead of trusting the client (ADR-006 known gap).
-        await authApi.signup({
-          email: email.trim(),
-          password,
-          displayName: username.trim(),
-          role: 'child',
-        });
+        // profile + custom claims, and now derives the role from birthYear
+        // (P3-14). Doing this client-side via createUserWithEmailAndPassword
+        // skips the Firestore doc and breaks useAuth's authApi.getMe() lookup.
+        try {
+          await authApi.signup({
+            email: email.trim(),
+            password,
+            displayName: username.trim(),
+            birthYear: year,
+          });
+        } catch (err) {
+          // api-client throws ApiError with a top-level `code`. UNDER_13
+          // pivots to the COPPA form (Phase C); AGE_GAP surfaces as a toast.
+          const apiErr = err as { code?: string };
+          if (apiErr.code === 'UNDER_13_PIPELINE_REQUIRED') {
+            return toast.error('Under 13: parent confirmation coming in Phase C.');
+          }
+          if (apiErr.code === 'AGE_GAP') {
+            return toast.error('Heroes are 13–16. Contact support if you are 17.');
+          }
+          throw err;
+        }
         await signInWithEmailAndPassword(auth, email.trim(), password);
         toast.success(`Welcome to the realm, ${username.trim()}!`);
         router.push('/character');
