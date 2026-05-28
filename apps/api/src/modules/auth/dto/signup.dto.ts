@@ -1,6 +1,23 @@
-import { IsEmail, IsString, IsNotEmpty, MinLength, MaxLength, Matches, IsIn } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, MinLength, MaxLength, Matches, IsInt, Min, Max } from 'class-validator';
 
-/** Request body for POST /auth/signup */
+/**
+ * Request body for POST /auth/signup.
+ *
+ * Per ADR-006 and Plan 3b A.1, the client sends `birthYear` only — the
+ * server computes the role:
+ *   - age 13–16 → role 'child'
+ *   - age 17    → rejected (`AGE_GAP` — between kid and adult tiers)
+ *   - age ≥ 18  → role 'parent'
+ *   - age < 13  → routed to the COPPA pipeline (Phase C; this endpoint
+ *                  rejects with `UNDER_13_PIPELINE_REQUIRED` so the
+ *                  frontend can prompt for `parentEmail`).
+ *
+ * Teachers do NOT signup via this endpoint — teachers self-onboard via a
+ * separate flow that does not yet exist in UI (filed as ROADMAP Stream 4
+ * gap "Teacher signup UI"). For now teachers are seeded via direct API
+ * calls; when a UI is added it will hit a dedicated `/auth/signup-teacher`
+ * route, not this one.
+ */
 export class SignupDto {
   /** Account email address */
   @IsEmail()
@@ -23,17 +40,12 @@ export class SignupDto {
   displayName!: string;
 
   /**
-   * Account role — 'parent', 'teacher', or 'child'.
-   *
-   * Per ADR-006 (kid signup flow), 'child' is now also accepted via
-   * /auth/signup so Welcome's "Begin Quest" tab (ages 13–16) can self-onboard.
-   * The /auth/add-child path remains for parent-driven account creation.
-   *
-   * Known gap (Plan 3 P3-14): the role is currently client-trusted. The Plan 3
-   * COPPA work will move role derivation server-side from a `birthYear` field.
+   * 4-digit year of birth used to derive role server-side.
+   * Constrained to [1900, current year] — `AuthService.signup` enforces
+   * the age-specific rules listed in the class JSDoc.
    */
-  @IsIn(['parent', 'teacher', 'child'], {
-    message: "Role must be 'parent', 'teacher', or 'child'",
-  })
-  role!: 'parent' | 'teacher' | 'child';
+  @IsInt()
+  @Min(1900)
+  @Max(new Date().getFullYear())
+  birthYear!: number;
 }
