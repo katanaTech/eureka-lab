@@ -16,6 +16,7 @@ import {
   SHOP_ABILITIES, SHOP_WEAPONS,
 } from '@/data/academy';
 import { useGame } from '@/state/game-context';
+import { inventoryApi } from '@/lib/api-client';
 import { BASE_ABILITIES, type Ability, type LogEntry, rand } from './_battle-config';
 import { HpBar, BattleStage } from './_battle-stage';
 import { BattleQuiz } from './_battle-quiz';
@@ -122,16 +123,22 @@ export default function BattlePage({
       pushLog(`Victory! +${mission?.xp ?? 0} XP earned.`, 'crit');
       if (mission && !rewardedRef.current) {
         rewardedRef.current = true;
-        // Optimistic-local KP credit. Backend hybrid validation is Plan 3 (P3-07).
-        // TODO(plan-3): POST /api/v1/combat/:battleId/complete with the play log
-        //               for server-side validation (spec §5.6).
-        addKnowledge(mission.xp);
+        // Server-authoritative KP award via /inventory/credit-kp, idempotent
+        // on slug:missionId so a refresh won't double-credit. Combat outcome
+        // validation (replaying a play log server-side) remains deferred to P3-07.
+        void inventoryApi
+          .creditKp({ event: 'minion_defeated', sourceId: `${slug}:${missionId}` })
+          .then((res) => {
+            if (res.granted > 0) addKnowledge(res.granted);
+          })
+          .catch(() => { /* offline tolerance — local KP stays whatever the
+                            previous useGame state was */ });
       }
     } else if (heroHp <= 0) {
       setOutcome('lose');
       pushLog('You were knocked down. Try again, hero!', 'enemy');
     }
-  }, [enemyHp, heroHp, outcome, mission, addKnowledge]);
+  }, [enemyHp, heroHp, outcome, mission, addKnowledge, slug, missionId]);
 
   function triggerAbility(ability: Ability) {
     if (turn !== 'hero' || outcome) return;
