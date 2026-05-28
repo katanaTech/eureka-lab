@@ -18,6 +18,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { CombatModule } from './modules/combat/combat.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { CoppaModule } from './modules/coppa/coppa.module';
+import { AcademyProgressModule } from './modules/academy-progress/academy-progress.module';
 
 /**
  * Root application module.
@@ -46,6 +47,7 @@ import { CoppaModule } from './modules/coppa/coppa.module';
     CombatModule,
     InventoryModule,
     CoppaModule,
+    AcademyProgressModule,
   ],
 })
 export class AppModule {}
