@@ -1,5 +1,6 @@
 import {
   Injectable,
+  BadRequestException,
   ConflictException,
   UnauthorizedException,
   ForbiddenException,
@@ -66,12 +67,47 @@ export class AuthService {
   ) {}
 
   /**
-   * Create a new parent or teacher account.
-   * @param dto - Signup data (role must be 'parent' or 'teacher')
+   * Derive a user role from year of birth using the kid-signup age rules
+   * defined in ADR-006. Throws structured exceptions for the rejected
+   * branches so the controller layer can surface meaningful error codes.
+   *
+   * @param birthYear - 4-digit year of birth (validated by SignupDto).
+   * @returns 'child' for ages 13–16, 'parent' for ages 18+.
+   * @throws BadRequestException with `code: 'AGE_GAP'` for age 17.
+   * @throws BadRequestException with `code: 'UNDER_13_PIPELINE_REQUIRED'` for age <13.
+   */
+  private deriveRole(birthYear: number): 'child' | 'parent' {
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - birthYear;
+
+    if (age < 13) {
+      throw new BadRequestException({
+        message:
+          'Under 13 requires parent confirmation. Use the COPPA signup flow instead.',
+        code: 'UNDER_13_PIPELINE_REQUIRED',
+      });
+    }
+    if (age === 17) {
+      throw new BadRequestException({
+        message:
+          'Heroes are 13–16 and adults are 18+. Contact support if you are 17.',
+        code: 'AGE_GAP',
+      });
+    }
+    return age <= 16 ? 'child' : 'parent';
+  }
+
+  /**
+   * Create a new account. Role is derived from `birthYear` per ADR-006.
+   * Under-13 callers MUST use the COPPA flow (see CoppaController in
+   * Phase C); this endpoint rejects them with a specific code so the
+   * frontend can pivot.
+   *
+   * @param dto - Signup data (email, password, displayName, birthYear)
    * @returns Created user info with token
    */
   async signup(dto: SignupDto): Promise<SignupResult> {
-    const role = dto.role ?? 'parent';
+    const role = this.deriveRole(dto.birthYear);
 
     try {
       const firebaseUser = await this.firebaseService.auth.createUser({
@@ -86,11 +122,12 @@ export class AuthService {
         email: dto.email,
         displayName: dto.displayName,
         role,
+        birthYear: dto.birthYear,
       });
 
       const token = await this.firebaseService.auth.createCustomToken(firebaseUser.uid);
 
-      this.logger.log({ event: 'signup', uid: firebaseUser.uid, role });
+      this.logger.log({ event: 'signup', uid: firebaseUser.uid, role, birthYear: dto.birthYear });
 
       return {
         uid: firebaseUser.uid,
