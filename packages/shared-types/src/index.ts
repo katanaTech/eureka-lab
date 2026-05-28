@@ -908,3 +908,19 @@ export const COMBAT_HP_CONFIG: Record<BattleType, { playerHp: number; zombieHp: 
 // Fantasy class system, inventory/shop catalog, KP economy, and campaign/zone
 // mappings.
 export * from './gameplay.types';
+
+// ── Academy Progress ─────────────────────────────────────────────────────────
+
+/**
+ * Persistent per-user academy progress.
+ * Stored at `academyProgress/{userId}` in Firestore.
+ * Lazily created on first read (returns the empty default if absent).
+ */
+export interface AcademyProgress {
+  /** Lesson IDs the user has completed (idempotent — no duplicates). */
+  completedLessonIds: string[];
+  /** Video IDs the user has watched. */
+  watchedVideoIds: string[];
+  /** Last update — ISO 8601 timestamp. */
+  updatedAt: string;
+}
