@@ -203,6 +203,20 @@ export const authApi = {
   signup: (data: { email: string; password: string; displayName: string; birthYear: number }) =>
     request<SignupResponse>('/auth/signup', { method: 'POST', body: JSON.stringify(data) }),
 
+  /**
+   * Complete the Firestore profile creation after a Google OAuth sign-in.
+   * The caller must pass a valid Firebase ID token (the `request` helper
+   * grabs it from the current Firebase session).
+   *
+   * @param body - { birthYear }
+   * @returns SignupResult — uid, email, displayName, role, token
+   */
+  completeOAuthSignup: (body: { birthYear: number }) =>
+    request<{ uid: string; email: string; displayName: string; role: string; token: string }>(
+      '/auth/complete-oauth-signup',
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
+
   /** Exchange Firebase ID token for enriched profile */
   login: (idToken: string) =>
     request<LoginResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ idToken }) }),

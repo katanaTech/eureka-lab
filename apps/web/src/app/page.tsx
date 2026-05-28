@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { auth } from '@/lib/firebase';
 import { authApi } from '@/lib/api-client';
 import { homeForRole } from '@/lib/auth-redirects';
+import { OAuthBirthYearModal } from '@/components/features/auth/OAuthBirthYearModal';
 
 const worldBg = '/assets/game/world-map.jpg';
 
@@ -41,6 +42,8 @@ export default function WelcomePage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [birthYear, setBirthYear] = useState('');
+  const [oauthModalOpen, setOauthModalOpen] = useState(false);
+  const [pendingOAuthUser, setPendingOAuthUser] = useState<{ uid: string } | null>(null);
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
@@ -112,24 +115,64 @@ export default function WelcomePage() {
 
   const handleGoogle = async () => {
     if (!auth) return toast.error('Auth is not available.');
-    // TODO(plan-3b): collect birthYear before Google OAuth so we can age-gate
-    // the kid sign-up path. Today Google OAuth users skip the age gate (ADR-006 / P3-15).
     try {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
       toast.success(`Welcome, ${cred.user.displayName ?? 'Hero'}.`);
-      // Best-effort role lookup: an orphan Google session (auth user exists
-      // but no Firestore profile) returns 404; useAuth signs that out and
-      // bounces back to /. For valid sessions, route by role.
+
+      // Try to fetch existing profile. If 404, this is a first-time OAuth
+      // user — show the birthYear modal so we can complete the signup.
       try {
         const profile = await authApi.getMe();
         router.push(homeForRole(profile.role));
-      } catch {
-        router.push('/');
+      } catch (err) {
+        const apiErr = err as { statusCode?: number };
+        if (apiErr.statusCode === 404) {
+          setPendingOAuthUser({ uid: cred.user.uid });
+          setOauthModalOpen(true);
+          return;
+        }
+        throw err;
       }
     } catch (err) {
       const msg = (err as { message?: string })?.message ?? 'Google sign-in failed.';
       toast.error(msg);
+    }
+  };
+
+  const handleOAuthBirthYearSubmit = async (birthYear: number) => {
+    if (!pendingOAuthUser) return;
+    try {
+      const result = await authApi.completeOAuthSignup({ birthYear });
+      setOauthModalOpen(false);
+      setPendingOAuthUser(null);
+      toast.success('Identity forged. Onward, hero.');
+      router.push(homeForRole(result.role));
+    } catch (err) {
+      // api-client throws ApiError with a top-level `code`. Re-throw a
+      // friendly message so the modal surfaces it in its error slot.
+      const code = (err as { code?: string }).code;
+      if (code === 'UNDER_13_PIPELINE_REQUIRED') {
+        throw new Error('Under 13 OAuth: parent confirmation coming in Phase C.');
+      }
+      if (code === 'AGE_GAP') {
+        throw new Error('Heroes are 13–16. Contact support if you are 17.');
+      }
+      throw err;
+    }
+  };
+
+  const handleOAuthCancel = async () => {
+    // User backed out of the birthYear collection — sign them out of Firebase
+    // so we don't leave an orphan session lying around.
+    setOauthModalOpen(false);
+    setPendingOAuthUser(null);
+    if (auth) {
+      try {
+        await auth.signOut();
+      } catch {
+        /* best-effort */
+      }
     }
   };
 
@@ -205,6 +248,12 @@ export default function WelcomePage() {
           </div>
         </section>
       </main>
+
+      <OAuthBirthYearModal
+        open={oauthModalOpen}
+        onSubmit={handleOAuthBirthYearSubmit}
+        onCancel={handleOAuthCancel}
+      />
     </Scene>
   );
 }
