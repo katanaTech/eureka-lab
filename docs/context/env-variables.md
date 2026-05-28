@@ -52,6 +52,8 @@ Backend vars are stored in Railway environment or `.env` locally (never committe
 | `STRIPE_PRICE_ID_CREATOR` | Yes (prod) | — | Stripe Price ID for Creator plan (price_...) |
 | `FRONTEND_URL` | No | `http://localhost:3010` | Frontend URL for Stripe redirect URLs |
 | `SENTRY_DSN` | No | — | Sentry DSN for error monitoring |
+| `RESEND_API_KEY` | Yes (prod) | — | Resend API key for transactional email (COPPA parent confirmation; magic-link signin if added later). Email service falls back to console-log when absent. |
+| `RESEND_FROM_EMAIL` | Yes (prod) | `no-reply@eurekalab.example.com` | From address for outbound email. Must be verified in Resend's dashboard. |
 
 ### Backend `.env` Template
 
@@ -67,6 +69,8 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_PRICE_ID_EXPLORER=price_...
 STRIPE_PRICE_ID_CREATOR=price_...
 FRONTEND_URL=http://localhost:3010
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=no-reply@yourdomain.com
 ```
 
 ---
