@@ -232,6 +232,36 @@ export const authApi = {
     request<AddChildResponse>('/auth/add-child', { method: 'POST', body: JSON.stringify(data) }),
 };
 
+/** COPPA pipeline API (public — no auth required). */
+export const coppaApi = {
+  /**
+   * Create a pending under-13 child account. Sends parent an email.
+   * @param body - { email, parentEmail, displayName, birthYear }
+   * @returns { token } — opaque ID for the pending account
+   */
+  createPendingChild: (body: {
+    email: string;
+    parentEmail: string;
+    displayName: string;
+    birthYear: number;
+  }) =>
+    request<{ token: string }>('/coppa/pending-child', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  /**
+   * Confirm a pending account using the token from the parent's email.
+   * @param body - { token }
+   * @returns { uid, email } — the new child account's identifiers
+   */
+  confirmParentEmail: (body: { token: string }) =>
+    request<{ uid: string; email: string }>('/coppa/confirm-parent-email', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+};
+
 /* ── Modules API ───────────────────────────────────────────────── */
 
 /** Modules API endpoints */
