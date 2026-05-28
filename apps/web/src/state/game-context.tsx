@@ -36,14 +36,15 @@ export interface GameStateActions {
    */
   spendKnowledge: (amount: number) => boolean;
   /**
-   * Mark a lesson as completed and credit KP optimistically.
-   * Backend persistence is deferred to Plan 3 — KP delta will not survive
-   * a hydrate from `inventoryApi.getMine()` until then.
+   * Mark a lesson as completed and credit KP via the backend.
+   * The `kp` arg is retained for source-compatibility but ignored — the
+   * server owns the amount via KP_REWARDS.
    */
   completeLesson: (lessonId: string, kp: number) => void;
   /**
-   * Mark a video as watched and credit KP optimistically.
-   * Same Plan 3 caveat as completeLesson.
+   * Mark a video as watched and credit KP via the backend.
+   * The `kp` arg is retained for source-compatibility but ignored — the
+   * server owns the amount via KP_REWARDS.
    */
   watchVideo: (videoId: string, kp: number) => void;
   /**
@@ -128,17 +129,28 @@ export function useGame(): GameStateView & GameStateActions {
       inv.spendKp(amount);
       return true;
     },
-    completeLesson: (lessonId, kp) => {
+    completeLesson: (lessonId, _kp) => {
       if (academy.completedLessonIds.includes(lessonId)) return;
       academy.completeLesson(lessonId);
-      inv.addKp(kp);
-      // TODO(plan-3): POST /api/v1/academy/lesson-complete to persist server-side.
+      // Server-authoritative KP award. Daily cap + idempotency are enforced
+      // server-side; the response's `granted` is the actual amount credited
+      // (may be 0 if the cap is reached for the day).
+      void inventoryApi
+        .creditKp({ event: 'lesson_completed', sourceId: lessonId })
+        .then((res) => {
+          if (res.granted > 0) inv.addKp(res.granted);
+        })
+        .catch(() => { /* offline tolerance */ });
     },
-    watchVideo: (videoId, kp) => {
+    watchVideo: (videoId, _kp) => {
       if (academy.watchedVideoIds.includes(videoId)) return;
       academy.watchVideo(videoId);
-      inv.addKp(kp);
-      // TODO(plan-3): POST /api/v1/academy/video-watched to persist server-side.
+      void inventoryApi
+        .creditKp({ event: 'practice_completed', sourceId: videoId })
+        .then((res) => {
+          if (res.granted > 0) inv.addKp(res.granted);
+        })
+        .catch(() => { /* offline tolerance */ });
     },
     buyAbility: (id, cost) => {
       if (inv.ownedAbilityIds.includes(id)) return true;

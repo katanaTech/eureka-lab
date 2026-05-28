@@ -957,6 +957,17 @@ export const inventoryApi = {
    */
   equipWeapon: (body: EquipWeaponBody) =>
     request<Inventory>('/inventory/equip', { method: 'POST', body: JSON.stringify(body) }),
+
+  /**
+   * Credit KP for a game event. Idempotency via sourceId.
+   * @param body - { event, sourceId }
+   * @returns { granted, duplicate }
+   */
+  creditKp: (body: { event: string; sourceId: string }) =>
+    request<{ granted: number; duplicate: boolean }>(
+      '/inventory/credit-kp',
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
 };
 
 /* ── Character API ─────────────────────────────────────────────── */
