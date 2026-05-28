@@ -30,14 +30,15 @@ Plus a backlog of 8 HIGH-priority ship-blockers (Stripe webhooks, COPPA review, 
 |---|---|
 | Branch | `redesign/v2-from-reference` |
 | PR | [#8](https://github.com/katanaTech/eureka-lab/pull/8) (draft, OPEN) |
-| Commits ahead of `main` | 65 |
-| HEAD | `a114845` |
-| Latest plan landed | Plan 3a (adult-page re-skin) |
-| Last push | 2026-05-15 |
+| Commits ahead of `main` | 68 |
+| HEAD | `0228842` |
+| Latest plan landed | Plan 3a (adult-page re-skin) — smoke **passed** 2026-05-28 |
+| Next plan | Plan 3b (written + pushed, **not executed**) — see [plan-3b](docs/superpowers/plans/2026-05-15-redesign-plan-3b-r5-and-persistence.md) |
+| Last push | 2026-05-28 |
 | TypeScript | web: 24 pre-existing test-file errors only / api: 0 errors |
 | Lint | web: ✅ clean / api: untracked |
-| Open smoke | Plan 3a Phase C.1 (user-driven, not yet run) |
-| Known open bugs | Role-aware post-auth routing (5 sites), missing teacher signup UI |
+| Open smoke | none — Plan 3a smoke passed; Plan 3b smoke pending its execution |
+| Known open bugs | none blocking (role-aware routing fixed in `1cf9efc`); missing teacher signup UI remains a Stream 4 gap |
 
 ---
 
@@ -76,20 +77,21 @@ The L2/L3/L4 curriculum is functional under `(dashboard)/learn/*` but is **not**
 | 1 | Foundation + Learner Shell (revert, salvage, design tokens, Welcome / Character / Dashboard) | **DONE** | [plan-1](docs/superpowers/plans/2026-05-11-redesign-plan-1-foundation-and-learner-shell.md) |
 | 2 | Learner loop completion (campaign, prepare, mission-prep, battle, inventory, shop, victory) | **DONE** | [plan-2](docs/superpowers/plans/2026-05-14-redesign-plan-2-campaign-and-combat.md) |
 | 3a | Adult-facing pages re-skin (parent / teacher / settings / pricing / achievements / checkout) | **DONE** | [plan-3a](docs/superpowers/plans/2026-05-15-redesign-plan-3a-adult-pages-reskin.md) |
-| 3b | Backend persistence + R5 follow-ups (P3-07/14/15/16/17/18 + P3a-N7) | **NOT WRITTEN** | — |
+| 3b | R5 follow-ups (P3-14/15/16) + learner persistence (P3-17/18). Combat validation P3-07 split out. | **WRITTEN — not executed** | [plan-3b](docs/superpowers/plans/2026-05-15-redesign-plan-3b-r5-and-persistence.md) |
 | 3c | Platform polish (i18n re-key, RTL fonts, E2E rewrite, PWA/Sentry, feature-component re-skin) | **NOT WRITTEN** | — |
+| 3-combat | P3-07 hybrid combat validation (split out of 3b; not blocking ship) | **NOT WRITTEN** | — |
 
-### Plan 3b proposed scope (when written)
+### Plan 3b scope (written — execute via the plan doc)
 
-| ID | Item | Severity |
-|---|---|---|
-| P3-07 | Backend hybrid combat validation (server replays play-log against seeded RNG) | Important, ~1 sprint |
-| P3-14 | Server-side `role` derivation from `birthYear` (R5 follow-up) | Important |
-| P3-15 | Google OAuth age gate (R5 follow-up) | Important |
-| P3-16 | Under-13 COPPA confirmation pipeline (parent email + audit log) | Important, ~1 sprint |
-| P3-17 | Backend KP-credit endpoints (lessons / videos / battle XP) | Important |
-| P3-18 | Persistent academy progress (`completedLessons` / `watchedVideos` across sessions) | Important |
-| P3a-N7 | **NEW** — role-aware post-auth router (currently 5 sites hardcode `/dashboard` regardless of role; parents bounce through `/character`) | Important — blocks adult smoke test today |
+| ID | Item | Severity | In plan |
+|---|---|---|---|
+| P3-14 | Server-side `role` derivation from `birthYear` (R5 follow-up) | Important | Phase A |
+| P3-15 | Google OAuth age gate (R5 follow-up) | Important | Phase B |
+| P3-16 | Under-13 COPPA confirmation pipeline (parent email + audit log) | Important, ~1 sprint | Phase C |
+| P3-17 | Backend KP-credit endpoints (lessons / videos / battle XP) | Important | Phase D |
+| P3-18 | Persistent academy progress (`completedLessons` / `watchedVideos` across sessions) | Important | Phase E |
+
+P3a-N7 (role-aware post-auth router) was **fixed ahead of Plan 3b** in commit `1cf9efc` — it blocked Plan 3a adult smoke, so it shipped immediately. P3-07 (combat validation) was **split out** of Plan 3b into its own future plan (`3-combat` row above) — not ship-blocking.
 
 ### Plan 3c proposed scope (when written)
 
@@ -134,9 +136,10 @@ Discovered during the 2026-05-15 audit. None of these has an owner or a target p
 | **L2-L4 integration with new campaign flow** | Spec §5.2 maps L1-L4 → Campaign 1-4 visually, but `(dashboard)/learn/*` (functional L2 workflows / L3 Monaco / L4 agents) is not wired into `/campaign/[slug]/prepare`. Plan 3c P3a-N3 is currently the only mention. | Spec §5.2 vs reality |
 | **Mobile PWA story** | `(mobile)/` route group deleted. Spec §9.2 asks "do we rely on Tailwind responsive utilities or keep `useMobileDetect`?" Still open. | Spec §9.2 |
 | **3D phase resumption** | 27 R3F components + game-store parked in `_future_r3f/`. Spec §11 says "future spec, not in scope." No date or owner. | Spec §11 |
-| **Teacher signup UI** | Backend accepts `role: 'teacher'`; no UI sends it. Workaround: curl the API. | Plan 3a smoke (2026-05-15) |
-| **Role-aware post-auth router** | Welcome / Login / Google OAuth / SignupForm / `(learner)/layout.tsx` all hardcode `/dashboard` or `/character` regardless of role. Tracked as new P3a-N7 above. | Plan 3a smoke (2026-05-15) |
+| **Teacher signup UI** | Backend accepts `role: 'teacher'`; no UI sends it. Workaround: curl the API. **⚠️ Plan 3b Phase A changes `/auth/signup` to take `birthYear` not `role` — the curl workaround stops creating teachers once Phase A lands.** Needs a dedicated `/auth/signup-teacher` route + UI; could fold into Plan 3c. | Plan 3a smoke (2026-05-15) |
 | **`(dashboard)/learn/*` decision** | Pre-redesign curriculum routes still serve real content but use old shadcn styling. Inherited new fantasy chrome via the Plan 3a layout rewrite — looks mismatched. Tracked as P3a-N3 above. | Plan 3a self-audit |
+
+**Resolved since the audit:** *Role-aware post-auth router* (parents/teachers bounced through `/character`) — fixed in commit `1cf9efc` via `homeForRole()` + 5 redirect-site updates.
 
 ---
 
