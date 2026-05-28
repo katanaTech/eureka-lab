@@ -16,6 +16,7 @@ import {
 import { InventoryService } from './inventory.service';
 import { PurchaseItemDto } from './dto/purchase-item.dto';
 import { EquipWeaponDto } from './dto/equip-weapon.dto';
+import { CreditKpDto } from './dto/credit-kp.dto';
 import type { Inventory, ShopCatalog } from '@eureka-lab/shared-types';
 
 /**
@@ -104,5 +105,24 @@ export class InventoryController {
       `equipWeapon: userId=${user.uid} weaponId=${dto.weaponId}`,
     );
     return this.inventoryService.equipWeapon(user.uid, dto);
+  }
+
+  /**
+   * Credit KP for a game event. Server owns the amount via KP_REWARDS;
+   * idempotency is provided by the (event, sourceId) tuple.
+   *
+   * @param user - Authenticated child user
+   * @param dto - { event, sourceId }
+   * @returns { granted, duplicate }
+   */
+  @Post('inventory/credit-kp')
+  async creditKp(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreditKpDto,
+  ): Promise<{ granted: number; duplicate: boolean }> {
+    this.logger.log(
+      `creditKp: userId=${user.uid} event=${dto.event} sourceId=${dto.sourceId}`,
+    );
+    return this.inventoryService.creditKpIdempotent(user.uid, dto.event, dto.sourceId);
   }
 }

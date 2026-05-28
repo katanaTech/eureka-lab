@@ -252,6 +252,57 @@ export class InventoryService {
   }
 
   /**
+   * Award KP for an event with idempotency. A second call with the same
+   * (userId, event, sourceId) tuple returns 0 without double-crediting.
+   *
+   * Persisted to `inventories/{userId}/kpEvents/{event}__{sourceId}`.
+   *
+   * @param userId - Firebase UID
+   * @param event - The KP earn event type
+   * @param sourceId - Opaque idempotency key (lessonId / battleId / date)
+   * @returns KP actually credited (0 if duplicate or daily-cap-reached)
+   */
+  async creditKpIdempotent(
+    userId: string,
+    event: KpEarnEvent,
+    sourceId: string,
+  ): Promise<{ granted: number; duplicate: boolean }> {
+    const eventDocId = `${event}__${sourceId}`;
+    const eventRef = this.firebase.firestore
+      .collection(this.collection)
+      .doc(userId)
+      .collection('kpEvents')
+      .doc(eventDocId);
+
+    return this.firebase.firestore.runTransaction(async (txn) => {
+      const snap = await txn.get(eventRef);
+      if (snap.exists) {
+        // Already credited — return 0 + duplicate flag.
+        return { granted: 0, duplicate: true };
+      }
+
+      // Mark the event as processed BEFORE the award so a retry won't race.
+      txn.set(eventRef, {
+        event,
+        sourceId,
+        createdAt: new Date().toISOString(),
+      });
+
+      // The actual award lives outside this transaction (awardKp has its
+      // own transaction for the daily cap + inventory write). Idempotency
+      // here is "the event has been recognised" — a crash between this
+      // tx commit and awardKp returning would lose the credit, which is
+      // acceptable: better to under-award than to double-award.
+      return { granted: -1, duplicate: false };
+    })
+    .then(async (interim) => {
+      if (interim.duplicate) return interim;
+      const granted = await this.awardKp(userId, event);
+      return { granted, duplicate: false };
+    });
+  }
+
+  /**
    * Check and increment today's KP tally for a user.
    * Returns the amount of KP that can still be granted, capped at {@link DAILY_KP_CAP}.
    *
