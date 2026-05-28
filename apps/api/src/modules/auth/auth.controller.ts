@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
+import { CompleteOAuthSignupDto } from './dto/complete-oauth-signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { AddChildDto } from './dto/add-child.dto';
 import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
@@ -33,6 +34,24 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() dto: SignupDto) {
     return this.authService.signup(dto);
+  }
+
+  /**
+   * Complete the Firestore profile creation for a Google OAuth user.
+   * Caller must be authenticated (Firebase ID token in Authorization header).
+   *
+   * @param user - Current authenticated user (from FirebaseAuthGuard)
+   * @param dto - { birthYear }
+   * @returns Created profile + custom token
+   */
+  @Post('complete-oauth-signup')
+  @UseGuards(FirebaseAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async completeOAuthSignup(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CompleteOAuthSignupDto,
+  ) {
+    return this.authService.completeOAuthSignup(user.uid, dto);
   }
 
   /**

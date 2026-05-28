@@ -10,6 +10,7 @@ import {
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 import { UsersRepository, type UserDoc } from '../users/users.repository';
 import type { SignupDto } from './dto/signup.dto';
+import type { CompleteOAuthSignupDto } from './dto/complete-oauth-signup.dto';
 import type { AddChildDto } from './dto/add-child.dto';
 import { getXpLevel } from '@eureka-lab/shared-types';
 
@@ -151,6 +152,54 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  /**
+   * Create a Firestore profile for an already-authenticated OAuth user.
+   * Looks up the Firebase user's email + displayName via the Admin SDK
+   * (the caller only supplies the verified UID + birthYear). Uses the same
+   * role-derivation rules as `signup`. Idempotent: if a profile already
+   * exists for `uid`, returns it unchanged.
+   *
+   * @param uid - Firebase UID (from the verified ID token)
+   * @param dto - { birthYear }
+   * @returns SignupResult-shaped payload
+   */
+  async completeOAuthSignup(
+    uid: string,
+    dto: CompleteOAuthSignupDto,
+  ): Promise<SignupResult> {
+    // Idempotency — if a profile already exists, return it.
+    const existing = await this.usersRepository.findByUid(uid);
+    if (existing) {
+      return {
+        uid: existing.uid,
+        email: existing.email,
+        displayName: existing.displayName,
+        role: existing.role,
+        token: await this.firebaseService.auth.createCustomToken(uid),
+      };
+    }
+
+    const fbUser = await this.firebaseService.auth.getUser(uid);
+    const email = fbUser.email ?? '';
+    const displayName = fbUser.displayName ?? email.split('@')[0] ?? 'Hero';
+    const role = this.deriveRole(dto.birthYear);
+
+    await this.firebaseService.auth.setCustomUserClaims(uid, { role });
+
+    await this.usersRepository.create(uid, {
+      email,
+      displayName,
+      role,
+      birthYear: dto.birthYear,
+    });
+
+    const token = await this.firebaseService.auth.createCustomToken(uid);
+
+    this.logger.log({ event: 'oauth_signup', uid, role, birthYear: dto.birthYear });
+
+    return { uid, email, displayName, role, token };
   }
 
   /**
