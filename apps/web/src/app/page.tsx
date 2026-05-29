@@ -47,6 +47,7 @@ export default function WelcomePage() {
   const [under13Mode, setUnder13Mode] = useState(false);
   const [parentEmail, setParentEmail] = useState('');
   const [pendingToken, setPendingToken] = useState<string | null>(null);
+  const [formError, setFormError] = useState('');
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
@@ -58,16 +59,26 @@ export default function WelcomePage() {
 
   if (isLoading) return null;
 
+  /**
+   * Surface an error both inline (persistent, reliable) and as a toast.
+   * The inline banner is the load-bearing channel; the toast is a bonus.
+   */
+  const fail = (msg: string) => {
+    setFormError(msg);
+    toast.error(msg);
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth) return toast.error('Auth is not available.');
+    setFormError('');
+    if (!auth) return fail('Auth is not available.');
 
     // Under-13 COPPA branch: collect the parent's email and create a pending
     // account instead of a real one (P3-16). The backend emails the parent a
     // confirmation link; no Firebase user exists until they click it.
     if (under13Mode) {
       if (!parentEmail.trim()) {
-        return toast.error('Parent email required.');
+        return fail('Parent email required.');
       }
       try {
         const yearNum = Number(birthYear);
@@ -81,7 +92,7 @@ export default function WelcomePage() {
         toast.success('A confirmation rune has flown to your parent.');
       } catch (err) {
         const msg = (err as { message?: string })?.message ?? 'Pending signup failed.';
-        toast.error(msg);
+        fail(msg);
       }
       return;
     }
@@ -89,11 +100,11 @@ export default function WelcomePage() {
     try {
       if (mode === 'register') {
         if (!username.trim() || !email.trim() || !password || !birthYear.trim()) {
-          return toast.error('Fill in all the runes, hero.');
+          return fail('Fill in all the runes, hero.');
         }
         const year = Number(birthYear);
         if (!Number.isInteger(year) || year < 1900 || year > CURRENT_YEAR) {
-          return toast.error('Year of birth looks odd, hero.');
+          return fail('Year of birth looks odd, hero.');
         }
         // Backend signup creates the Firebase user (Admin SDK) + Firestore
         // profile + custom claims, and now derives the role from birthYear
@@ -111,12 +122,13 @@ export default function WelcomePage() {
           // pivots to the COPPA form (Phase C); AGE_GAP surfaces as a toast.
           const apiErr = err as { code?: string };
           if (apiErr.code === 'UNDER_13_PIPELINE_REQUIRED') {
+            setFormError('');
             setUnder13Mode(true);
             toast.message('Almost there — we just need a grown-up to confirm.');
             return;
           }
           if (apiErr.code === 'AGE_GAP') {
-            return toast.error('Heroes are 13–16. Contact support if you are 17.');
+            return fail('Heroes are 13–16. Contact support if you are 17.');
           }
           throw err;
         }
@@ -125,7 +137,7 @@ export default function WelcomePage() {
         router.push('/character');
       } else {
         if (!email.trim() || !password) {
-          return toast.error('Email and password required.');
+          return fail('Email and password required.');
         }
         await signInWithEmailAndPassword(auth, email.trim(), password);
         // Fetch profile now so we can route by role; useAuth will also pick it
@@ -138,7 +150,7 @@ export default function WelcomePage() {
       }
     } catch (err) {
       const msg = (err as { message?: string })?.message ?? 'Auth failed.';
-      toast.error(msg);
+      fail(msg);
     }
   };
 
@@ -240,7 +252,7 @@ export default function WelcomePage() {
               {(['register', 'login'] as Mode[]).map((m) => (
                 <button
                   key={m}
-                  onClick={() => setMode(m)}
+                  onClick={() => { setMode(m); setFormError(''); }}
                   className={`flex-1 h-10 rounded-lg text-xs font-display tracking-widest uppercase transition-all ${
                     mode === m
                       ? 'bg-gradient-primary text-primary-foreground glow-primary'
@@ -276,6 +288,12 @@ export default function WelcomePage() {
               )}
               <Field label="Email Sigil" value={email} onChange={setEmail} placeholder="hero@realm.io" type="email" />
               <Field label="Secret Rune" value={password} onChange={setPassword} placeholder="••••••••" type="password" />
+
+              {formError && (
+                <p role="alert" className="text-sm text-destructive text-center">
+                  {formError}
+                </p>
+              )}
 
               <GameButton type="submit" size="lg" className="w-full mt-2">
                 {mode === 'register' ? 'Forge My Legend' : 'Enter the Realm'}
