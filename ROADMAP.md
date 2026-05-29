@@ -30,14 +30,15 @@ Plus a backlog of 8 HIGH-priority ship-blockers (Stripe webhooks, COPPA review, 
 |---|---|
 | Branch | `redesign/v2-from-reference` |
 | PR | [#8](https://github.com/katanaTech/eureka-lab/pull/8) (draft, OPEN) |
-| Commits ahead of `main` | 68 |
-| HEAD | `0228842` |
-| Latest plan landed | Plan 3a (adult-page re-skin) — smoke **passed** 2026-05-28 |
-| Next plan | Plan 3b (written + pushed, **not executed**) — see [plan-3b](docs/superpowers/plans/2026-05-15-redesign-plan-3b-r5-and-persistence.md) |
-| Last push | 2026-05-28 |
+| Commits ahead of `main` | 90 |
+| HEAD | `def27d6` |
+| Latest plan landed | Plan 3b (R5 + persistence) — **code complete 2026-05-29**, user smoke pending |
+| Next plan | Plan 3c (polish) — **not written** |
+| Last push | 2026-05-28 (Plan 3b commits unpushed pending approval) |
 | TypeScript | web: 24 pre-existing test-file errors only / api: 0 errors |
 | Lint | web: ✅ clean / api: untracked |
-| Open smoke | none — Plan 3a smoke passed; Plan 3b smoke pending its execution |
+| Tests | api: 260 passing (24 suites), incl. 12 new Plan 3b unit tests |
+| Open smoke | Plan 3b smoke (Phase F.1) pending — user-driven |
 | Known open bugs | none blocking (role-aware routing fixed in `1cf9efc`); missing teacher signup UI remains a Stream 4 gap |
 
 ---
@@ -77,19 +78,19 @@ The L2/L3/L4 curriculum is functional under `(dashboard)/learn/*` but is **not**
 | 1 | Foundation + Learner Shell (revert, salvage, design tokens, Welcome / Character / Dashboard) | **DONE** | [plan-1](docs/superpowers/plans/2026-05-11-redesign-plan-1-foundation-and-learner-shell.md) |
 | 2 | Learner loop completion (campaign, prepare, mission-prep, battle, inventory, shop, victory) | **DONE** | [plan-2](docs/superpowers/plans/2026-05-14-redesign-plan-2-campaign-and-combat.md) |
 | 3a | Adult-facing pages re-skin (parent / teacher / settings / pricing / achievements / checkout) | **DONE** | [plan-3a](docs/superpowers/plans/2026-05-15-redesign-plan-3a-adult-pages-reskin.md) |
-| 3b | R5 follow-ups (P3-14/15/16) + learner persistence (P3-17/18). Combat validation P3-07 split out. | **WRITTEN — not executed** | [plan-3b](docs/superpowers/plans/2026-05-15-redesign-plan-3b-r5-and-persistence.md) |
+| 3b | R5 follow-ups (P3-14/15/16) + learner persistence (P3-17/18). Combat validation P3-07 split out. | **CODE COMPLETE — user smoke pending** (executed 2026-05-29; tsc/lint/tests green) | [plan-3b](docs/superpowers/plans/2026-05-15-redesign-plan-3b-r5-and-persistence.md) |
 | 3c | Platform polish (i18n re-key, RTL fonts, E2E rewrite, PWA/Sentry, feature-component re-skin) | **NOT WRITTEN** | — |
 | 3-combat | P3-07 hybrid combat validation (split out of 3b; not blocking ship) | **NOT WRITTEN** | — |
 
-### Plan 3b scope (written — execute via the plan doc)
+### Plan 3b scope (executed 2026-05-29 — code complete, user smoke pending)
 
-| ID | Item | Severity | In plan |
-|---|---|---|---|
-| P3-14 | Server-side `role` derivation from `birthYear` (R5 follow-up) | Important | Phase A |
-| P3-15 | Google OAuth age gate (R5 follow-up) | Important | Phase B |
-| P3-16 | Under-13 COPPA confirmation pipeline (parent email + audit log) | Important, ~1 sprint | Phase C |
-| P3-17 | Backend KP-credit endpoints (lessons / videos / battle XP) | Important | Phase D |
-| P3-18 | Persistent academy progress (`completedLessons` / `watchedVideos` across sessions) | Important | Phase E |
+| ID | Item | Severity | In plan | Status |
+|---|---|---|---|---|
+| P3-14 | Server-side `role` derivation from `birthYear` (R5 follow-up) | Important | Phase A | CODE DONE (ADR-007; +6 unit tests) |
+| P3-15 | Google OAuth age gate (R5 follow-up) | Important | Phase B | CODE DONE (`OAuthBirthYearModal` + `/auth/complete-oauth-signup`) |
+| P3-16 | Under-13 COPPA confirmation pipeline (parent email + audit log) | Important, ~1 sprint | Phase C | CODE DONE (`email` + `coppa` modules; +6 unit tests) |
+| P3-17 | Backend KP-credit endpoints (lessons / videos / battle XP) | Important | Phase D | CODE DONE (`POST /inventory/credit-kp` idempotent) |
+| P3-18 | Persistent academy progress (`completedLessons` / `watchedVideos` across sessions) | Important | Phase E | CODE DONE (`academy-progress` module + Firestore-backed store) |
 
 P3a-N7 (role-aware post-auth router) was **fixed ahead of Plan 3b** in commit `1cf9efc` — it blocked Plan 3a adult smoke, so it shipped immediately. P3-07 (combat validation) was **split out** of Plan 3b into its own future plan (`3-combat` row above) — not ship-blocking.
 
@@ -158,6 +159,7 @@ Discovered during the 2026-05-15 audit. None of these has an owner or a target p
 
 | ADR | Decision | Date | File |
 |---|---|---|---|
+| 007 | Server-side role derivation from `birthYear`; OAuth age-gate modal; teachers via separate flow | 2026-05-29 | [ADR-007](docs/context/ADR-007-server-side-role-derivation.md) |
 | 006 | Kid signup flow: self-signup with age gate (13-16), under-13 deferred to Plan 3b COPPA pipeline | 2026-05-14 | [ADR-006](docs/context/ADR-006-kid-signup-flow.md) |
 | 001-005 | Referenced but not on disk — may have been deleted in the Phase 16 revert or never written | — | — |
 
