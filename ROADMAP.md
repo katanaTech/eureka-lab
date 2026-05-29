@@ -2,7 +2,7 @@
 
 > **Single canonical view of where we are and what's next.** Updated whenever a phase / plan changes state. If anything in this doc disagrees with what's in code, code wins — file an update.
 >
-> **Last updated:** 2026-05-15
+> **Last updated:** 2026-05-29
 > **Next review:** weekly (every Wednesday)
 > **Maintainer:** whoever last touched a major plan
 
@@ -17,7 +17,7 @@ Eureka Lab is an AI-literacy SaaS for kids 8-16. The product shipped through Pha
 - **Plan 1** (foundation + learner shell): **DONE**
 - **Plan 2** (campaign + combat + inventory + shop + victory): **DONE**
 - **Plan 3a** (adult-page re-skin): **DONE today (2026-05-15)**
-- **Plan 3b** (backend persistence + R5 COPPA follow-ups): **NOT WRITTEN**
+- **Plan 3b** (backend persistence + R5 COPPA follow-ups): **DONE** (2026-05-29)
 - **Plan 3c** (i18n + RTL + E2E + polish): **NOT WRITTEN**
 
 Plus a backlog of 8 HIGH-priority ship-blockers (Stripe webhooks, COPPA review, prod env vars, tests, i18n, security, a11y, perf) carried from `main` 2026-03-07 — **none addressed by the redesign branch yet**.
@@ -30,16 +30,16 @@ Plus a backlog of 8 HIGH-priority ship-blockers (Stripe webhooks, COPPA review, 
 |---|---|
 | Branch | `redesign/v2-from-reference` |
 | PR | [#8](https://github.com/katanaTech/eureka-lab/pull/8) (draft, OPEN) |
-| Commits ahead of `main` | 90 |
-| HEAD | `def27d6` |
-| Latest plan landed | Plan 3b (R5 + persistence) — **code complete 2026-05-29**, user smoke pending |
+| Commits ahead of `main` | 92 |
+| HEAD | `2a00a92` |
+| Latest plan landed | Plan 3b (R5 + persistence) — **DONE 2026-05-29** (smoke passed) |
 | Next plan | Plan 3c (polish) — **not written** |
 | Last push | 2026-05-28 (Plan 3b commits unpushed pending approval) |
 | TypeScript | web: 24 pre-existing test-file errors only / api: 0 errors |
 | Lint | web: ✅ clean / api: untracked |
 | Tests | api: 260 passing (24 suites), incl. 12 new Plan 3b unit tests |
-| Open smoke | Plan 3b smoke (Phase F.1) pending — user-driven |
-| Known open bugs | none blocking (role-aware routing fixed in `1cf9efc`); missing teacher signup UI remains a Stream 4 gap |
+| Open smoke | None — Plan 3b smoke passed 2026-05-29 |
+| Known open bugs | none blocking; missing teacher signup UI remains a Stream 4 gap |
 
 ---
 
@@ -78,11 +78,11 @@ The L2/L3/L4 curriculum is functional under `(dashboard)/learn/*` but is **not**
 | 1 | Foundation + Learner Shell (revert, salvage, design tokens, Welcome / Character / Dashboard) | **DONE** | [plan-1](docs/superpowers/plans/2026-05-11-redesign-plan-1-foundation-and-learner-shell.md) |
 | 2 | Learner loop completion (campaign, prepare, mission-prep, battle, inventory, shop, victory) | **DONE** | [plan-2](docs/superpowers/plans/2026-05-14-redesign-plan-2-campaign-and-combat.md) |
 | 3a | Adult-facing pages re-skin (parent / teacher / settings / pricing / achievements / checkout) | **DONE** | [plan-3a](docs/superpowers/plans/2026-05-15-redesign-plan-3a-adult-pages-reskin.md) |
-| 3b | R5 follow-ups (P3-14/15/16) + learner persistence (P3-17/18). Combat validation P3-07 split out. | **CODE COMPLETE — user smoke pending** (executed 2026-05-29; tsc/lint/tests green) | [plan-3b](docs/superpowers/plans/2026-05-15-redesign-plan-3b-r5-and-persistence.md) |
+| 3b | R5 follow-ups (P3-14/15/16) + learner persistence (P3-17/18). Combat validation P3-07 split out. | **DONE** (code complete 2026-05-29; QA smoke passed 2026-05-29; 2 bug-fix commits `1df4c3f` + `2a00a92` verified) | [plan-3b](docs/superpowers/plans/2026-05-15-redesign-plan-3b-r5-and-persistence.md) |
 | 3c | Platform polish (i18n re-key, RTL fonts, E2E rewrite, PWA/Sentry, feature-component re-skin) | **NOT WRITTEN** | — |
 | 3-combat | P3-07 hybrid combat validation (split out of 3b; not blocking ship) | **NOT WRITTEN** | — |
 
-### Plan 3b scope (executed 2026-05-29 — code complete, user smoke pending)
+### Plan 3b scope (DONE 2026-05-29 — code complete + QA smoke passed)
 
 | ID | Item | Severity | In plan | Status |
 |---|---|---|---|---|
