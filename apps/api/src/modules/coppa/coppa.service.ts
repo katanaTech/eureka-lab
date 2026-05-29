@@ -163,11 +163,30 @@ export class CoppaService {
     // sets their real password via the reset link generated below — we
     // never persisted a credential for an under-13 account.
     const randomPassword = randomBytes(24).toString('hex');
-    const fbUser = await this.firebase.auth.createUser({
-      email: pending.email,
-      password: randomPassword,
-      displayName: pending.displayName,
-    });
+    let fbUser;
+    try {
+      fbUser = await this.firebase.auth.createUser({
+        email: pending.email,
+        password: randomPassword,
+        displayName: pending.displayName,
+      });
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code ?? '';
+      if (code === 'auth/email-already-exists') {
+        // Idempotency: a concurrent confirm (e.g. the page's effect firing
+        // twice under React StrictMode) or a retry already created this
+        // account. Treat as success and skip re-provisioning + a duplicate
+        // audit row — the winning call owns those.
+        const existing = await this.firebase.auth.getUserByEmail(pending.email);
+        this.logger.log({
+          event: 'coppa_confirm_idempotent_hit',
+          kidEmail: pending.email,
+          childUid: existing.uid,
+        });
+        return { uid: existing.uid, email: pending.email };
+      }
+      throw err;
+    }
     await this.firebase.auth.setCustomUserClaims(fbUser.uid, { role: 'child' });
 
     await this.users.create(fbUser.uid, {

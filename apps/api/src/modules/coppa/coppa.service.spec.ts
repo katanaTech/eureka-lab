@@ -158,5 +158,28 @@ describe('CoppaService', () => {
       );
       expect(firestoreMock.batch).toHaveBeenCalled();
     });
+
+    it('is idempotent: on auth/email-already-exists, returns existing user without re-provisioning', async () => {
+      const future = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      const docMock = buildDocMock({
+        token: 'a'.repeat(32),
+        email: 'kid@realm.io',
+        parentEmail: 'parent@realm.io',
+        displayName: 'Spark',
+        birthYear: 2017,
+        createdAt: new Date().toISOString(),
+        expiresAt: future,
+      });
+      firestoreMock.collection.mockReturnValue({ doc: () => docMock });
+      firebaseAuthMock.createUser.mockRejectedValue({ code: 'auth/email-already-exists' });
+      firebaseAuthMock.getUserByEmail.mockResolvedValue({ uid: 'existing-uid' });
+
+      const result = await service.confirmParentEmail({ token: 'a'.repeat(32) });
+      expect(result.uid).toBe('existing-uid');
+      // The winning call already provisioned + audited — this one must not.
+      expect(firebaseAuthMock.setCustomUserClaims).not.toHaveBeenCalled();
+      expect(usersMock.create).not.toHaveBeenCalled();
+      expect(firestoreMock.batch).not.toHaveBeenCalled();
+    });
   });
 });

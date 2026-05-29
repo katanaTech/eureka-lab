@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Scene } from '@/components/game/Scene';
 import { Logo } from '@/components/game/Logo';
@@ -28,15 +28,19 @@ interface PageProps {
 export default function ConfirmParentPage({ params }: PageProps) {
   const [state, setState] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState('');
+  // Guard against React StrictMode's dev double-mount firing the confirm
+  // POST twice. The ref persists across the simulated remount, so the
+  // request runs exactly once and its result is the one rendered.
+  const didConfirm = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
+    if (didConfirm.current) return;
+    didConfirm.current = true;
     (async () => {
       try {
         await coppaApi.confirmParentEmail({ token: params.token });
-        if (!cancelled) setState('success');
+        setState('success');
       } catch (err) {
-        if (cancelled) return;
         // api-client throws ApiError with top-level `code` + `message`.
         const apiErr = err as { code?: string; message?: string };
         const msg = apiErr.message ?? 'Confirmation failed.';
@@ -48,9 +52,6 @@ export default function ConfirmParentPage({ params }: PageProps) {
         setState('error');
       }
     })();
-    return () => {
-      cancelled = true;
-    };
   }, [params.token]);
 
   return (
