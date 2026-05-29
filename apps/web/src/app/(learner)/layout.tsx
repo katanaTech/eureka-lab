@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useCharacterStore } from '@/stores/character-store';
 import { useInventoryStore } from '@/stores/inventory-store';
+import { useAcademyProgressStore } from '@/stores/academy-progress-store';
 import { homeForRole } from '@/lib/auth-redirects';
 
 /**
@@ -24,6 +25,7 @@ export default function LearnerLayout({ children }: { children: React.ReactNode 
   const { isAuthenticated, isLoading, user } = useAuth();
   const hydrateCharacter = useCharacterStore((s) => s.hydrate);
   const hydrateInventory = useInventoryStore((s) => s.hydrate);
+  const hydrateAcademy = useAcademyProgressStore((s) => s.hydrate);
   const character = useCharacterStore((s) => s.character);
   const hasHydrated = useCharacterStore((s) => s.hasHydrated);
   const router = useRouter();
@@ -33,8 +35,9 @@ export default function LearnerLayout({ children }: { children: React.ReactNode 
     if (isAuthenticated) {
       void hydrateCharacter();
       void hydrateInventory();
+      void hydrateAcademy();
     }
-  }, [isAuthenticated, hydrateCharacter, hydrateInventory]);
+  }, [isAuthenticated, hydrateCharacter, hydrateInventory, hydrateAcademy]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace('/');

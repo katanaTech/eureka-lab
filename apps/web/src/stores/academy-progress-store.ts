@@ -1,33 +1,73 @@
 'use client';
 
 import { create } from 'zustand';
+import { academyProgressApi } from '@/lib/api-client';
 
 /**
- * In-memory academy progress: which lessons the user has completed and which
- * mock videos they've watched in this session. NOT persisted — page reload
- * resets to empty. Backend persistence is a Plan 3 deliverable.
+ * Persistent academy progress (P3-18). State mirrors the server's
+ * `academyProgress/{userId}` doc and is hydrated on auth via the
+ * `(learner)/layout.tsx` hook.
  */
 interface AcademyProgressState {
   completedLessonIds: string[];
   watchedVideoIds: string[];
-  /** Mark a lesson as completed (idempotent). */
-  completeLesson: (lessonId: string) => void;
-  /** Mark a video as watched (idempotent). */
-  watchVideo: (videoId: string) => void;
-  /** Clear both lists — typically called on logout. */
+  /** True after the first hydrate() resolves. */
+  hasHydrated: boolean;
+  /** Mark a lesson as completed (idempotent). Writes through to backend. */
+  completeLesson: (lessonId: string) => Promise<void>;
+  /** Mark a video as watched (idempotent). Writes through to backend. */
+  watchVideo: (videoId: string) => Promise<void>;
+  /** Hydrate from backend on auth. */
+  hydrate: () => Promise<void>;
+  /** Clear both lists — called on logout. */
   reset: () => void;
 }
 
 export const useAcademyProgressStore = create<AcademyProgressState>((set, get) => ({
   completedLessonIds: [],
   watchedVideoIds: [],
-  completeLesson: (lessonId) => {
+  hasHydrated: false,
+
+  hydrate: async () => {
+    try {
+      const data = await academyProgressApi.getMine();
+      set({
+        completedLessonIds: data.completedLessonIds,
+        watchedVideoIds: data.watchedVideoIds,
+        hasHydrated: true,
+      });
+    } catch {
+      // Network/offline: stay empty but mark hydrated so the UI doesn't
+      // get stuck on a loading state.
+      set({ hasHydrated: true });
+    }
+  },
+
+  completeLesson: async (lessonId) => {
     if (get().completedLessonIds.includes(lessonId)) return;
-    set({ completedLessonIds: [...get().completedLessonIds, lessonId] });
+    // Optimistic-local + server write-through.
+    const previous = get().completedLessonIds;
+    set({ completedLessonIds: [...previous, lessonId] });
+    try {
+      const updated = await academyProgressApi.completeLesson(lessonId);
+      set({ completedLessonIds: updated.completedLessonIds });
+    } catch {
+      // Roll back on failure.
+      set({ completedLessonIds: previous });
+    }
   },
-  watchVideo: (videoId) => {
+
+  watchVideo: async (videoId) => {
     if (get().watchedVideoIds.includes(videoId)) return;
-    set({ watchedVideoIds: [...get().watchedVideoIds, videoId] });
+    const previous = get().watchedVideoIds;
+    set({ watchedVideoIds: [...previous, videoId] });
+    try {
+      const updated = await academyProgressApi.watchVideo(videoId);
+      set({ watchedVideoIds: updated.watchedVideoIds });
+    } catch {
+      set({ watchedVideoIds: previous });
+    }
   },
-  reset: () => set({ completedLessonIds: [], watchedVideoIds: [] }),
+
+  reset: () => set({ completedLessonIds: [], watchedVideoIds: [], hasHydrated: false }),
 }));

@@ -131,7 +131,7 @@ export function useGame(): GameStateView & GameStateActions {
     },
     completeLesson: (lessonId, _kp) => {
       if (academy.completedLessonIds.includes(lessonId)) return;
-      academy.completeLesson(lessonId);
+      void academy.completeLesson(lessonId);
       // Server-authoritative KP award. Daily cap + idempotency are enforced
       // server-side; the response's `granted` is the actual amount credited
       // (may be 0 if the cap is reached for the day).
@@ -144,7 +144,7 @@ export function useGame(): GameStateView & GameStateActions {
     },
     watchVideo: (videoId, _kp) => {
       if (academy.watchedVideoIds.includes(videoId)) return;
-      academy.watchVideo(videoId);
+      void academy.watchVideo(videoId);
       void inventoryApi
         .creditKp({ event: 'practice_completed', sourceId: videoId })
         .then((res) => {

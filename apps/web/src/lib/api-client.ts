@@ -36,6 +36,7 @@ import type {
   ShopCatalog,
   FantasyCharacter,
   FantasyClass,
+  AcademyProgress,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -968,6 +969,26 @@ export const inventoryApi = {
       '/inventory/credit-kp',
       { method: 'POST', body: JSON.stringify(body) },
     ),
+};
+
+/* ── Academy Progress API ──────────────────────────────────────── */
+
+/** Persistent academy progress (lessons completed + videos watched). */
+export const academyProgressApi = {
+  /** Fetch the authenticated child's academy progress (lazy-creates if absent). */
+  getMine: () => request<AcademyProgress>('/academy-progress'),
+  /** Mark a lesson completed (idempotent). */
+  completeLesson: (lessonId: string) =>
+    request<AcademyProgress>('/academy-progress/complete-lesson', {
+      method: 'POST',
+      body: JSON.stringify({ lessonId }),
+    }),
+  /** Mark a video watched (idempotent). */
+  watchVideo: (videoId: string) =>
+    request<AcademyProgress>('/academy-progress/watch-video', {
+      method: 'POST',
+      body: JSON.stringify({ videoId }),
+    }),
 };
 
 /* ── Character API ─────────────────────────────────────────────── */
