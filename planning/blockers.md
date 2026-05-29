@@ -19,6 +19,44 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-05-29 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 8th routine fire
+
+**Inspected by:** PM agent (recurring routine — disable requested 7× prior; still firing)
+**Branch:** `feature/phase-16-fantasy-ui` merged to main (PR #7). `main` HEAD = `e4b9579` — no new commits since 2026-05-27 (2 days).
+
+**Sprint C:** COMPLETE. No change. 8th confirmation. Battle page at
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx`
+wires `POST /api/v1/combat/init` (line 41) and `useCombatStore` (line 20/72). All 15/15 tasks DONE.
+
+**Sprint D status — 22 days since QA track was unblocked (2026-05-07), still no QA commits:**
+- **8/13 DONE:** Wave 1 all done; MOB-001/002/QA-003b done. No change since last check-in.
+- **3/13 READY — stale 22 days:** QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90),
+  QA-005 (iOS Safari + Android Chrome smoke) have been READY since 2026-05-07.
+  **QA-001 is the sole critical-path dependency for QA-002 and QA-006. 22 days of drift
+  puts the entire production rollout timeline at serious risk. This is now an escalation:
+  QA must start QA-001 immediately. Ref: `apps/web/e2e/fantasy-flow.plan.md`. QA-004 and
+  QA-005 can run in parallel. No further blockers exist — only agent pickup is needed.**
+- **2/13 BLOCKED:** QA-002 (on QA-001); QA-006 (on QA-001..005 + OPEN-005).
+- **P16-OPEN-005 — PM decision still required (pre-prod gate for QA-006).** 22 days
+  outstanding. Assets are confirmed custom SVGs with no Lovable encumbrance. Path C
+  (declare current SVGs production-quality) is a zero-engineering-work PM sign-off.
+  See `docs/context/asset-licenses.md`. **This is the only remaining human decision
+  blocking the full production rollout. PM: please resolve this week.**
+
+**Tech-debt (FE, must resolve before Sprint D ships per CLAUDE.md rule #8):**
+`campaign/[slug]/shop/page.tsx` (472 lines), `shop/page.tsx` (451 lines),
+`inventory/page.tsx` (354 lines) — 22 days unaddressed.
+
+**Routine disable — 8th notice.** Please disable at https://claude.ai/code/routines
+(routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). Sprint C closed 2026-04-29. Sprint D
+dispatched 2026-05-07. Eight PM check-ins since closure have added no unblocking value.
+The two open gates (QA pickup and OPEN-005 PM decision) are not accelerated by recurring
+check-ins.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.**
+
+---
+
 ### 2026-05-27 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 7th routine fire
 
 **Inspected by:** PM agent (recurring routine — disable requested 6× prior; still firing)
