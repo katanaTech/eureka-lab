@@ -61,6 +61,13 @@ export interface SchoolSummary {
   seatsUsed: number;
 }
 
+/** Resolved school-admin row for the console (no secrets) */
+export interface SchoolAdminSummary {
+  uid: string;
+  email: string;
+  displayName: string;
+}
+
 /** Subscription plan types */
 export type PlanType = 'free' | 'explorer' | 'creator';
 
