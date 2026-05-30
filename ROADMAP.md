@@ -165,7 +165,7 @@ A multi-tenant B2B layer on top of the existing B2C model: a platform **super-ad
 | # | Sub-project | Status | Spec |
 |---|---|---|---|
 | 1 | Tenancy + role foundation (`schools` collection, `super_admin`/`school_admin` roles, `schoolId`, seeded super-admin, super-admin backend, `TenantGuard`, tests — **no UI**) | **DONE** (`feat/school-tenancy`, 2026-05-30; api 30 suites/288 tests, new code ~91% cov) | [foundation](docs/superpowers/specs/2026-05-30-school-tenancy-foundation-design.md) · [plan](docs/superpowers/plans/2026-05-30-school-tenancy-foundation-plan.md) |
-| 2 | Super-admin console (create/suspend schools; edit subscription, seats, keys; create school admins; usage) | NOT WRITTEN | — |
+| 2 | Super-admin console (Core: list/create/detail/suspend schools, edit seat limit, create + list school admins; subscription/key editing + usage deferred to sub-project 5) | **DONE** (`feat/school-superadmin-console`, 2026-05-30; api 30 suites/295 tests, schools module ~92% cov) | [console](docs/superpowers/specs/2026-05-30-school-tenancy-superadmin-console-design.md) · [plan](docs/superpowers/plans/2026-05-30-school-tenancy-superadmin-console-plan.md) |
 | 3 | School-admin console (add/list/deactivate teachers in own school) | NOT WRITTEN | — |
 | 4 | Seat/license enforcement + rollup + enrollment (incl. school-consent COPPA path) | NOT WRITTEN | — |
 | 5 | B2B subscriptions / billing / key rotation (intersects `STRIPE-001`) | NOT WRITTEN | — |
