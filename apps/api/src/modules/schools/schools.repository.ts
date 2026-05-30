@@ -37,6 +37,18 @@ export class SchoolsRepository {
   }
 
   /**
+   * Update mutable school fields (status / seatLimit).
+   * @param id - School id.
+   * @param partial - Subset of mutable fields to write.
+   */
+  async updateSchool(
+    id: string,
+    partial: Partial<Pick<School, 'status' | 'seatLimit'>>,
+  ): Promise<void> {
+    await this.firebase.firestore.collection(this.collection).doc(id).update(partial);
+  }
+
+  /**
    * Fetch a school by id.
    * @param id - School document id.
    * @returns The school or null if not found.
