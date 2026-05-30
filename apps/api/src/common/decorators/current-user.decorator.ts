@@ -11,6 +11,8 @@ export interface AuthenticatedUser {
   email: string;
   /** User role from custom claims */
   role: string;
+  /** Tenant id from custom claims (school_admin / school-provisioned users) */
+  schoolId?: string;
 }
 
 /**

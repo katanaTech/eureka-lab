@@ -6,7 +6,60 @@
 // ── User & Auth ──────────────────────────────────────────────────────────────
 
 /** User roles in the platform */
-export type UserRole = 'child' | 'parent' | 'teacher' | 'admin';
+export type UserRole =
+  | 'child'
+  | 'parent'
+  | 'teacher'
+  | 'admin'
+  | 'super_admin'
+  | 'school_admin';
+
+/** Lifecycle status of a school tenant */
+export type SchoolStatus = 'active' | 'suspended';
+
+/** School subscription — simple fields now; real billing is epic sub-project 5 */
+export interface SchoolSubscription {
+  /** Plan tier label, e.g. 'trial' | 'standard' */
+  tier: string;
+  /** Status label, e.g. 'active' | 'trialing' | 'past_due' */
+  status: string;
+  /** Unix ms when the current period ends (optional until billing lands) */
+  periodEnd?: number;
+}
+
+/** School access keys — semantics/rotation are epic sub-project 5 */
+export interface SchoolSecretKeys {
+  /** Secret used (later) to gate student enrollment under this school */
+  enrollmentSecret: string;
+}
+
+/** A school tenant document (`schools/{id}`) */
+export interface School {
+  id: string;
+  name: string;
+  status: SchoolStatus;
+  /** Max student licenses */
+  seatLimit: number;
+  /** Denormalized count of students consuming a seat (enforced in sub-project 4) */
+  seatsUsed: number;
+  /** UIDs of this school's school_admin users */
+  adminUids: string[];
+  subscription: SchoolSubscription;
+  secretKeys: SchoolSecretKeys;
+  /** Unix ms creation time */
+  createdAt: number;
+  /** super_admin uid that created the school */
+  createdBy: string;
+}
+
+/** Compact school view for list endpoints (no secrets) */
+export interface SchoolSummary {
+  id: string;
+  name: string;
+  status: SchoolStatus;
+  seatLimit: number;
+  seatsUsed: number;
+}
 
 /** Subscription plan types */
 export type PlanType = 'free' | 'explorer' | 'creator';
@@ -50,6 +103,8 @@ export interface UserProfile {
   children?: ChildSummary[];
   /** Active subscription details (undefined for free plan) */
   subscription?: SubscriptionData;
+  /** Tenant id when this user belongs to a school (B2B); absent for B2C + super_admin */
+  schoolId?: string;
 }
 
 /** Summary of a child account (nested in parent profile) */

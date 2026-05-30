@@ -11,6 +11,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
+    "seed:super-admin": "node dist/scripts/seed-super-admin.js",
     "clean": "rimraf dist .turbo"
   },
   "dependencies": {

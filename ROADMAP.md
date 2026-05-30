@@ -137,7 +137,7 @@ Discovered during the 2026-05-15 audit. None of these has an owner or a target p
 | **L2-L4 integration with new campaign flow** | Spec §5.2 maps L1-L4 → Campaign 1-4 visually, but `(dashboard)/learn/*` (functional L2 workflows / L3 Monaco / L4 agents) is not wired into `/campaign/[slug]/prepare`. Plan 3c P3a-N3 is currently the only mention. | Spec §5.2 vs reality |
 | **Mobile PWA story** | `(mobile)/` route group deleted. Spec §9.2 asks "do we rely on Tailwind responsive utilities or keep `useMobileDetect`?" Still open. | Spec §9.2 |
 | **3D phase resumption** | 27 R3F components + game-store parked in `_future_r3f/`. Spec §11 says "future spec, not in scope." No date or owner. | Spec §11 |
-| **Teacher signup UI** | Backend accepts `role: 'teacher'`; no UI sends it. Workaround: curl the API. **⚠️ Plan 3b Phase A changes `/auth/signup` to take `birthYear` not `role` — the curl workaround stops creating teachers once Phase A lands.** Needs a dedicated `/auth/signup-teacher` route + UI; could fold into Plan 3c. | Plan 3a smoke (2026-05-15) |
+| **Teacher signup UI** | **SUPERSEDED by Stream 6 (B2B School Tenancy epic, 2026-05-30).** Teachers will be provisioned by a school admin, not self-served. Original framing (dedicated `/auth/signup-teacher` route) is no longer the plan. | Plan 3a smoke (2026-05-15) → reframed 2026-05-30 |
 | **`(dashboard)/learn/*` decision** | Pre-redesign curriculum routes still serve real content but use old shadcn styling. Inherited new fantasy chrome via the Plan 3a layout rewrite — looks mismatched. Tracked as P3a-N3 above. | Plan 3a self-audit |
 | **App-wide Sonner toasts do not render** | `toast()` emitter and `<Toaster>` resolve to disconnected stores in this Next 14 build: `toast.getHistory()` returned 1 while `useSonner()` from the same import stayed empty. Three config fixes failed (client-component wrapper, `transpilePackages: ['sonner']`, webpack `resolve.alias`); a from-scratch Zustand replacement with a `globalThis`-anchored store also didn't render (deeper than a config issue). **Not blocking:** auth-form rejection (the one QA hit) is reliably visible via the inline alert added in `1df4c3f`; other toasts (login success, shop, battle, character) silently no-op but no flows break. Defer to a dedicated investigation — full evidence in [`2026-05-30-plan-3b-done-sonner-deferred-handover.md`](docs/superpowers/handover/2026-05-30-plan-3b-done-sonner-deferred-handover.md). | Plan 3b QA smoke (Bug 1 deep-dive 2026-05-30) |
 
@@ -156,10 +156,27 @@ Discovered during the 2026-05-15 audit. None of these has an owner or a target p
 
 ---
 
+## Stream 6 — B2B School Tenancy (epic — NEW 2026-05-30)
+
+A multi-tenant B2B layer on top of the existing B2C model: a platform **super-admin** manages **schools** (tenants: subscriptions, license seats, secret keys), each school's **admin** manages **teachers**, and school **students** consume license seats. Runs parallel to the existing parent → child consumer tree (separate trees; a child is in exactly one). **Supersedes** the Stream 4 "Teacher signup UI" gap. New direction — not part of the redesign branch; will live on its own branch/PR.
+
+**Epic spec:** [`docs/superpowers/specs/2026-05-30-school-tenancy-b2b-epic-design.md`](docs/superpowers/specs/2026-05-30-school-tenancy-b2b-epic-design.md) · **ADR:** [ADR-008](docs/context/ADR-008-school-tenancy-and-role-hierarchy.md)
+
+| # | Sub-project | Status | Spec |
+|---|---|---|---|
+| 1 | Tenancy + role foundation (`schools` collection, `super_admin`/`school_admin` roles, `schoolId`, seeded super-admin, super-admin backend, `TenantGuard`, tests — **no UI**) | **DONE** (`feat/school-tenancy`, 2026-05-30; api 30 suites/288 tests, new code ~91% cov) | [foundation](docs/superpowers/specs/2026-05-30-school-tenancy-foundation-design.md) · [plan](docs/superpowers/plans/2026-05-30-school-tenancy-foundation-plan.md) |
+| 2 | Super-admin console (create/suspend schools; edit subscription, seats, keys; create school admins; usage) | NOT WRITTEN | — |
+| 3 | School-admin console (add/list/deactivate teachers in own school) | NOT WRITTEN | — |
+| 4 | Seat/license enforcement + rollup + enrollment (incl. school-consent COPPA path) | NOT WRITTEN | — |
+| 5 | B2B subscriptions / billing / key rotation (intersects `STRIPE-001`) | NOT WRITTEN | — |
+
+---
+
 ## Recent decisions (ADRs)
 
 | ADR | Decision | Date | File |
 |---|---|---|---|
+| 008 | Multi-tenant B2B school hierarchy: `super_admin`/`school_admin` roles; separate B2C/B2B trees; hybrid `schoolId`+counter tenancy; super-admin seed-only | 2026-05-30 | [ADR-008](docs/context/ADR-008-school-tenancy-and-role-hierarchy.md) |
 | 007 | Server-side role derivation from `birthYear`; OAuth age-gate modal; teachers via separate flow | 2026-05-29 | [ADR-007](docs/context/ADR-007-server-side-role-derivation.md) |
 | 006 | Kid signup flow: self-signup with age gate (13-16), under-13 deferred to Plan 3b COPPA pipeline | 2026-05-14 | [ADR-006](docs/context/ADR-006-kid-signup-flow.md) |
 | 001-005 | Referenced but not on disk — may have been deleted in the Phase 16 revert or never written | — | — |
