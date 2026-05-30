@@ -45,6 +45,7 @@ export class FirebaseAuthGuard implements CanActivate {
         uid: decoded.uid,
         email: decoded.email ?? '',
         role: (decoded['role'] as string) ?? 'parent',
+        schoolId: (decoded['schoolId'] as string | undefined) ?? undefined,
       };
 
       (request as FastifyRequest & { user: AuthenticatedUser }).user = user;
