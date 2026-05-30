@@ -68,6 +68,15 @@ export interface SchoolAdminSummary {
   displayName: string;
 }
 
+/** Resolved teacher row for the school-admin console */
+export interface SchoolTeacherSummary {
+  uid: string;
+  email: string;
+  displayName: string;
+  /** false when the teacher's login is disabled; defaults true on older docs */
+  active: boolean;
+}
+
 /** Subscription plan types */
 export type PlanType = 'free' | 'explorer' | 'creator';
 
