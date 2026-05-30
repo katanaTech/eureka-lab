@@ -11,7 +11,14 @@
  */
 
 /** All roles the backend recognises today. */
-export type UserRoleString = 'child' | 'parent' | 'teacher' | 'admin' | string;
+export type UserRoleString =
+  | 'child'
+  | 'parent'
+  | 'teacher'
+  | 'admin'
+  | 'super_admin'
+  | 'school_admin'
+  | string;
 
 /**
  * Home route for a given user role. Used by every post-auth redirect site.
@@ -20,6 +27,8 @@ export type UserRoleString = 'child' | 'parent' | 'teacher' | 'admin' | string;
  * @returns Absolute path the user should land on after auth.
  */
 export function homeForRole(role: UserRoleString): string {
+  if (role === 'super_admin') return '/admin';
+  if (role === 'school_admin') return '/school';
   if (role === 'parent') return '/parent';
   if (role === 'teacher') return '/teacher';
   if (role === 'admin') return '/parent'; // admins co-mingled with parents for now; no separate /admin
