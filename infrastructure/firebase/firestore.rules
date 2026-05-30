@@ -41,6 +41,9 @@ service cloud.firestore {
       // Admins can read any profile
       allow read: if hasRole('admin');
 
+      // Super admins can read any profile
+      allow read: if hasRole('super_admin');
+
       // Only the backend (admin SDK) creates and updates user docs
       // No client-side writes allowed
       allow write: if false;
@@ -200,6 +203,20 @@ service cloud.firestore {
         && isParentOf(resource.data.userId);
 
       // Only backend writes interactions
+      allow write: if false;
+    }
+
+    // ── Schools Collection (B2B tenancy) ─────────────────────────────────
+
+    match /schools/{schoolId} {
+      // Super admins manage everything
+      allow read: if hasRole('super_admin');
+
+      // School admins can read their own school
+      allow read: if hasRole('school_admin')
+        && request.auth.uid in resource.data.adminUids;
+
+      // Only the backend (Admin SDK) writes school docs
       allow write: if false;
     }
 
