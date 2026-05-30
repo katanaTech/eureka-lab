@@ -39,7 +39,7 @@ Plus a backlog of 8 HIGH-priority ship-blockers (Stripe webhooks, COPPA review, 
 | Lint | web: ✅ clean / api: untracked |
 | Tests | api: 260 passing (24 suites), incl. 12 new Plan 3b unit tests |
 | Open smoke | None — Plan 3b smoke passed 2026-05-29 |
-| Known open bugs | none blocking; missing teacher signup UI remains a Stream 4 gap |
+| Known open bugs | none blocking; **app-wide Sonner toast failure** (Stream 4 — auth path covered by inline alert); **missing teacher signup UI** (Stream 4) |
 
 ---
 
@@ -139,6 +139,7 @@ Discovered during the 2026-05-15 audit. None of these has an owner or a target p
 | **3D phase resumption** | 27 R3F components + game-store parked in `_future_r3f/`. Spec §11 says "future spec, not in scope." No date or owner. | Spec §11 |
 | **Teacher signup UI** | Backend accepts `role: 'teacher'`; no UI sends it. Workaround: curl the API. **⚠️ Plan 3b Phase A changes `/auth/signup` to take `birthYear` not `role` — the curl workaround stops creating teachers once Phase A lands.** Needs a dedicated `/auth/signup-teacher` route + UI; could fold into Plan 3c. | Plan 3a smoke (2026-05-15) |
 | **`(dashboard)/learn/*` decision** | Pre-redesign curriculum routes still serve real content but use old shadcn styling. Inherited new fantasy chrome via the Plan 3a layout rewrite — looks mismatched. Tracked as P3a-N3 above. | Plan 3a self-audit |
+| **App-wide Sonner toasts do not render** | `toast()` emitter and `<Toaster>` resolve to disconnected stores in this Next 14 build: `toast.getHistory()` returned 1 while `useSonner()` from the same import stayed empty. Three config fixes failed (client-component wrapper, `transpilePackages: ['sonner']`, webpack `resolve.alias`); a from-scratch Zustand replacement with a `globalThis`-anchored store also didn't render (deeper than a config issue). **Not blocking:** auth-form rejection (the one QA hit) is reliably visible via the inline alert added in `1df4c3f`; other toasts (login success, shop, battle, character) silently no-op but no flows break. Defer to a dedicated investigation — full evidence in [`2026-05-30-plan-3b-done-sonner-deferred-handover.md`](docs/superpowers/handover/2026-05-30-plan-3b-done-sonner-deferred-handover.md). | Plan 3b QA smoke (Bug 1 deep-dive 2026-05-30) |
 
 **Resolved since the audit:** *Role-aware post-auth router* (parents/teachers bounced through `/character`) — fixed in commit `1cf9efc` via `homeForRole()` + 5 redirect-site updates.
 
