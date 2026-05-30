@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Timestamp } from 'firebase-admin/firestore';
-import type { SubscriptionData, PlanType, FantasyCharacter } from '@eureka-lab/shared-types';
+import type { SubscriptionData, PlanType, FantasyCharacter, UserRole } from '@eureka-lab/shared-types';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 
 /**
@@ -10,7 +10,8 @@ export interface UserDoc {
   uid: string;
   email: string;
   displayName: string;
-  role: 'child' | 'parent' | 'teacher' | 'admin';
+  role: UserRole;
+  schoolId?: string;
   plan: 'free' | 'explorer' | 'creator';
   xp: number;
   streak: number;
@@ -29,7 +30,8 @@ export interface UserDoc {
 export interface CreateUserData {
   email: string;
   displayName: string;
-  role: 'child' | 'parent' | 'teacher' | 'admin';
+  role: UserRole;
+  schoolId?: string;
   parentUid?: string;
   birthYear?: number;
 }
@@ -72,6 +74,7 @@ export class UsersRepository {
       xp: 0,
       streak: 0,
       ...(data.parentUid && { parentUid: data.parentUid }),
+      ...(data.schoolId && { schoolId: data.schoolId }),
       ...(data.birthYear && { birthYear: data.birthYear }),
       ...(data.role === 'parent' && { children: [] }),
       createdAt: now,
