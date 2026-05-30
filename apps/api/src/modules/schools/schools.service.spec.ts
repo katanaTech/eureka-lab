@@ -12,11 +12,12 @@ const mockRepo = {
   findById: jest.fn(),
   listAll: jest.fn(),
   addAdminUid: jest.fn().mockResolvedValue(undefined),
+  updateSchool: jest.fn().mockResolvedValue(undefined),
 };
 const mockCreateUser = jest.fn();
 const mockSetClaims = jest.fn().mockResolvedValue(undefined);
 const mockFirebase = { auth: { createUser: mockCreateUser, setCustomUserClaims: mockSetClaims } };
-const mockUsersRepo = { create: jest.fn().mockResolvedValue(undefined) };
+const mockUsersRepo = { create: jest.fn().mockResolvedValue(undefined), findByUid: jest.fn() };
 const mockModeration = { moderateInput: jest.fn().mockReturnValue({ passed: true }) };
 
 describe('SchoolsService', () => {
@@ -110,6 +111,46 @@ describe('SchoolsService', () => {
       const result = await service.listSchools();
       expect(result).toEqual([{ id: 's1', name: 'A', status: 'active', seatLimit: 5, seatsUsed: 2 }]);
       expect(JSON.stringify(result)).not.toContain('sek_secret');
+    });
+  });
+
+  describe('updateSchool', () => {
+    it('throws NotFound when missing', async () => {
+      mockRepo.findById.mockResolvedValueOnce(null);
+      await expect(service.updateSchool('nope', { status: 'suspended' }))
+        .rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('writes only provided fields and returns the merged school', async () => {
+      mockRepo.findById.mockResolvedValueOnce({
+        id: 'school-1', name: 'A', status: 'active', seatLimit: 100, seatsUsed: 3,
+        adminUids: [], subscription: { tier: 'trial', status: 'active' },
+        secretKeys: { enrollmentSecret: 'sek_x' }, createdAt: 1, createdBy: 'sa',
+      });
+      const result = await service.updateSchool('school-1', { seatLimit: 25 });
+      expect(mockRepo.updateSchool).toHaveBeenCalledWith('school-1', { seatLimit: 25 });
+      expect(result.seatLimit).toBe(25);
+      expect(result.status).toBe('active');
+    });
+  });
+
+  describe('listSchoolAdmins', () => {
+    it('throws NotFound when missing', async () => {
+      mockRepo.findById.mockResolvedValueOnce(null);
+      await expect(service.listSchoolAdmins('nope')).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('resolves adminUids to summaries and skips missing users', async () => {
+      mockRepo.findById.mockResolvedValueOnce({
+        id: 'school-1', name: 'A', status: 'active', seatLimit: 1, seatsUsed: 0,
+        adminUids: ['u-1', 'gone'], subscription: { tier: 'trial', status: 'active' },
+        secretKeys: { enrollmentSecret: 'sek_x' }, createdAt: 1, createdBy: 'sa',
+      });
+      mockUsersRepo.findByUid
+        .mockResolvedValueOnce({ uid: 'u-1', email: 'a@s.edu', displayName: 'Admin One' })
+        .mockResolvedValueOnce(null);
+      const result = await service.listSchoolAdmins('school-1');
+      expect(result).toEqual([{ uid: 'u-1', email: 'a@s.edu', displayName: 'Admin One' }]);
     });
   });
 });

@@ -6,13 +6,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { randomBytes } from 'crypto';
-import type { School, SchoolSummary } from '@eureka-lab/shared-types';
+import type { School, SchoolSummary, SchoolAdminSummary } from '@eureka-lab/shared-types';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 import { UsersRepository } from '../users/users.repository';
 import { ContentModerationService } from '../ai/content-moderation.service';
 import { SchoolsRepository } from './schools.repository';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { CreateSchoolAdminDto } from './dto/create-school-admin.dto';
+import { UpdateSchoolDto } from './dto/update-school.dto';
 
 /** Result of minting a school_admin. */
 export interface MintSchoolAdminResult {
@@ -134,6 +135,48 @@ export class SchoolsService {
       throw new NotFoundException({ message: 'School not found', code: 'SCHOOL_NOT_FOUND' });
     }
     return school;
+  }
+
+  /**
+   * Update a school's mutable fields (status and/or seatLimit).
+   * @param id - School id.
+   * @param dto - Partial update.
+   * @returns The updated school.
+   * @throws NotFoundException when missing.
+   */
+  async updateSchool(id: string, dto: UpdateSchoolDto): Promise<School> {
+    const school = await this.repo.findById(id);
+    if (!school) {
+      throw new NotFoundException({ message: 'School not found', code: 'SCHOOL_NOT_FOUND' });
+    }
+    const partial: Partial<Pick<School, 'status' | 'seatLimit'>> = {};
+    if (dto.status !== undefined) partial.status = dto.status;
+    if (dto.seatLimit !== undefined) partial.seatLimit = dto.seatLimit;
+    await this.repo.updateSchool(id, partial);
+    this.logger.log({ event: 'school_updated', schoolId: id, fields: Object.keys(partial) });
+    return { ...school, ...partial };
+  }
+
+  /**
+   * Resolve a school's adminUids to summaries (uid/email/displayName).
+   * Skips uids that no longer resolve to a user.
+   * @param id - School id.
+   * @returns Array of admin summaries.
+   * @throws NotFoundException when the school is missing.
+   */
+  async listSchoolAdmins(id: string): Promise<SchoolAdminSummary[]> {
+    const school = await this.repo.findById(id);
+    if (!school) {
+      throw new NotFoundException({ message: 'School not found', code: 'SCHOOL_NOT_FOUND' });
+    }
+    const admins: SchoolAdminSummary[] = [];
+    for (const uid of school.adminUids) {
+      const user = await this.usersRepository.findByUid(uid);
+      if (user) {
+        admins.push({ uid: user.uid, email: user.email, displayName: user.displayName });
+      }
+    }
+    return admins;
   }
 
   /**
