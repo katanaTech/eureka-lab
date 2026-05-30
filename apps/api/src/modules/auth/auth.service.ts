@@ -32,6 +32,7 @@ export interface LoginResult {
   plan: string;
   xp: number;
   level: number;
+  schoolId?: string;
   children?: ChildSummaryResult[];
 }
 
@@ -236,6 +237,7 @@ export class AuthService {
       plan: userDoc.plan,
       xp: userDoc.xp,
       level: xpLevel.level,
+      schoolId: userDoc.schoolId,
     };
 
     if (userDoc.role === 'parent') {
@@ -270,6 +272,7 @@ export class AuthService {
       plan: userDoc.plan,
       xp: userDoc.xp,
       level: xpLevel.level,
+      schoolId: userDoc.schoolId,
       streak: userDoc.streak,
       children: undefined as ChildSummaryResult[] | undefined,
     };
