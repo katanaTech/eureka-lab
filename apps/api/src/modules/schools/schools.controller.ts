@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   UseGuards,
@@ -15,6 +16,7 @@ import { CurrentUser, type AuthenticatedUser } from '../../common/decorators/cur
 import { SchoolsService } from './schools.service';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { CreateSchoolAdminDto } from './dto/create-school-admin.dto';
+import { UpdateSchoolDto } from './dto/update-school.dto';
 
 /**
  * Super-admin-only endpoints for managing school tenants.
@@ -55,6 +57,27 @@ export class SchoolsController {
   @Get(':id')
   async getSchool(@Param('id') id: string) {
     return this.schoolsService.getSchool(id);
+  }
+
+  /**
+   * Update a school's status and/or seat limit.
+   * @param id - School id.
+   * @param dto - Partial update.
+   * @returns The updated school.
+   */
+  @Patch(':id')
+  async updateSchool(@Param('id') id: string, @Body() dto: UpdateSchoolDto) {
+    return this.schoolsService.updateSchool(id, dto);
+  }
+
+  /**
+   * List a school's admins (resolved summaries).
+   * @param id - School id.
+   * @returns { admins }.
+   */
+  @Get(':id/admins')
+  async listSchoolAdmins(@Param('id') id: string) {
+    return { admins: await this.schoolsService.listSchoolAdmins(id) };
   }
 
   /**

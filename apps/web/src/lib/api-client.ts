@@ -37,6 +37,9 @@ import type {
   FantasyCharacter,
   FantasyClass,
   AcademyProgress,
+  School,
+  SchoolSummary,
+  SchoolAdminSummary,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -1081,4 +1084,34 @@ export type {
   ShopCatalog,
   FantasyCharacter,
   FantasyClass,
+};
+
+/* ── Schools API (super-admin console) ─────────────────────────── */
+
+/** Super-admin school/tenant management endpoints (all require super_admin). */
+export const schoolsApi = {
+  /** List all schools as summaries. */
+  list: () => request<{ schools: SchoolSummary[] }>('/schools'),
+
+  /** Get one school (full doc, incl. read-only subscription/secret). */
+  get: (id: string) => request<School>(`/schools/${id}`),
+
+  /** Create a school tenant. */
+  create: (body: { name: string; seatLimit: number; subscriptionTier?: string }) =>
+    request<School>('/schools', { method: 'POST', body: JSON.stringify(body) }),
+
+  /** Update status and/or seat limit. */
+  update: (id: string, body: { status?: 'active' | 'suspended'; seatLimit?: number }) =>
+    request<School>(`/schools/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+
+  /** List a school's admins (resolved summaries). */
+  listAdmins: (id: string) =>
+    request<{ admins: SchoolAdminSummary[] }>(`/schools/${id}/admins`),
+
+  /** Mint a school admin (super-admin sets the temp password). */
+  createAdmin: (id: string, body: { email: string; displayName: string; password: string }) =>
+    request<{ uid: string; email: string; displayName: string; role: string; schoolId: string }>(
+      `/schools/${id}/admins`,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
 };

@@ -69,4 +69,9 @@ describe('SchoolsRepository', () => {
     await repo.incrementSeatsUsed('school-1', 1);
     expect(mockUpdate).toHaveBeenCalledTimes(1);
   });
+
+  it('updateSchool updates only the provided fields', async () => {
+    await repo.updateSchool('school-1', { status: 'suspended', seatLimit: 25 });
+    expect(mockUpdate).toHaveBeenCalledWith({ status: 'suspended', seatLimit: 25 });
+  });
 });

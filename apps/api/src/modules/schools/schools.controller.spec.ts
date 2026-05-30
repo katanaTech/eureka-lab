@@ -10,6 +10,8 @@ const mockService = {
   listSchools: jest.fn(),
   getSchool: jest.fn(),
   mintSchoolAdmin: jest.fn(),
+  updateSchool: jest.fn(),
+  listSchoolAdmins: jest.fn(),
 };
 
 const mockGuard = { canActivate: jest.fn().mockReturnValue(true) };
@@ -58,5 +60,19 @@ describe('SchoolsController', () => {
     const result = await controller.createSchoolAdmin('s1', dto);
     expect(mockService.mintSchoolAdmin).toHaveBeenCalledWith('s1', dto);
     expect(result).toEqual({ uid: 'admin-9' });
+  });
+
+  it('updateSchool delegates id + dto', async () => {
+    mockService.updateSchool.mockResolvedValueOnce({ id: 's1', status: 'suspended' });
+    const result = await controller.updateSchool('s1', { status: 'suspended' });
+    expect(mockService.updateSchool).toHaveBeenCalledWith('s1', { status: 'suspended' });
+    expect(result).toEqual({ id: 's1', status: 'suspended' });
+  });
+
+  it('listSchoolAdmins wraps results in an { admins } envelope', async () => {
+    mockService.listSchoolAdmins.mockResolvedValueOnce([{ uid: 'u1', email: 'a@s.edu', displayName: 'A' }]);
+    const result = await controller.listSchoolAdmins('s1');
+    expect(mockService.listSchoolAdmins).toHaveBeenCalledWith('s1');
+    expect(result).toEqual({ admins: [{ uid: 'u1', email: 'a@s.edu', displayName: 'A' }] });
   });
 });
