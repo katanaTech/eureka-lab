@@ -40,6 +40,7 @@ import type {
   School,
   SchoolSummary,
   SchoolAdminSummary,
+  SchoolTeacherSummary,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -1114,4 +1115,22 @@ export const schoolsApi = {
       `/schools/${id}/admins`,
       { method: 'POST', body: JSON.stringify(body) },
     ),
+
+  /** List a school's teachers. */
+  listTeachers: (schoolId: string) =>
+    request<{ teachers: SchoolTeacherSummary[] }>(`/schools/${schoolId}/teachers`),
+
+  /** Mint a teacher (school_admin sets the temp password). */
+  createTeacher: (schoolId: string, body: { email: string; displayName: string; password: string }) =>
+    request<{ uid: string; email: string; displayName: string; role: string; schoolId: string; active: boolean }>(
+      `/schools/${schoolId}/teachers`,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
+
+  /** Activate / deactivate a teacher. */
+  setTeacherActive: (schoolId: string, teacherId: string, active: boolean) =>
+    request<SchoolTeacherSummary>(`/schools/${schoolId}/teachers/${teacherId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ active }),
+    }),
 };

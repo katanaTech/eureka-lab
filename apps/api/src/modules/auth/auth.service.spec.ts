@@ -165,6 +165,21 @@ describe('AuthService', () => {
       expect(result.children).toEqual([]);
     });
 
+    it('includes schoolId when the user has one', async () => {
+      mockFirebaseAuth.verifyIdToken.mockResolvedValue({ uid: 'admin-1' });
+      mockUsersRepository.findByUid.mockResolvedValue({
+        uid: 'admin-1',
+        email: 'admin@s.edu',
+        displayName: 'Admin',
+        role: 'school_admin',
+        plan: 'free',
+        xp: 0,
+        schoolId: 'school-1',
+      });
+      const result = await service.login('valid-token');
+      expect(result.schoolId).toBe('school-1');
+    });
+
     it('should throw UnauthorizedException for invalid token', async () => {
       mockFirebaseAuth.verifyIdToken.mockRejectedValue(new Error('Invalid token'));
 

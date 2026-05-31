@@ -12,6 +12,7 @@ export interface UserDoc {
   displayName: string;
   role: UserRole;
   schoolId?: string;
+  active?: boolean;
   plan: 'free' | 'explorer' | 'creator';
   xp: number;
   streak: number;
@@ -32,6 +33,7 @@ export interface CreateUserData {
   displayName: string;
   role: UserRole;
   schoolId?: string;
+  active?: boolean;
   parentUid?: string;
   birthYear?: number;
 }
@@ -75,6 +77,7 @@ export class UsersRepository {
       streak: 0,
       ...(data.parentUid && { parentUid: data.parentUid }),
       ...(data.schoolId && { schoolId: data.schoolId }),
+      ...(data.active !== undefined && { active: data.active }),
       ...(data.birthYear && { birthYear: data.birthYear }),
       ...(data.role === 'parent' && { children: [] }),
       createdAt: now,
@@ -129,6 +132,33 @@ export class UsersRepository {
       .get();
 
     return snapshot.data().count;
+  }
+
+  /**
+   * Find all teacher user docs belonging to a school.
+   * @param schoolId - School tenant id.
+   * @returns Teacher user documents.
+   */
+  async findTeachersBySchool(schoolId: string): Promise<UserDoc[]> {
+    const snapshot = await this.firebase.firestore
+      .collection(this.collection)
+      .where('role', '==', 'teacher')
+      .where('schoolId', '==', schoolId)
+      .get();
+    return snapshot.docs.map((d) => d.data() as UserDoc);
+  }
+
+  /**
+   * Set the `active` flag on a user document.
+   * @param uid - Firebase UID.
+   * @param active - New active state.
+   */
+  async setActive(uid: string, active: boolean): Promise<void> {
+    const { FieldValue } = await import('firebase-admin/firestore');
+    await this.firebase.firestore
+      .collection(this.collection)
+      .doc(uid)
+      .update({ active, updatedAt: FieldValue.serverTimestamp() });
   }
 
   /**
