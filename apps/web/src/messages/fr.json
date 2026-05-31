@@ -220,9 +220,6 @@
     "reactivateSchool": "Réactiver",
     "suspendConfirm": "Suspendre cette école ? Ses membres perdent l'accès jusqu'à réactivation.",
     "reactivateConfirm": "Réactiver cette école ?",
-    "adminCreatedTitle": "Administrateur créé — partagez ces identifiants maintenant",
-    "adminCreatedNote": "Ce mot de passe n'est affiché qu'une fois. Copiez-le avant de fermer.",
-    "done": "Terminé",
     "actionFailed": "L'action a échoué. Veuillez réessayer."
   },
   "SchoolAdmin": {
@@ -244,9 +241,6 @@
     "reactivate": "Réactiver",
     "deactivateConfirm": "Désactiver cet enseignant ? Il ne pourra pas se connecter jusqu'à réactivation.",
     "reactivateConfirm": "Réactiver cet enseignant ?",
-    "teacherCreatedTitle": "Enseignant créé — partagez ces identifiants maintenant",
-    "teacherCreatedNote": "Ce mot de passe n'est affiché qu'une fois. Copiez-le avant de fermer.",
-    "done": "Terminé",
     "actionFailed": "L'action a échoué. Veuillez réessayer."
   },
   "Teacher": {
