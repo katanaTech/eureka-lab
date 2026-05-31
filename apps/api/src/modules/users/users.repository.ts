@@ -13,6 +13,7 @@ export interface UserDoc {
   role: UserRole;
   schoolId?: string;
   active?: boolean;
+  username?: string;
   plan: 'free' | 'explorer' | 'creator';
   xp: number;
   streak: number;
@@ -34,6 +35,7 @@ export interface CreateUserData {
   role: UserRole;
   schoolId?: string;
   active?: boolean;
+  username?: string;
   parentUid?: string;
   birthYear?: number;
 }
@@ -78,6 +80,7 @@ export class UsersRepository {
       ...(data.parentUid && { parentUid: data.parentUid }),
       ...(data.schoolId && { schoolId: data.schoolId }),
       ...(data.active !== undefined && { active: data.active }),
+      ...(data.username !== undefined && { username: data.username }),
       ...(data.birthYear && { birthYear: data.birthYear }),
       ...(data.role === 'parent' && { children: [] }),
       createdAt: now,
@@ -143,6 +146,20 @@ export class UsersRepository {
     const snapshot = await this.firebase.firestore
       .collection(this.collection)
       .where('role', '==', 'teacher')
+      .where('schoolId', '==', schoolId)
+      .get();
+    return snapshot.docs.map((d) => d.data() as UserDoc);
+  }
+
+  /**
+   * Find all student (child) user docs belonging to a school.
+   * @param schoolId - School tenant id.
+   * @returns Student user documents.
+   */
+  async findStudentsBySchool(schoolId: string): Promise<UserDoc[]> {
+    const snapshot = await this.firebase.firestore
+      .collection(this.collection)
+      .where('role', '==', 'child')
       .where('schoolId', '==', schoolId)
       .get();
     return snapshot.docs.map((d) => d.data() as UserDoc);
