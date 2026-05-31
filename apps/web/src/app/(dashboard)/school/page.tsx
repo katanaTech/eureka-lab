@@ -1,18 +1,111 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { Plus } from 'lucide-react';
+import { RoleGate } from '@/components/auth/RoleGate';
+import { useAuth } from '@/hooks/useAuth';
+import { GameButton } from '@/components/game/GameButton';
+import { TeachersTable } from '@/components/features/school/TeachersTable';
+import { CreateTeacherDialog } from '@/components/features/school/CreateTeacherDialog';
+import { schoolsApi } from '@/lib/api-client';
+import type { SchoolTeacherSummary } from '@eureka-lab/shared-types';
+
 /** Force dynamic rendering — uses Firebase auth */
 export const dynamic = 'force-dynamic';
 
-/**
- * School-admin console placeholder. The teacher-management console lands in
- * B2B epic sub-project 3; this exists so `homeForRole` redirects for
- * school_admin resolve without a 404.
- */
-export default function SchoolConsolePage() {
-  return (
-    <div className="max-w-3xl mx-auto space-y-4">
-      <h1 className="font-display text-3xl text-glow-primary">School Admin</h1>
-      <div className="panel p-8 text-center">
-        <p className="text-muted-foreground">Teacher management console — coming soon.</p>
+/** School-admin teacher console. Gated to school_admin via RoleGate. */
+function SchoolAdminInner() {
+  const t = useTranslations('SchoolAdmin');
+  const { user } = useAuth();
+  const schoolId = user?.schoolId;
+
+  const [teachers, setTeachers] = useState<SchoolTeacherSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [busyUid, setBusyUid] = useState<string | null>(null);
+
+  const fetchTeachers = useCallback(async () => {
+    if (!schoolId) {
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await schoolsApi.listTeachers(schoolId);
+      setTeachers(res.teachers);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load teachers');
+    } finally {
+      setLoading(false);
+    }
+  }, [schoolId]);
+
+  useEffect(() => {
+    fetchTeachers();
+  }, [fetchTeachers]);
+
+  const handleCreate = async (values: { email: string; displayName: string; password: string }) => {
+    if (!schoolId) return;
+    await schoolsApi.createTeacher(schoolId, values);
+    await fetchTeachers();
+  };
+
+  const handleToggle = async (teacher: SchoolTeacherSummary) => {
+    if (!schoolId) return;
+    const confirmMsg = teacher.active ? t('deactivateConfirm') : t('reactivateConfirm');
+    if (!window.confirm(confirmMsg)) return;
+    setBusyUid(teacher.uid);
+    setError('');
+    try {
+      await schoolsApi.setTeacherActive(schoolId, teacher.uid, !teacher.active);
+      await fetchTeachers();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('actionFailed'));
+    } finally {
+      setBusyUid(null);
+    }
+  };
+
+  if (!schoolId) {
+    return (
+      <div className="max-w-3xl mx-auto">
+        <div className="panel border-destructive/60 p-4 text-sm text-destructive" role="alert">{t('noSchool')}</div>
       </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h1 className="font-display text-3xl text-glow-primary">{t('title')}</h1>
+        <GameButton variant="primary" size="sm" onClick={() => setDialogOpen(true)}>
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          {t('addTeacher')}
+        </GameButton>
+      </div>
+
+      {error && <div className="panel border-destructive/60 p-4 text-sm text-destructive" role="alert">{error}</div>}
+
+      {loading ? (
+        <div className="flex justify-center py-12"><p className="text-muted-foreground">{t('loading')}</p></div>
+      ) : teachers.length === 0 ? (
+        <div className="panel p-8 text-center"><p className="text-muted-foreground">{t('noTeachers')}</p></div>
+      ) : (
+        <TeachersTable teachers={teachers} busyUid={busyUid} onToggle={handleToggle} />
+      )}
+
+      <CreateTeacherDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onSubmit={handleCreate} />
     </div>
+  );
+}
+
+/** Page wrapper applying the school_admin role gate. */
+export default function SchoolAdminPage() {
+  return (
+    <RoleGate allow={['school_admin']}>
+      <SchoolAdminInner />
+    </RoleGate>
   );
 }
