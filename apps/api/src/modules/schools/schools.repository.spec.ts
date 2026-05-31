@@ -7,10 +7,15 @@ const mockSet = jest.fn();
 const mockGet = jest.fn();
 const mockUpdate = jest.fn();
 const mockLimitGet = jest.fn();
+const mockWhereLimitGet = jest.fn();
+const mockWhereRef = {
+  limit: jest.fn().mockReturnValue({ get: mockWhereLimitGet }),
+};
 const mockDocRef = { id: 'auto-id-1', get: mockGet, set: mockSet, update: mockUpdate };
 const mockCollectionRef = {
   doc: jest.fn().mockReturnValue(mockDocRef),
   limit: jest.fn().mockReturnValue({ get: mockLimitGet }),
+  where: jest.fn().mockReturnValue(mockWhereRef),
 };
 const mockFirebaseService = {
   firestore: { collection: jest.fn().mockReturnValue(mockCollectionRef) },
@@ -73,5 +78,29 @@ describe('SchoolsRepository', () => {
   it('updateSchool updates only the provided fields', async () => {
     await repo.updateSchool('school-1', { status: 'suspended', seatLimit: 25 });
     expect(mockUpdate).toHaveBeenCalledWith({ status: 'suspended', seatLimit: 25 });
+  });
+
+  describe('generateUniqueLoginCode', () => {
+    it('returns a 6-char code that is not already used', async () => {
+      // arrange: the uniqueness query returns an empty result (code unused)
+      mockWhereLimitGet.mockResolvedValueOnce({ empty: true });
+      const code = await repo.generateUniqueLoginCode();
+      expect(code).toMatch(/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);
+    });
+
+    it('retries when the first candidate is already taken', async () => {
+      mockWhereLimitGet
+        .mockResolvedValueOnce({ empty: false }) // first candidate collides
+        .mockResolvedValueOnce({ empty: true }); // second candidate is free
+      const code = await repo.generateUniqueLoginCode();
+      expect(code).toMatch(/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);
+      expect(mockWhereLimitGet).toHaveBeenCalledTimes(2);
+    });
+
+    it('throws after 10 colliding attempts', async () => {
+      mockWhereLimitGet.mockResolvedValue({ empty: false }); // every candidate collides
+      await expect(repo.generateUniqueLoginCode()).rejects.toThrow('Failed to generate a unique school login code');
+      expect(mockWhereLimitGet).toHaveBeenCalledTimes(10);
+    });
   });
 });
