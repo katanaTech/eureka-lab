@@ -41,6 +41,7 @@ import type {
   SchoolSummary,
   SchoolAdminSummary,
   SchoolTeacherSummary,
+  SchoolStudentSummary,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -1130,6 +1131,25 @@ export const schoolsApi = {
   /** Activate / deactivate a teacher. */
   setTeacherActive: (schoolId: string, teacherId: string, active: boolean) =>
     request<SchoolTeacherSummary>(`/schools/${schoolId}/teachers/${teacherId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ active }),
+    }),
+
+  /** List a school's students + login code + seat usage. */
+  listStudents: (schoolId: string) =>
+    request<{ students: SchoolStudentSummary[]; loginCode: string; seatsUsed: number; seatLimit: number }>(
+      `/schools/${schoolId}/students`,
+    ),
+
+  /** Provision a student (school_admin sets username + temp password). */
+  createStudent: (
+    schoolId: string,
+    body: { displayName: string; username: string; password: string; birthYear: number; consentAttested: boolean },
+  ) => request<SchoolStudentSummary>(`/schools/${schoolId}/students`, { method: 'POST', body: JSON.stringify(body) }),
+
+  /** Activate / deactivate a student. */
+  setStudentActive: (schoolId: string, studentId: string, active: boolean) =>
+    request<SchoolStudentSummary>(`/schools/${schoolId}/students/${studentId}`, {
       method: 'PATCH',
       body: JSON.stringify({ active }),
     }),
