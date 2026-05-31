@@ -37,7 +37,7 @@ export const StudentsPanel: FC<StudentsPanelProps> = ({ schoolId }) => {
     } finally {
       setLoading(false);
     }
-  }, [schoolId]);
+  }, [schoolId, t]);
 
   useEffect(() => {
     fetchRoster();

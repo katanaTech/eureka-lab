@@ -225,6 +225,7 @@
   "SchoolStudents": {
     "tab": "الطلاب",
     "teachersTab": "المعلمون",
+    "tabsLabel": "أقسام لوحة التحكم",
     "title": "الطلاب",
     "addStudent": "إضافة طالب",
     "name": "الاسم",

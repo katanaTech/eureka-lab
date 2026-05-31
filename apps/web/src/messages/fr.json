@@ -225,6 +225,7 @@
   "SchoolStudents": {
     "tab": "Élèves",
     "teachersTab": "Enseignants",
+    "tabsLabel": "Sections de la console",
     "title": "Élèves",
     "addStudent": "Ajouter un élève",
     "name": "Nom",

@@ -225,6 +225,7 @@
   "SchoolStudents": {
     "tab": "Students",
     "teachersTab": "Teachers",
+    "tabsLabel": "Console sections",
     "title": "Students",
     "addStudent": "Add Student",
     "name": "Name",
