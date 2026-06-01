@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
  */
 export const LoginForm: FC = () => {
   const t = useTranslations('Auth');
+  const ts = useTranslations('SchoolStudents');
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
 
@@ -139,6 +140,12 @@ export const LoginForm: FC = () => {
         {t('noAccount')}{' '}
         <a href="/signup" className="font-medium text-primary hover:underline">
           {t('signupButton')}
+        </a>
+      </p>
+
+      <p className="text-center text-sm text-muted-foreground">
+        <a href="/student-login" className="font-medium text-primary hover:underline">
+          {ts('studentLoginTitle')}
         </a>
       </p>
     </div>

@@ -8,18 +8,21 @@ import { useAuth } from '@/hooks/useAuth';
 import { GameButton } from '@/components/game/GameButton';
 import { TeachersTable } from '@/components/features/school/TeachersTable';
 import { CreateTeacherDialog } from '@/components/features/school/CreateTeacherDialog';
+import { StudentsPanel } from '@/components/features/school/StudentsPanel';
 import { schoolsApi } from '@/lib/api-client';
 import type { SchoolTeacherSummary } from '@eureka-lab/shared-types';
 
 /** Force dynamic rendering — uses Firebase auth */
 export const dynamic = 'force-dynamic';
 
-/** School-admin teacher console. Gated to school_admin via RoleGate. */
+/** School-admin console (teachers + students), gated to school_admin via RoleGate. */
 function SchoolAdminInner() {
   const t = useTranslations('SchoolAdmin');
+  const ts = useTranslations('SchoolStudents');
   const { user } = useAuth();
   const schoolId = user?.schoolId;
 
+  const [tab, setTab] = useState<'teachers' | 'students'>('teachers');
   const [teachers, setTeachers] = useState<SchoolTeacherSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -33,14 +36,15 @@ function SchoolAdminInner() {
     }
     try {
       setLoading(true);
+      setError('');
       const res = await schoolsApi.listTeachers(schoolId);
       setTeachers(res.teachers);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to load teachers');
+      setError(err instanceof Error ? err.message : t('actionFailed'));
     } finally {
       setLoading(false);
     }
-  }, [schoolId]);
+  }, [schoolId, t]);
 
   useEffect(() => {
     fetchTeachers();
@@ -79,24 +83,59 @@ function SchoolAdminInner() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="font-display text-3xl text-glow-primary">{t('title')}</h1>
-        <GameButton variant="primary" size="sm" onClick={() => setDialogOpen(true)}>
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          {t('addTeacher')}
-        </GameButton>
+        <h1 className="font-display text-3xl text-glow-primary">{tab === 'teachers' ? t('title') : ts('title')}</h1>
+        {tab === 'teachers' && (
+          <GameButton variant="primary" size="sm" onClick={() => setDialogOpen(true)}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {t('addTeacher')}
+          </GameButton>
+        )}
       </div>
 
-      {error && <div className="panel border-destructive/60 p-4 text-sm text-destructive" role="alert">{error}</div>}
+      <div role="tablist" aria-label={ts('tabsLabel')} className="flex gap-2 border-b border-border">
+        <button
+          role="tab"
+          id="tab-teachers"
+          aria-selected={tab === 'teachers'}
+          aria-controls="panel-teachers"
+          onClick={() => setTab('teachers')}
+          className={`px-3 py-2 text-sm font-medium ${tab === 'teachers' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground'}`}
+        >
+          {ts('teachersTab')}
+        </button>
+        <button
+          role="tab"
+          id="tab-students"
+          aria-selected={tab === 'students'}
+          aria-controls="panel-students"
+          onClick={() => setTab('students')}
+          className={`px-3 py-2 text-sm font-medium ${tab === 'students' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground'}`}
+        >
+          {ts('tab')}
+        </button>
+      </div>
 
-      {loading ? (
-        <div className="flex justify-center py-12"><p className="text-muted-foreground">{t('loading')}</p></div>
-      ) : teachers.length === 0 ? (
-        <div className="panel p-8 text-center"><p className="text-muted-foreground">{t('noTeachers')}</p></div>
-      ) : (
-        <TeachersTable teachers={teachers} busyUid={busyUid} onToggle={handleToggle} />
+      {tab === 'teachers' && (
+        <div role="tabpanel" id="panel-teachers" aria-labelledby="tab-teachers" className="space-y-6">
+          {error && <div className="panel border-destructive/60 p-4 text-sm text-destructive" role="alert">{error}</div>}
+
+          {loading ? (
+            <div className="flex justify-center py-12"><p className="text-muted-foreground">{t('loading')}</p></div>
+          ) : teachers.length === 0 ? (
+            <div className="panel p-8 text-center"><p className="text-muted-foreground">{t('noTeachers')}</p></div>
+          ) : (
+            <TeachersTable teachers={teachers} busyUid={busyUid} onToggle={handleToggle} />
+          )}
+
+          <CreateTeacherDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onSubmit={handleCreate} />
+        </div>
       )}
 
-      <CreateTeacherDialog open={dialogOpen} onClose={() => setDialogOpen(false)} onSubmit={handleCreate} />
+      {tab === 'students' && (
+        <div role="tabpanel" id="panel-students" aria-labelledby="tab-students">
+          <StudentsPanel schoolId={schoolId} />
+        </div>
+      )}
     </div>
   );
 }

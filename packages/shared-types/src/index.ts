@@ -42,6 +42,8 @@ export interface School {
   seatLimit: number;
   /** Denormalized count of students consuming a seat (enforced in sub-project 4) */
   seatsUsed: number;
+  /** Short code students type at sign-in to resolve their school (lazily generated) */
+  loginCode?: string;
   /** UIDs of this school's school_admin users */
   adminUids: string[];
   subscription: SchoolSubscription;
@@ -74,6 +76,19 @@ export interface SchoolTeacherSummary {
   email: string;
   displayName: string;
   /** false when the teacher's login is disabled; defaults true on older docs */
+  active: boolean;
+}
+
+/**
+ * Resolved student row for the school-admin console.
+ * No email field: students authenticate with a synthetic address built by
+ * synthesizeStudentEmail, not a real one.
+ */
+export interface SchoolStudentSummary {
+  uid: string;
+  username: string;
+  displayName: string;
+  /** false when the student's login is disabled; defaults true on older docs */
   active: boolean;
 }
 
@@ -979,6 +994,19 @@ export const COMBAT_HP_CONFIG: Record<BattleType, { playerHp: number; zombieHp: 
 // Fantasy class system, inventory/shop catalog, KP economy, and campaign/zone
 // mappings.
 export * from './gameplay.types';
+
+// ── Student Enrollment Helpers ───────────────────────────────────────────────
+
+/**
+ * Build the non-routable synthetic email a school student authenticates with.
+ * Deterministic so backend provisioning and frontend login never drift.
+ * @param loginCode - The school's short login code.
+ * @param username - The student's per-school username.
+ * @returns `<username>@<loginCode>.students.local` (lowercased).
+ */
+export function synthesizeStudentEmail(loginCode: string, username: string): string {
+  return `${username.toLowerCase()}@${loginCode.toLowerCase()}.students.local`;
+}
 
 // ── Academy Progress ─────────────────────────────────────────────────────────
 

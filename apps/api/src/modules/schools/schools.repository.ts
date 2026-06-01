@@ -5,6 +5,10 @@ import { FirebaseService } from '../../infrastructure/firebase/firebase.service'
 
 /** Max schools returned by an unbounded list (CLAUDE.md Rule 3 — no unbounded reads). */
 const MAX_SCHOOLS = 500;
+/** Ambiguity-free charset for login codes (mirrors classroom join codes). */
+const LOGIN_CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+/** Login code length. */
+const LOGIN_CODE_LENGTH = 6;
 
 /**
  * Firestore repository for school tenant documents (`schools/{id}`).
@@ -92,5 +96,26 @@ export class SchoolsRepository {
       .collection(this.collection)
       .doc(id)
       .update({ seatsUsed: FieldValue.increment(delta) });
+  }
+
+  /**
+   * Generate a 6-char school login code not currently in use.
+   * @returns A unique login code.
+   * @throws {Error} if all 10 uniqueness attempts collide (astronomically unlikely).
+   */
+  async generateUniqueLoginCode(): Promise<string> {
+    for (let attempt = 0; attempt < 10; attempt++) {
+      let code = '';
+      for (let i = 0; i < LOGIN_CODE_LENGTH; i++) {
+        code += LOGIN_CODE_CHARS[Math.floor(Math.random() * LOGIN_CODE_CHARS.length)];
+      }
+      const existing = await this.firebase.firestore
+        .collection(this.collection)
+        .where('loginCode', '==', code)
+        .limit(1)
+        .get();
+      if (existing.empty) return code;
+    }
+    throw new Error('Failed to generate a unique school login code');
   }
 }

@@ -4,6 +4,8 @@ import { SchoolsService } from './schools.service';
 import { SchoolsRepository } from './schools.repository';
 import { SchoolTeachersController } from './school-teachers.controller';
 import { SchoolTeachersService } from './school-teachers.service';
+import { SchoolStudentsController } from './school-students.controller';
+import { SchoolStudentsService } from './school-students.service';
 import { UsersModule } from '../users/users.module';
 import { AiModule } from '../ai/ai.module';
 
@@ -13,8 +15,8 @@ import { AiModule } from '../ai/ai.module';
  */
 @Module({
   imports: [UsersModule, AiModule],
-  controllers: [SchoolsController, SchoolTeachersController],
-  providers: [SchoolsService, SchoolsRepository, SchoolTeachersService],
+  controllers: [SchoolsController, SchoolTeachersController, SchoolStudentsController],
+  providers: [SchoolsService, SchoolsRepository, SchoolTeachersService, SchoolStudentsService],
   exports: [SchoolsService, SchoolsRepository],
 })
 export class SchoolsModule {}

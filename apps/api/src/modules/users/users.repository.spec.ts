@@ -69,4 +69,26 @@ describe('UsersRepository', () => {
       expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ active: false }));
     });
   });
+
+  describe('create username', () => {
+    it('persists username when provided', async () => {
+      await repo.create('s-1', { email: 'jsmith@ab12cd.students.local', displayName: 'Jamie', role: 'child', schoolId: 'school-1', username: 'jsmith' });
+      expect(mockSet.mock.calls[0][0]).toMatchObject({ username: 'jsmith', role: 'child', schoolId: 'school-1' });
+    });
+
+    it('omits username when not provided', async () => {
+      await repo.create('s-2', { email: 'a@b.com', displayName: 'A', role: 'child', schoolId: 'school-1' });
+      expect(mockSet.mock.calls[0][0]).not.toHaveProperty('username');
+    });
+  });
+
+  describe('findStudentsBySchool', () => {
+    it('queries role==child AND schoolId==id and maps data', async () => {
+      mockGet.mockResolvedValueOnce({ docs: [{ data: () => ({ uid: 's-1', role: 'child', schoolId: 'school-1', username: 'jsmith' }) }] });
+      const result = await repo.findStudentsBySchool('school-1');
+      expect(mockCollectionRef.where).toHaveBeenCalledWith('role', '==', 'child');
+      expect(whereChain.where).toHaveBeenCalledWith('schoolId', '==', 'school-1');
+      expect(result).toEqual([{ uid: 's-1', role: 'child', schoolId: 'school-1', username: 'jsmith' }]);
+    });
+  });
 });
