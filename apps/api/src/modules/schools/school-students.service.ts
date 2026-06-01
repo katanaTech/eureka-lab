@@ -162,8 +162,16 @@ export class SchoolStudentsService {
       }
     } else {
       await this.firebase.auth.updateUser(studentId, { disabled: true });
-      await this.usersRepository.setActive(studentId, false);
-      await this.schoolsRepository.incrementSeatsUsed(schoolId, -1);
+      try {
+        await this.usersRepository.setActive(studentId, false);
+        await this.schoolsRepository.incrementSeatsUsed(schoolId, -1);
+      } catch (error) {
+        // Re-enable the account so it doesn't end up disabled-in-Auth but active-in-doc.
+        await this.firebase.auth.updateUser(studentId, { disabled: false }).catch((rollbackErr) => {
+          this.logger.error({ event: 'student_deactivate_rollback_failed', studentId, rollbackErr });
+        });
+        throw error;
+      }
     }
 
     this.logger.log({ event: 'student_active_changed', schoolId, studentId, active });

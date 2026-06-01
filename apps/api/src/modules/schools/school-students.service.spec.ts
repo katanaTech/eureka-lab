@@ -195,5 +195,13 @@ describe('SchoolStudentsService', () => {
       expect(mockUpdateUser).not.toHaveBeenCalled();
       expect(result.active).toBe(true);
     });
+
+    it('re-enables the account if a deactivation Firestore write fails', async () => {
+      mockUsersRepo.findByUid.mockResolvedValueOnce({ uid: 's-1', username: 'jsmith', displayName: 'Jamie', role: 'child', schoolId: 'school-1', active: true });
+      mockUsersRepo.setActive.mockRejectedValueOnce(new Error('Firestore unreachable'));
+      await expect(service.setStudentActive('school-1', 's-1', false)).rejects.toThrow('Firestore unreachable');
+      expect(mockUpdateUser).toHaveBeenNthCalledWith(1, 's-1', { disabled: true });
+      expect(mockUpdateUser).toHaveBeenNthCalledWith(2, 's-1', { disabled: false }); // rollback
+    });
   });
 });
