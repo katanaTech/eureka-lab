@@ -16,6 +16,7 @@ import type {
   ClassroomSummary,
   ClassroomDetailView,
   StudentProgressSummary,
+  SchoolStudentSummary,
 } from '@eureka-lab/shared-types';
 
 /** Maximum number of classrooms a teacher may own */
@@ -141,6 +142,28 @@ export class ClassroomsService {
         createdAt: data.createdAt,
       };
     });
+  }
+
+  /**
+   * List the active students of a teacher's school for the assignment picker.
+   * Returns an empty list when the teacher has no school (B2C).
+   *
+   * @param schoolId - Caller-teacher's school id (from their token claim), or undefined.
+   * @returns Active student summaries of that school.
+   */
+  async getSchoolRoster(schoolId: string | undefined): Promise<SchoolStudentSummary[]> {
+    if (!schoolId) {
+      return [];
+    }
+    const docs = await this.usersRepository.findStudentsBySchool(schoolId);
+    return docs
+      .filter((d) => (d.active ?? true) !== false)
+      .map((d) => ({
+        uid: d.uid,
+        username: d.username ?? '',
+        displayName: d.displayName,
+        active: d.active ?? true,
+      }));
   }
 
   /**

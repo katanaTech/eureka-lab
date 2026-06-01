@@ -17,6 +17,7 @@ const mockClassroomsService = {
   deleteClassroom: jest.fn(),
   regenerateJoinCode: jest.fn(),
   assignStudents: jest.fn(),
+  getSchoolRoster: jest.fn(),
 };
 
 const mockGuard = { canActivate: jest.fn().mockReturnValue(true) };
@@ -210,6 +211,17 @@ describe('ClassroomsController', () => {
       const res = await controller.assignStudents(user, 'c1', { studentIds: ['s1'] });
       expect(res).toEqual({ id: 'c1', studentIds: ['s1'] });
       expect(mockClassroomsService.assignStudents).toHaveBeenCalledWith('teacher-1', 'c1', ['s1']);
+    });
+  });
+
+  /* ── getRoster ───────────────────────────────────────────────────── */
+  describe('getRoster', () => {
+    it('getRoster returns the school roster for the caller-teacher', async () => {
+      mockClassroomsService.getSchoolRoster.mockResolvedValueOnce([{ uid: 's1', username: 'k', displayName: 'K', active: true }]);
+      const user = { uid: 'teacher-1', email: 't@s.edu', role: 'teacher', schoolId: 'school-7' } as AuthenticatedUser;
+      const res = await controller.getRoster(user);
+      expect(res).toEqual({ students: [{ uid: 's1', username: 'k', displayName: 'K', active: true }] });
+      expect(mockClassroomsService.getSchoolRoster).toHaveBeenCalledWith('school-7');
     });
   });
 });

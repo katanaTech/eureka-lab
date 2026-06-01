@@ -81,6 +81,18 @@ export class ClassroomsController {
   }
 
   /**
+   * List the caller-teacher's school roster (active students) for assignment.
+   *
+   * @param user - Authenticated teacher
+   * @returns Active student summaries of the teacher's school (empty for B2C).
+   */
+  @Get('roster')
+  @Roles('teacher')
+  async getRoster(@CurrentUser() user: AuthenticatedUser) {
+    return { students: await this.classroomsService.getSchoolRoster(user.schoolId) };
+  }
+
+  /**
    * Get a single classroom with full student progress data.
    *
    * @param user - Authenticated teacher

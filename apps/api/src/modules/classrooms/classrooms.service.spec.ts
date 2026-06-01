@@ -49,6 +49,7 @@ const mockFirebaseService = {
 
 const mockUsersRepository = {
   findByUid: jest.fn(),
+  findStudentsBySchool: jest.fn(),
 };
 
 const mockProgressService = {
@@ -554,6 +555,25 @@ describe('ClassroomsService', () => {
       await expect(
         service.regenerateJoinCode(teacherId, classroomId),
       ).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  /* ── getSchoolRoster ─────────────────────────────────────────────── */
+  describe('getSchoolRoster', () => {
+    it('returns the school active students as summaries', async () => {
+      mockUsersRepository.findStudentsBySchool.mockResolvedValueOnce([
+        { uid: 's1', username: 'kid1', displayName: 'Kid One', active: true },
+        { uid: 's2', username: 'kid2', displayName: 'Kid Two', active: false },
+        { uid: 's3', username: 'kid3', displayName: 'Kid Three' },
+      ]);
+      const res = await service.getSchoolRoster('school-7');
+      expect(res.map((s) => s.uid)).toEqual(['s1', 's3']);
+      expect(res[0]).toEqual({ uid: 's1', username: 'kid1', displayName: 'Kid One', active: true });
+    });
+
+    it('returns an empty list for a school-less (B2C) teacher', async () => {
+      const res = await service.getSchoolRoster(undefined);
+      expect(res).toEqual([]);
     });
   });
 });
