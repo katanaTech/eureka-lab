@@ -357,8 +357,68 @@ describe('ClassroomsService', () => {
     });
   });
 
+  /* ── joinClassroom tenancy ───────────────────────────────────────── */
+  describe('joinClassroom tenancy', () => {
+    const baseClass = {
+      id: classroomId,
+      teacherId,
+      name: 'Math 101',
+      joinCode: 'ABC123',
+      studentIds: [],
+      maxStudents: 30,
+      createdAt: '2026-01-01T00:00:00.000Z',
+    };
+
+    /** Make the join-code lookup resolve to the given classroom doc. */
+    const stubCodeLookup = (classroom: Record<string, unknown>) => {
+      mockWhere.mockReturnValueOnce({
+        limit: jest.fn().mockReturnValue({
+          get: jest.fn().mockResolvedValue({ empty: false, docs: [{ data: () => classroom }] }),
+        }),
+        count: jest.fn().mockReturnValue({ get: mockCountGet }),
+        orderBy: mockOrderBy,
+        get: jest.fn(),
+      });
+    };
+
+    it('rejects a cross-school child with CROSS_SCHOOL_JOIN', async () => {
+      stubCodeLookup({ ...baseClass, schoolId: 'school-7' });
+      mockUsersRepository.findByUid.mockResolvedValueOnce({ uid: 'child-x', role: 'child', schoolId: 'other-school' });
+      await expect(service.joinClassroom('child-x', 'ABC123')).rejects.toMatchObject({
+        response: { code: 'CROSS_SCHOOL_JOIN' },
+      });
+    });
+
+    it('lets a same-school child join a school classroom', async () => {
+      stubCodeLookup({ ...baseClass, schoolId: 'school-7' });
+      mockUsersRepository.findByUid.mockResolvedValueOnce({ uid: 'child-y', role: 'child', schoolId: 'school-7' });
+      const res = await service.joinClassroom('child-y', 'ABC123');
+      expect(res.studentIds).toContain('child-y');
+    });
+
+    it('leaves B2C self-join unaffected (no schoolId on class)', async () => {
+      stubCodeLookup({ ...baseClass });
+      mockUsersRepository.findByUid.mockResolvedValueOnce({ uid: 'child-z', role: 'child' });
+      const res = await service.joinClassroom('child-z', 'ABC123');
+      expect(res.studentIds).toContain('child-z');
+    });
+
+    it('rejects a same-school non-child (e.g. teacher) with CROSS_SCHOOL_JOIN', async () => {
+      stubCodeLookup({ ...baseClass, schoolId: 'school-7' });
+      mockUsersRepository.findByUid.mockResolvedValueOnce({ uid: 'teacher-x', role: 'teacher', schoolId: 'school-7' });
+      await expect(service.joinClassroom('teacher-x', 'ABC123')).rejects.toMatchObject({
+        response: { code: 'CROSS_SCHOOL_JOIN' },
+      });
+    });
+  });
+
   /* ── assignStudents ──────────────────────────────────────────────── */
   describe('assignStudents', () => {
+    beforeEach(() => {
+      /* Reset findByUid so the getClassroomDetail mockImplementation doesn't bleed in. */
+      mockUsersRepository.findByUid.mockReset();
+    });
+
     const schoolClassroom = {
       id: classroomId,
       teacherId,

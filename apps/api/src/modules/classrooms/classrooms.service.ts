@@ -194,6 +194,7 @@ export class ClassroomsService {
    * @param studentId - Student's (child) Firebase UID
    * @param joinCode - 6-character join code
    * @returns The classroom the student joined
+   * @throws ForbiddenException CROSS_SCHOOL_JOIN when a non-child or a child from a different school tries to join a school classroom.
    */
   async joinClassroom(
     studentId: string,
@@ -212,6 +213,17 @@ export class ClassroomsService {
 
     const doc = snapshot.docs[0];
     const classroom = doc.data() as ClassroomDocument;
+
+    /* Tenant safety: a school classroom may only be joined by its own students. */
+    if (classroom.schoolId) {
+      const student = await this.usersRepository.findByUid(studentId);
+      if (!student || student.role !== 'child' || student.schoolId !== classroom.schoolId) {
+        throw new ForbiddenException({
+          message: 'You cannot join a classroom from another school',
+          code: 'CROSS_SCHOOL_JOIN',
+        });
+      }
+    }
 
     /* Check if student is already a member */
     if (classroom.studentIds.includes(studentId)) {
