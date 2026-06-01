@@ -42,6 +42,7 @@ import type {
   SchoolAdminSummary,
   SchoolTeacherSummary,
   SchoolStudentSummary,
+  SchoolClassroomSummary,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -777,6 +778,17 @@ export const classroomsApi = {
     request<{ joinCode: string }>(`/classrooms/${id}/regenerate-code`, {
       method: 'POST',
     }),
+
+  /** List the caller-teacher's school roster (active students) for the picker. */
+  getRoster: () =>
+    request<{ students: SchoolStudentSummary[] }>('/classrooms/roster'),
+
+  /** Assign school-roster students to a classroom the teacher owns. */
+  assignStudents: (classroomId: string, studentIds: string[]) =>
+    request<ClassroomDocument>(`/classrooms/${classroomId}/students`, {
+      method: 'POST',
+      body: JSON.stringify({ studentIds }),
+    }),
 };
 
 /* ── Combat API ────────────────────────────────────────────────── */
@@ -1153,4 +1165,8 @@ export const schoolsApi = {
       method: 'PATCH',
       body: JSON.stringify({ active }),
     }),
+
+  /** List a school's classrooms (read-only rollup). */
+  listClassrooms: (schoolId: string) =>
+    request<{ classrooms: SchoolClassroomSummary[] }>(`/schools/${schoolId}/classrooms`),
 };
