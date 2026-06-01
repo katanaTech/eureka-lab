@@ -55,11 +55,13 @@ export class ClassroomsService {
    *
    * @param teacherId - Teacher's Firebase UID
    * @param name - Classroom name (moderated)
+   * @param schoolId - Owning school tenant id; stamped on the doc when present (school teachers), omitted for B2C.
    * @returns Created classroom document
    */
   async createClassroom(
     teacherId: string,
     name: string,
+    schoolId?: string,
   ): Promise<ClassroomDocument> {
     /* Moderate classroom name */
     const nameCheck = this.moderation.moderateInput(name);
@@ -99,6 +101,7 @@ export class ClassroomsService {
       studentIds: [],
       maxStudents: DEFAULT_MAX_STUDENTS,
       createdAt: now,
+      ...(schoolId ? { schoolId } : {}),
     };
 
     await docRef.set(classroom);

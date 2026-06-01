@@ -159,6 +159,22 @@ describe('ClassroomsService', () => {
         service.createClassroom(teacherId, 'Extra Class'),
       ).rejects.toThrow(BadRequestException);
     });
+
+    it('stamps schoolId on the created classroom when provided', async () => {
+      const created = await service.createClassroom(teacherId, 'Math 101', 'school-7');
+      expect(created.schoolId).toBe('school-7');
+      expect(mockSet).toHaveBeenCalledWith(
+        expect.objectContaining({ schoolId: 'school-7' }),
+      );
+    });
+
+    it('omits schoolId for a B2C teacher (no schoolId arg)', async () => {
+      const created = await service.createClassroom(teacherId, 'Math 101');
+      expect(created.schoolId).toBeUndefined();
+      expect(mockSet).toHaveBeenCalledWith(
+        expect.not.objectContaining({ schoolId: expect.anything() }),
+      );
+    });
   });
 
   /* ── getTeacherClassrooms ────────────────────────────────────────── */

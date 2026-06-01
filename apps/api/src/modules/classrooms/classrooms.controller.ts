@@ -62,7 +62,7 @@ export class ClassroomsController {
       name: dto.name,
     });
 
-    return this.classroomsService.createClassroom(user.uid, dto.name);
+    return this.classroomsService.createClassroom(user.uid, dto.name, user.schoolId);
   }
 
   /**
