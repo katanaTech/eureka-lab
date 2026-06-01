@@ -19,6 +19,36 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-06-01 — PM check-in: Sprint D status — QA-001 still unstarted (11 days), OPEN-005 still open, escalation warranted
+
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**Inspection findings (2026-06-01):**
+
+No new commits have landed on the feature branch since the 2026-05-21 check-in (11 days of inactivity). Sprint C remains confirmed DONE (closed 2026-04-29). Sprint D is at 9/13 DONE — unchanged from the prior 5 check-ins.
+
+**Sprint D current state (13 tasks):**
+
+| Status | Tasks |
+|--------|-------|
+| DONE (9) | MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b |
+| READY — action needed (3) | QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90), QA-005 (Safari/Chrome smoke) |
+| BLOCKED (2) | QA-002 (on QA-001), QA-006 (on OPEN-005 + all QA) |
+| IN_PROGRESS (1) | OPEN-005 (license decision — PM/DEVOPS) |
+
+**Escalation: QA-001 has been READY for 25+ days with no implementation.** The test plan (`apps/web/e2e/fantasy-flow.plan.md`) is complete, mobile routes are done, Sprint C is done — zero remaining blockers. QA-001 is the single gate for QA-002, and both are required before QA-006 (production rollout). If QA bandwidth is exhausted, PM should replan: either (a) assign QA-001 to FE as a stretch task, (b) reduce E2E scope to a smoke subset to unblock QA-006 sooner, or (c) accept a flag-gated production rollout without full Playwright coverage as a time-boxed risk decision.
+
+**OPEN-005 decision is also overdue.** All current assets are custom SVG placeholders with no known license encumbrance (per DEVOPS dispatch 2026-04-29). The simplest resolution is **Path C: document that no Lovable assets were used** and close the blocker. If PM accepts this, post the resolution in `Resolved Blockers` below so QA-006 can proceed.
+
+**Pending actions — escalated:**
+- **QA:** P16-QA-001 Playwright E2E — begin immediately. 25+ days overdue. Unblocks QA-002 and the entire production rollout.
+- **QA:** P16-QA-004 (Lighthouse mobile ≥90) and P16-QA-005 (Safari/Chrome smoke) — both READY and parallel-safe.
+- **PM/DEVOPS:** Close P16-OPEN-005 by documenting Path C (no Lovable assets used; SVG placeholders are clean). Removes the last non-QA gate on QA-006.
+
+**PM check-in routine: Sprint D fully scheduled. Routine has been asking to be disabled since 2026-05-13. Please visit https://claude.ai/code/routines to turn off the Phase 16 PM check-in routine.** If this routine fires again without QA-001 progress or OPEN-005 resolution, PM will replan Sprint D scope (see escalation paths above).
+
+---
+
 ### 2026-05-21 — PM check-in: Sprint D status — QA-001 critical path still unstarted, OPEN-005 still open
 
 **Branch:** `feature/phase-16-fantasy-ui`
