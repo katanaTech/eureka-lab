@@ -773,6 +773,11 @@ export interface ClassroomDocument {
   id: string;
   /** Teacher's Firebase UID */
   teacherId: string;
+  /**
+   * Owning school tenant id (denormalized, ADR-008). Set when a teacher who
+   * has a schoolId creates the class; absent for B2C classrooms.
+   */
+  schoolId?: string;
   /** Classroom display name */
   name: string;
   /** 6-character alphanumeric join code (uppercase) */
@@ -797,6 +802,18 @@ export interface ClassroomSummary {
   studentCount: number;
   /** ISO timestamp of creation */
   createdAt: string;
+}
+
+/** Resolved classroom row for the school-admin read-only rollup. */
+export interface SchoolClassroomSummary {
+  /** Classroom document id */
+  id: string;
+  /** Classroom display name */
+  name: string;
+  /** Owning teacher's display name */
+  teacherName: string;
+  /** Number of enrolled students */
+  studentCount: number;
 }
 
 /** Per-student progress summary for teacher dashboard */
