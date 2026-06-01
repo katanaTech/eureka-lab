@@ -16,6 +16,7 @@ const mockClassroomsService = {
   removeStudent: jest.fn(),
   deleteClassroom: jest.fn(),
   regenerateJoinCode: jest.fn(),
+  assignStudents: jest.fn(),
 };
 
 const mockGuard = { canActivate: jest.fn().mockReturnValue(true) };
@@ -78,7 +79,15 @@ describe('ClassroomsController', () => {
       expect(mockClassroomsService.createClassroom).toHaveBeenCalledWith(
         'teacher-1',
         'Math 101',
+        undefined,
       );
+    });
+
+    it('createClassroom threads schoolId from the user token to the service', async () => {
+      mockClassroomsService.createClassroom.mockResolvedValueOnce({ id: 'c1' });
+      const user = { uid: 'teacher-1', email: 't@s.edu', role: 'teacher', schoolId: 'school-7' } as AuthenticatedUser;
+      await controller.createClassroom(user, { name: 'Math 101' });
+      expect(mockClassroomsService.createClassroom).toHaveBeenCalledWith('teacher-1', 'Math 101', 'school-7');
     });
   });
 
@@ -190,6 +199,17 @@ describe('ClassroomsController', () => {
       expect(
         mockClassroomsService.regenerateJoinCode,
       ).toHaveBeenCalledWith('teacher-1', 'classroom-1');
+    });
+  });
+
+  /* ── assignStudents ──────────────────────────────────────────────── */
+  describe('assignStudents', () => {
+    it('assignStudents delegates uid + id + studentIds', async () => {
+      mockClassroomsService.assignStudents.mockResolvedValueOnce({ id: 'c1', studentIds: ['s1'] });
+      const user = { uid: 'teacher-1', email: 't@s.edu', role: 'teacher', schoolId: 'school-7' } as AuthenticatedUser;
+      const res = await controller.assignStudents(user, 'c1', { studentIds: ['s1'] });
+      expect(res).toEqual({ id: 'c1', studentIds: ['s1'] });
+      expect(mockClassroomsService.assignStudents).toHaveBeenCalledWith('teacher-1', 'c1', ['s1']);
     });
   });
 });

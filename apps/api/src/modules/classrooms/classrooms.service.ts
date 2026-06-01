@@ -230,6 +230,89 @@ export class ClassroomsService {
   }
 
   /**
+   * Assign school-roster students to a teacher's own classroom.
+   * Validates every student up front (all-or-nothing), then writes the class
+   * studentIds and each student's classroomIds in a single atomic batch.
+   * Capacity is enforced on the NET-NEW count (already-enrolled students are
+   * deduped and consume no seat).
+   *
+   * @param teacherId - Caller (must own the classroom).
+   * @param classroomId - Target classroom (must have a schoolId).
+   * @param studentIds - Candidate student UIDs.
+   * @returns The updated classroom document.
+   * @throws ForbiddenException when the caller does not own the classroom.
+   * @throws NotFoundException when the classroom does not exist.
+   * @throws BadRequestException NOT_A_SCHOOL_CLASSROOM / STUDENT_NOT_IN_SCHOOL / CLASSROOM_FULL.
+   */
+  async assignStudents(
+    teacherId: string,
+    classroomId: string,
+    studentIds: string[],
+  ): Promise<ClassroomDocument> {
+    const classroom = await this.getOwnedClassroom(teacherId, classroomId);
+
+    if (!classroom.schoolId) {
+      throw new BadRequestException({
+        message: 'This classroom is not a school classroom',
+        code: 'NOT_A_SCHOOL_CLASSROOM',
+      });
+    }
+
+    /* Net-new only: dedupe against current roster, preserving order. */
+    const enrolled = new Set(classroom.studentIds);
+    const netNew = [...new Set(studentIds)].filter((id) => !enrolled.has(id));
+
+    /* Validate every net-new student belongs to this school, is a child, and is active. */
+    for (const studentId of netNew) {
+      const student = await this.usersRepository.findByUid(studentId);
+      if (
+        !student ||
+        student.role !== 'child' ||
+        (student.active ?? true) === false ||
+        student.schoolId !== classroom.schoolId
+      ) {
+        throw new BadRequestException({
+          message: `Student ${studentId} is not an active child of this school`,
+          code: 'STUDENT_NOT_IN_SCHOOL',
+        });
+      }
+    }
+
+    /* Capacity check on net-new seats. */
+    if (classroom.studentIds.length + netNew.length > classroom.maxStudents) {
+      throw new BadRequestException({
+        message: 'Classroom is full',
+        code: 'CLASSROOM_FULL',
+      });
+    }
+
+    /* Atomic write: class roster + each student's classroomIds. */
+    if (netNew.length > 0) {
+      const { FieldValue } = await import('firebase-admin/firestore');
+      const batch = this.firebase.firestore.batch();
+
+      const classRef = this.firebase.firestore.collection(this.collectionName).doc(classroomId);
+      batch.update(classRef, { studentIds: FieldValue.arrayUnion(...netNew) });
+
+      for (const studentId of netNew) {
+        const userRef = this.firebase.firestore.collection('users').doc(studentId);
+        batch.update(userRef, { classroomIds: FieldValue.arrayUnion(classroomId) });
+      }
+
+      await batch.commit();
+    }
+
+    this.logger.log({
+      event: 'students_assigned',
+      teacherId,
+      classroomId,
+      added: netNew.length,
+    });
+
+    return { ...classroom, studentIds: [...classroom.studentIds, ...netNew] };
+  }
+
+  /**
    * Remove a student from a classroom.
    *
    * @param teacherId - Teacher's Firebase UID

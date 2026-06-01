@@ -356,6 +356,104 @@ describe('ClassroomsService', () => {
     });
   });
 
+  /* ── assignStudents ──────────────────────────────────────────────── */
+  describe('assignStudents', () => {
+    const schoolClassroom = {
+      id: classroomId,
+      teacherId,
+      name: 'Math 101',
+      joinCode: 'ABC123',
+      schoolId: 'school-7',
+      studentIds: ['existing-1'],
+      maxStudents: 3,
+      createdAt: '2026-01-01T00:00:00.000Z',
+    };
+
+    const childInSchool = (uid: string) => ({
+      uid,
+      role: 'child',
+      schoolId: 'school-7',
+      active: true,
+      displayName: 'Kid',
+    });
+
+    it('adds same-school active children and returns the updated doc', async () => {
+      mockGet.mockResolvedValueOnce({ exists: true, data: () => schoolClassroom });
+      mockUsersRepository.findByUid
+        .mockResolvedValueOnce(childInSchool('new-1'))
+        .mockResolvedValueOnce(childInSchool('new-2'));
+      const batchUpdate = jest.fn();
+      const batchCommit = jest.fn().mockResolvedValue(undefined);
+      mockFirebaseService.firestore.batch.mockReturnValueOnce({ update: batchUpdate, commit: batchCommit });
+
+      const result = await service.assignStudents(teacherId, classroomId, ['new-1', 'new-2']);
+
+      expect(result.studentIds).toEqual(['existing-1', 'new-1', 'new-2']);
+      expect(batchUpdate).toHaveBeenCalledTimes(3);
+      expect(batchCommit).toHaveBeenCalledTimes(1);
+    });
+
+    it('dedupes students already enrolled', async () => {
+      mockGet.mockResolvedValueOnce({ exists: true, data: () => schoolClassroom });
+      mockUsersRepository.findByUid.mockResolvedValueOnce(childInSchool('new-1'));
+      const batchUpdate = jest.fn();
+      const batchCommit = jest.fn().mockResolvedValue(undefined);
+      mockFirebaseService.firestore.batch.mockReturnValueOnce({ update: batchUpdate, commit: batchCommit });
+
+      const result = await service.assignStudents(teacherId, classroomId, ['existing-1', 'new-1']);
+
+      expect(result.studentIds).toEqual(['existing-1', 'new-1']);
+      expect(batchUpdate).toHaveBeenCalledTimes(2);
+    });
+
+    it('rejects a non-owner teacher (ForbiddenException)', async () => {
+      mockGet.mockResolvedValueOnce({ exists: true, data: () => ({ ...schoolClassroom, teacherId: 'someone-else' }) });
+      await expect(service.assignStudents(teacherId, classroomId, ['new-1'])).rejects.toThrow(ForbiddenException);
+    });
+
+    it('rejects a B2C classroom with NOT_A_SCHOOL_CLASSROOM', async () => {
+      mockGet.mockResolvedValueOnce({ exists: true, data: () => ({ ...schoolClassroom, schoolId: undefined }) });
+      await expect(service.assignStudents(teacherId, classroomId, ['new-1'])).rejects.toMatchObject({
+        response: { code: 'NOT_A_SCHOOL_CLASSROOM' },
+      });
+    });
+
+    it('rejects a student from another school with STUDENT_NOT_IN_SCHOOL', async () => {
+      mockGet.mockResolvedValueOnce({ exists: true, data: () => schoolClassroom });
+      mockUsersRepository.findByUid.mockResolvedValueOnce({ ...childInSchool('new-1'), schoolId: 'other-school' });
+      await expect(service.assignStudents(teacherId, classroomId, ['new-1'])).rejects.toMatchObject({
+        response: { code: 'STUDENT_NOT_IN_SCHOOL' },
+      });
+    });
+
+    it('rejects a non-child / inactive user with STUDENT_NOT_IN_SCHOOL', async () => {
+      mockGet.mockResolvedValueOnce({ exists: true, data: () => schoolClassroom });
+      mockUsersRepository.findByUid.mockResolvedValueOnce({ ...childInSchool('new-1'), active: false });
+      await expect(service.assignStudents(teacherId, classroomId, ['new-1'])).rejects.toMatchObject({
+        response: { code: 'STUDENT_NOT_IN_SCHOOL' },
+      });
+    });
+
+    it('enforces maxStudents with CLASSROOM_FULL (net-new count)', async () => {
+      mockGet.mockResolvedValueOnce({ exists: true, data: () => schoolClassroom });
+      mockUsersRepository.findByUid
+        .mockResolvedValueOnce(childInSchool('n1'))
+        .mockResolvedValueOnce(childInSchool('n2'))
+        .mockResolvedValueOnce(childInSchool('n3'));
+      await expect(service.assignStudents(teacherId, classroomId, ['n1', 'n2', 'n3'])).rejects.toMatchObject({
+        response: { code: 'CLASSROOM_FULL' },
+      });
+    });
+
+    it('rejects a non-existent UID with STUDENT_NOT_IN_SCHOOL', async () => {
+      mockGet.mockResolvedValueOnce({ exists: true, data: () => schoolClassroom });
+      mockUsersRepository.findByUid.mockResolvedValueOnce(null);
+      await expect(service.assignStudents(teacherId, classroomId, ['ghost-uid'])).rejects.toMatchObject({
+        response: { code: 'STUDENT_NOT_IN_SCHOOL' },
+      });
+    });
+  });
+
   /* ── removeStudent ───────────────────────────────────────────────── */
   describe('removeStudent', () => {
     beforeEach(() => {
