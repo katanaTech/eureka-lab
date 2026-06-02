@@ -35,7 +35,7 @@
 
 **Modify:**
 - `packages/shared-types/src/index.ts` — extend `SchoolSubscription`, add `billingEmail` to `School`, add `SchoolBillingSummary`.
-- `apps/api/src/infrastructure/stripe/stripe.service.ts` — add `createSchoolSubscription`, `updateSubscriptionQuantity`.
+- `apps/api/src/infrastructure/stripe/stripe.service.ts` — add `createSchoolSubscription`, `updateSubscriptionQuantity`. (Param/result interfaces live in a sibling `stripe.types.ts`, created in Task 2, to keep the service < 300 lines — edit that file for future StripeService type additions.)
 - `apps/api/src/modules/schools/schools.repository.ts` — add `findByStripeSubscriptionId`, `findByStripeCustomerId`, and widen `updateSchool`'s allowed fields to the subscription block + `billingEmail`.
 - `apps/api/src/modules/schools/schools.service.ts` — proration side-effect in `updateSchool`.
 - `apps/api/src/modules/schools/schools.service.spec.ts` — proration test.
