@@ -3,13 +3,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, RefreshCw, Trash2 } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Trash2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GameButton } from '@/components/game/GameButton';
 import { JoinCodeDisplay } from '@/components/features/teacher/JoinCodeDisplay';
 import { StudentProgressTable } from '@/components/features/teacher/StudentProgressTable';
 import { classroomsApi } from '@/lib/api-client';
 import type { ClassroomDetailView } from '@/lib/api-client';
+import { useAuth } from '@/hooks/useAuth';
+import { AddStudentsDialog } from '@/components/features/teacher/AddStudentsDialog';
 
 /** Force dynamic rendering — uses Firebase auth */
 export const dynamic = 'force-dynamic';
@@ -30,6 +32,9 @@ export default function ClassroomDetailPage() {
   const [error, setError] = useState('');
   const [regenerating, setRegenerating] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const { user } = useAuth();
+  const [addOpen, setAddOpen] = useState(false);
 
   /** Fetch classroom detail with student progress. */
   const fetchDetail = useCallback(async () => {
@@ -195,11 +200,17 @@ export default function ClassroomDetailPage() {
         </GameButton>
       </div>
 
-      {/* Student count */}
+      {/* Student count + add (school teachers only) */}
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg">
           {t('studentCount')}: {detail.students.length}/{detail.classroom.maxStudents}
         </h2>
+        {user?.schoolId && (
+          <GameButton variant="primary" size="sm" onClick={() => setAddOpen(true)}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {t('addStudents')}
+          </GameButton>
+        )}
       </div>
 
       {/* Student progress table — nested component, keeps current styling */}
@@ -223,6 +234,13 @@ export default function ClassroomDetailPage() {
           {t('deleteClassroom')}
         </GameButton>
       </div>
+      <AddStudentsDialog
+        open={addOpen}
+        classroomId={classroomId}
+        enrolledIds={detail.classroom.studentIds}
+        onClose={() => setAddOpen(false)}
+        onAssigned={fetchDetail}
+      />
     </div>
   );
 }
