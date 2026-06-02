@@ -51,7 +51,7 @@ Extend the existing `SchoolSubscription` — all new fields optional so existing
 export interface SchoolSubscription {
   tier: string;                    // existing — plan tier label
   status: string;                  // existing — now mirrors Stripe status
-  periodEnd?: number;              // existing — Unix ms current period end
+  periodEnd?: number;              // existing — Unix seconds current period end (matches SubscriptionData)
   stripeCustomerId?: string;       // new — cus_...
   stripeSubscriptionId?: string;   // new — sub_...
   seatQuantity?: number;           // new — quantity synced to Stripe (= seatLimit at last sync)

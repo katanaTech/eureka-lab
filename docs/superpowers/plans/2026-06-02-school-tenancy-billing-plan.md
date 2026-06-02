@@ -64,7 +64,7 @@ export interface SchoolSubscription {
   tier: string;
   /** Status label mirroring Stripe: 'active' | 'trialing' | 'past_due' | 'canceled' | 'none' */
   status: string;
-  /** Unix ms when the current period ends */
+  /** Unix seconds when the current period ends (Stripe current_period_end; matches SubscriptionData) */
   periodEnd?: number;
   /** Stripe customer id (cus_...) */
   stripeCustomerId?: string;
@@ -1437,7 +1437,7 @@ Import `SchoolBillingSummary` from `@eureka-lab/shared-types`.
 - [ ] **Step 3: Super-admin Billing panel**
 
 In the school-detail component, add a "Billing" panel that:
-- On mount, calls `getSchoolBilling(schoolId)` and shows tier / status (badge) / seats (`seatQuantity ?? seatLimit`) / `periodEnd` (formatted) and, if present, a "View invoice" link to `latestInvoiceUrl`.
+- On mount, calls `getSchoolBilling(schoolId)` and shows tier / status (badge) / seats (`seatQuantity ?? seatLimit`) / `periodEnd` (formatted — **note `periodEnd` is Unix *seconds*; multiply by 1000 for a JS `Date`**) and, if present, a "View invoice" link to `latestInvoiceUrl`.
 - If `hasSubscription === false`, shows a "Set up subscription" form: a billing-email input and an optional trial-days number input, with a submit button calling `setUpSchoolSubscription(...)`. On success, re-fetch the summary and show the invoice link **inline** (no `toast()`). On error, show an inline error message.
 - Use existing console components/`GameButton` variants (`primary | gold | ghost | danger`). Keyboard-navigable inputs with ARIA labels.
 
