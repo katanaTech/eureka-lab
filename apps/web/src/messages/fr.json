@@ -255,6 +255,16 @@
     "studentLoginHint": "Saisissez le code de votre école, votre identifiant et votre mot de passe.",
     "signIn": "Se connecter"
   },
+  "SchoolClassrooms": {
+    "title": "Classes",
+    "tab": "Classes",
+    "name": "Classe",
+    "teacher": "Enseignant",
+    "students": "Élèves",
+    "loading": "Chargement…",
+    "noClassrooms": "Aucune classe pour l'instant. Les enseignants créent des classes et ajoutent des élèves depuis la liste.",
+    "actionFailed": "Échec de l'action. Veuillez réessayer."
+  },
   "SchoolAdmin": {
     "title": "Enseignants",
     "addTeacher": "Ajouter un enseignant",
@@ -309,7 +319,13 @@
     "classroomDeleted": "Classe supprimée.",
     "loading": "Chargement des classes...",
     "backToDashboard": "Retour au tableau de bord",
-    "dangerZone": "Zone de danger"
+    "dangerZone": "Zone de danger",
+    "addStudents": "Ajouter des élèves",
+    "assignSelected": "Ajouter {count} sélectionné(s)",
+    "assigning": "Ajout…",
+    "assignFailed": "Impossible d'ajouter les élèves. Veuillez réessayer.",
+    "noRosterStudents": "Aucun autre élève à ajouter depuis la liste de votre école.",
+    "cancel": "Annuler"
   },
   "Gamification": {
     "achievementsTitle": "Réalisations",

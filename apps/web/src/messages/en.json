@@ -255,6 +255,16 @@
     "studentLoginHint": "Enter your school code, username, and password.",
     "signIn": "Sign in"
   },
+  "SchoolClassrooms": {
+    "title": "Classrooms",
+    "tab": "Classrooms",
+    "name": "Classroom",
+    "teacher": "Teacher",
+    "students": "Students",
+    "loading": "Loading…",
+    "noClassrooms": "No classrooms yet. Teachers create classrooms and add students from the roster.",
+    "actionFailed": "Action failed. Please try again."
+  },
   "SchoolAdmin": {
     "title": "Teachers",
     "addTeacher": "Add Teacher",
@@ -309,7 +319,13 @@
     "classroomDeleted": "Classroom deleted.",
     "loading": "Loading classrooms...",
     "backToDashboard": "Back to Dashboard",
-    "dangerZone": "Danger Zone"
+    "dangerZone": "Danger Zone",
+    "addStudents": "Add Students",
+    "assignSelected": "Add {count} selected",
+    "assigning": "Adding…",
+    "assignFailed": "Could not add students. Please try again.",
+    "noRosterStudents": "No more students to add from your school roster.",
+    "cancel": "Cancel"
   },
   "Gamification": {
     "achievementsTitle": "Achievements",

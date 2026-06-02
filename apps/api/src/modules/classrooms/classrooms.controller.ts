@@ -27,6 +27,7 @@ import {
 import { ClassroomsService } from './classrooms.service';
 import { CreateClassroomDto } from './dto/create-classroom.dto';
 import { JoinClassroomDto } from './dto/join-classroom.dto';
+import { AssignStudentsDto } from './dto/assign-students.dto';
 
 /**
  * ClassroomsController provides endpoints for the teacher dashboard.
@@ -62,7 +63,7 @@ export class ClassroomsController {
       name: dto.name,
     });
 
-    return this.classroomsService.createClassroom(user.uid, dto.name);
+    return this.classroomsService.createClassroom(user.uid, dto.name, user.schoolId);
   }
 
   /**
@@ -77,6 +78,18 @@ export class ClassroomsController {
     return {
       classrooms: await this.classroomsService.getTeacherClassrooms(user.uid),
     };
+  }
+
+  /**
+   * List the caller-teacher's school roster (active students) for assignment.
+   *
+   * @param user - Authenticated teacher
+   * @returns Active student summaries of the teacher's school (empty for B2C).
+   */
+  @Get('roster')
+  @Roles('teacher')
+  async getRoster(@CurrentUser() user: AuthenticatedUser) {
+    return { students: await this.classroomsService.getSchoolRoster(user.schoolId) };
   }
 
   /**
@@ -116,6 +129,25 @@ export class ClassroomsController {
     });
 
     return this.classroomsService.joinClassroom(user.uid, dto.joinCode);
+  }
+
+  /**
+   * Assign school-roster students to a classroom the teacher owns.
+   *
+   * @param user - Authenticated teacher
+   * @param id - Classroom document ID
+   * @param dto - Student UIDs to add
+   * @returns The updated classroom document
+   */
+  @Post(':id/students')
+  @Roles('teacher')
+  @HttpCode(HttpStatus.OK)
+  async assignStudents(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: AssignStudentsDto,
+  ) {
+    return this.classroomsService.assignStudents(user.uid, id, dto.studentIds);
   }
 
   /**

@@ -255,6 +255,16 @@
     "studentLoginHint": "أدخل رمز مدرستك واسم المستخدم وكلمة المرور.",
     "signIn": "تسجيل الدخول"
   },
+  "SchoolClassrooms": {
+    "title": "الفصول",
+    "tab": "الفصول",
+    "name": "الفصل",
+    "teacher": "المعلّم",
+    "students": "الطلاب",
+    "loading": "جارٍ التحميل…",
+    "noClassrooms": "لا توجد فصول بعد. ينشئ المعلّمون الفصول ويضيفون الطلاب من القائمة.",
+    "actionFailed": "فشل الإجراء. يرجى المحاولة مرة أخرى."
+  },
   "SchoolAdmin": {
     "title": "المعلمون",
     "addTeacher": "إضافة معلم",
@@ -309,7 +319,13 @@
     "classroomDeleted": "تم حذف الفصل.",
     "loading": "جارٍ تحميل الفصول...",
     "backToDashboard": "العودة إلى لوحة التحكم",
-    "dangerZone": "منطقة الخطر"
+    "dangerZone": "منطقة الخطر",
+    "addStudents": "إضافة طلاب",
+    "assignSelected": "إضافة {count} محدد",
+    "assigning": "جارٍ الإضافة…",
+    "assignFailed": "تعذّرت إضافة الطلاب. يرجى المحاولة مرة أخرى.",
+    "noRosterStudents": "لا يوجد طلاب آخرون لإضافتهم من قائمة مدرستك.",
+    "cancel": "إلغاء"
   },
   "Gamification": {
     "achievementsTitle": "الإنجازات",

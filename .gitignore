@@ -50,3 +50,6 @@ smoke-*.png
 
 # Office temp/lock files
 ~$*
+
+# Vercel CLI link state
+.vercel

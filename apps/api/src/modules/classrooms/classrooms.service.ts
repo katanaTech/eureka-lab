@@ -16,6 +16,7 @@ import type {
   ClassroomSummary,
   ClassroomDetailView,
   StudentProgressSummary,
+  SchoolStudentSummary,
 } from '@eureka-lab/shared-types';
 
 /** Maximum number of classrooms a teacher may own */
@@ -55,11 +56,13 @@ export class ClassroomsService {
    *
    * @param teacherId - Teacher's Firebase UID
    * @param name - Classroom name (moderated)
+   * @param schoolId - Owning school tenant id; stamped on the doc when present (school teachers), omitted for B2C.
    * @returns Created classroom document
    */
   async createClassroom(
     teacherId: string,
     name: string,
+    schoolId?: string,
   ): Promise<ClassroomDocument> {
     /* Moderate classroom name */
     const nameCheck = this.moderation.moderateInput(name);
@@ -99,6 +102,7 @@ export class ClassroomsService {
       studentIds: [],
       maxStudents: DEFAULT_MAX_STUDENTS,
       createdAt: now,
+      ...(schoolId ? { schoolId } : {}),
     };
 
     await docRef.set(classroom);
@@ -141,6 +145,28 @@ export class ClassroomsService {
   }
 
   /**
+   * List the active students of a teacher's school for the assignment picker.
+   * Returns an empty list when the teacher has no school (B2C).
+   *
+   * @param schoolId - Caller-teacher's school id (from their token claim), or undefined.
+   * @returns Active student summaries of that school.
+   */
+  async getSchoolRoster(schoolId: string | undefined): Promise<SchoolStudentSummary[]> {
+    if (!schoolId) {
+      return [];
+    }
+    const docs = await this.usersRepository.findStudentsBySchool(schoolId);
+    return docs
+      .filter((d) => (d.active ?? true) !== false)
+      .map((d) => ({
+        uid: d.uid,
+        username: d.username ?? '',
+        displayName: d.displayName,
+        active: d.active ?? true,
+      }));
+  }
+
+  /**
    * Get full classroom detail with per-student progress.
    * CLAUDE.md Rule 13: Student names are anonymized (first name only).
    *
@@ -168,6 +194,7 @@ export class ClassroomsService {
    * @param studentId - Student's (child) Firebase UID
    * @param joinCode - 6-character join code
    * @returns The classroom the student joined
+   * @throws ForbiddenException CROSS_SCHOOL_JOIN when a non-child or a child from a different school tries to join a school classroom.
    */
   async joinClassroom(
     studentId: string,
@@ -186,6 +213,17 @@ export class ClassroomsService {
 
     const doc = snapshot.docs[0];
     const classroom = doc.data() as ClassroomDocument;
+
+    /* Tenant safety: a school classroom may only be joined by its own students. */
+    if (classroom.schoolId) {
+      const student = await this.usersRepository.findByUid(studentId);
+      if (!student || student.role !== 'child' || student.schoolId !== classroom.schoolId) {
+        throw new ForbiddenException({
+          message: 'You cannot join a classroom from another school',
+          code: 'CROSS_SCHOOL_JOIN',
+        });
+      }
+    }
 
     /* Check if student is already a member */
     if (classroom.studentIds.includes(studentId)) {
@@ -224,6 +262,89 @@ export class ClassroomsService {
       ...classroom,
       studentIds: [...classroom.studentIds, studentId],
     };
+  }
+
+  /**
+   * Assign school-roster students to a teacher's own classroom.
+   * Validates every student up front (all-or-nothing), then writes the class
+   * studentIds and each student's classroomIds in a single atomic batch.
+   * Capacity is enforced on the NET-NEW count (already-enrolled students are
+   * deduped and consume no seat).
+   *
+   * @param teacherId - Caller (must own the classroom).
+   * @param classroomId - Target classroom (must have a schoolId).
+   * @param studentIds - Candidate student UIDs.
+   * @returns The updated classroom document.
+   * @throws ForbiddenException when the caller does not own the classroom.
+   * @throws NotFoundException when the classroom does not exist.
+   * @throws BadRequestException NOT_A_SCHOOL_CLASSROOM / STUDENT_NOT_IN_SCHOOL / CLASSROOM_FULL.
+   */
+  async assignStudents(
+    teacherId: string,
+    classroomId: string,
+    studentIds: string[],
+  ): Promise<ClassroomDocument> {
+    const classroom = await this.getOwnedClassroom(teacherId, classroomId);
+
+    if (!classroom.schoolId) {
+      throw new BadRequestException({
+        message: 'This classroom is not a school classroom',
+        code: 'NOT_A_SCHOOL_CLASSROOM',
+      });
+    }
+
+    /* Net-new only: dedupe against current roster, preserving order. */
+    const enrolled = new Set(classroom.studentIds);
+    const netNew = [...new Set(studentIds)].filter((id) => !enrolled.has(id));
+
+    /* Validate every net-new student belongs to this school, is a child, and is active. */
+    for (const studentId of netNew) {
+      const student = await this.usersRepository.findByUid(studentId);
+      if (
+        !student ||
+        student.role !== 'child' ||
+        (student.active ?? true) === false ||
+        student.schoolId !== classroom.schoolId
+      ) {
+        throw new BadRequestException({
+          message: `Student ${studentId} is not an active child of this school`,
+          code: 'STUDENT_NOT_IN_SCHOOL',
+        });
+      }
+    }
+
+    /* Capacity check on net-new seats. */
+    if (classroom.studentIds.length + netNew.length > classroom.maxStudents) {
+      throw new BadRequestException({
+        message: 'Classroom is full',
+        code: 'CLASSROOM_FULL',
+      });
+    }
+
+    /* Atomic write: class roster + each student's classroomIds. */
+    if (netNew.length > 0) {
+      const { FieldValue } = await import('firebase-admin/firestore');
+      const batch = this.firebase.firestore.batch();
+
+      const classRef = this.firebase.firestore.collection(this.collectionName).doc(classroomId);
+      batch.update(classRef, { studentIds: FieldValue.arrayUnion(...netNew) });
+
+      for (const studentId of netNew) {
+        const userRef = this.firebase.firestore.collection('users').doc(studentId);
+        batch.update(userRef, { classroomIds: FieldValue.arrayUnion(classroomId) });
+      }
+
+      await batch.commit();
+    }
+
+    this.logger.log({
+      event: 'students_assigned',
+      teacherId,
+      classroomId,
+      added: netNew.length,
+    });
+
+    return { ...classroom, studentIds: [...classroom.studentIds, ...netNew] };
   }
 
   /**

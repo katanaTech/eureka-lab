@@ -9,6 +9,7 @@ import { GameButton } from '@/components/game/GameButton';
 import { TeachersTable } from '@/components/features/school/TeachersTable';
 import { CreateTeacherDialog } from '@/components/features/school/CreateTeacherDialog';
 import { StudentsPanel } from '@/components/features/school/StudentsPanel';
+import { ClassroomsPanel } from '@/components/features/school/ClassroomsPanel';
 import { schoolsApi } from '@/lib/api-client';
 import type { SchoolTeacherSummary } from '@eureka-lab/shared-types';
 
@@ -19,10 +20,11 @@ export const dynamic = 'force-dynamic';
 function SchoolAdminInner() {
   const t = useTranslations('SchoolAdmin');
   const ts = useTranslations('SchoolStudents');
+  const tc = useTranslations('SchoolClassrooms');
   const { user } = useAuth();
   const schoolId = user?.schoolId;
 
-  const [tab, setTab] = useState<'teachers' | 'students'>('teachers');
+  const [tab, setTab] = useState<'teachers' | 'students' | 'classrooms'>('teachers');
   const [teachers, setTeachers] = useState<SchoolTeacherSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -83,7 +85,7 @@ function SchoolAdminInner() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="font-display text-3xl text-glow-primary">{tab === 'teachers' ? t('title') : ts('title')}</h1>
+        <h1 className="font-display text-3xl text-glow-primary">{tab === 'teachers' ? t('title') : tab === 'students' ? ts('title') : tc('title')}</h1>
         {tab === 'teachers' && (
           <GameButton variant="primary" size="sm" onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4" aria-hidden="true" />
@@ -113,6 +115,16 @@ function SchoolAdminInner() {
         >
           {ts('tab')}
         </button>
+        <button
+          role="tab"
+          id="tab-classrooms"
+          aria-selected={tab === 'classrooms'}
+          aria-controls="panel-classrooms"
+          onClick={() => setTab('classrooms')}
+          className={`px-3 py-2 text-sm font-medium ${tab === 'classrooms' ? 'border-b-2 border-primary text-foreground' : 'text-muted-foreground'}`}
+        >
+          {tc('tab')}
+        </button>
       </div>
 
       {tab === 'teachers' && (
@@ -134,6 +146,12 @@ function SchoolAdminInner() {
       {tab === 'students' && (
         <div role="tabpanel" id="panel-students" aria-labelledby="tab-students">
           <StudentsPanel schoolId={schoolId} />
+        </div>
+      )}
+
+      {tab === 'classrooms' && (
+        <div role="tabpanel" id="panel-classrooms" aria-labelledby="tab-classrooms">
+          <ClassroomsPanel schoolId={schoolId} />
         </div>
       )}
     </div>
