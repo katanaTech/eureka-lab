@@ -35,6 +35,15 @@ const nextConfig = {
   /* Experimental performance features */
   experimental: {
     optimizePackageImports: ['lucide-react', '@anthropic-ai/sdk'],
+    /*
+     * Disable SWC minification of the SERVER bundle. On next@14.2.35 the server
+     * minifier miscompiles one of our modules into `TypeError: e[o] is not a
+     * function`, which crashes RSC rendering of several pages during the static
+     * prerender pass of `next build` (and would 500 the same pages when
+     * server-rendered at runtime). Client bundles are still minified.
+     * Revisit on the next Next.js upgrade — the upstream SWC bug may be fixed.
+     */
+    serverMinification: false,
   },
 
   async redirects() {
