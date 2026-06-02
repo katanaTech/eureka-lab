@@ -17,14 +17,22 @@ export type UserRole =
 /** Lifecycle status of a school tenant */
 export type SchoolStatus = 'active' | 'suspended';
 
-/** School subscription — simple fields now; real billing is epic sub-project 5 */
+/** School subscription — billing state (sub-project 5a) */
 export interface SchoolSubscription {
   /** Plan tier label, e.g. 'trial' | 'standard' */
   tier: string;
-  /** Status label, e.g. 'active' | 'trialing' | 'past_due' */
+  /** Status label mirroring Stripe: 'active' | 'trialing' | 'past_due' | 'canceled' | 'none' */
   status: string;
-  /** Unix ms when the current period ends (optional until billing lands) */
+  /** Unix seconds when the current period ends (Stripe current_period_end; matches SubscriptionData) */
   periodEnd?: number;
+  /** Stripe customer id (cus_...) */
+  stripeCustomerId?: string;
+  /** Stripe subscription id (sub_...) */
+  stripeSubscriptionId?: string;
+  /** Seat quantity last synced to Stripe (equals seatLimit at sync time) */
+  seatQuantity?: number;
+  /** How Stripe collects payment for this subscription */
+  collectionMethod?: 'send_invoice' | 'charge_automatically';
 }
 
 /** School access keys — semantics/rotation are epic sub-project 5 */
@@ -44,6 +52,8 @@ export interface School {
   seatsUsed: number;
   /** Short code students type at sign-in to resolve their school (lazily generated) */
   loginCode?: string;
+  /** Email Stripe sends invoices / portal links to (set at subscription setup) */
+  billingEmail?: string;
   /** UIDs of this school's school_admin users */
   adminUids: string[];
   subscription: SchoolSubscription;
@@ -61,6 +71,21 @@ export interface SchoolSummary {
   status: SchoolStatus;
   seatLimit: number;
   seatsUsed: number;
+}
+
+/** Billing view for the console (no secrets). */
+export interface SchoolBillingSummary {
+  schoolId: string;
+  tier: string;
+  /** active | trialing | past_due | canceled | none */
+  status: string;
+  seatLimit: number;
+  seatsUsed: number;
+  seatQuantity?: number;
+  periodEnd?: number;
+  hasSubscription: boolean;
+  /** Hosted invoice URL from the last setup — super-admin view only */
+  latestInvoiceUrl?: string;
 }
 
 /** Resolved school-admin row for the console (no secrets) */
