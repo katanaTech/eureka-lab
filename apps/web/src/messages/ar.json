@@ -797,5 +797,25 @@
     "defeatedMessage": "كان العدو قوياً جداً هذه المرة. ادرس أكثر في الأكاديمية وحاول مجدداً.",
     "tryAgain": "حاول مجدداً",
     "returnToAcademy": "العودة إلى الأكاديمية"
+  },
+  "SchoolBilling": {
+    "title": "الفوترة",
+    "status": "الحالة",
+    "tier": "الخطة",
+    "seats": "المقاعد",
+    "renews": "التجديد",
+    "viewInvoice": "عرض الفاتورة",
+    "setUpTitle": "إعداد الاشتراك",
+    "billingEmail": "بريد الفوترة الإلكتروني",
+    "trialDays": "أيام التجربة (اختياري)",
+    "setUpCta": "إعداد الاشتراك",
+    "manageBilling": "إدارة الفوترة",
+    "loading": "جارٍ التحميل…",
+    "statusActive": "نشط",
+    "statusTrialing": "في فترة تجريبية",
+    "statusPastDue": "متأخر في الدفع",
+    "statusCanceled": "ملغى",
+    "statusNone": "لا يوجد",
+    "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
   }
 }

@@ -797,5 +797,25 @@
     "defeatedMessage": "The enemy was too strong this time. Study more at the Academy and try again.",
     "tryAgain": "Try Again",
     "returnToAcademy": "Return to Academy"
+  },
+  "SchoolBilling": {
+    "title": "Billing",
+    "status": "Status",
+    "tier": "Plan",
+    "seats": "Seats",
+    "renews": "Renews",
+    "viewInvoice": "View invoice",
+    "setUpTitle": "Set up subscription",
+    "billingEmail": "Billing email",
+    "trialDays": "Trial days (optional)",
+    "setUpCta": "Set up subscription",
+    "manageBilling": "Manage billing",
+    "loading": "Loading…",
+    "statusActive": "Active",
+    "statusTrialing": "Trialing",
+    "statusPastDue": "Past due",
+    "statusCanceled": "Canceled",
+    "statusNone": "None",
+    "errorGeneric": "Something went wrong. Please try again."
   }
 }

@@ -797,5 +797,25 @@
     "defeatedMessage": "L'ennemi \u00e9tait trop fort cette fois. \u00c9tudie plus \u00e0 l'Acad\u00e9mie et r\u00e9essaie.",
     "tryAgain": "R\u00e9essayer",
     "returnToAcademy": "Retour \u00e0 l'Acad\u00e9mie"
+  },
+  "SchoolBilling": {
+    "title": "Facturation",
+    "status": "Statut",
+    "tier": "Offre",
+    "seats": "Places",
+    "renews": "Renouvellement",
+    "viewInvoice": "Voir la facture",
+    "setUpTitle": "Configurer l'abonnement",
+    "billingEmail": "E-mail de facturation",
+    "trialDays": "Jours d'essai (facultatif)",
+    "setUpCta": "Configurer l'abonnement",
+    "manageBilling": "G\u00e9rer la facturation",
+    "loading": "Chargement\u2026",
+    "statusActive": "Actif",
+    "statusTrialing": "En essai",
+    "statusPastDue": "Paiement en retard",
+    "statusCanceled": "Annul\u00e9",
+    "statusNone": "Aucun",
+    "errorGeneric": "Une erreur s'est produite. Veuillez r\u00e9essayer."
   }
 }

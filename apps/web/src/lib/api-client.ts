@@ -43,6 +43,7 @@ import type {
   SchoolTeacherSummary,
   SchoolStudentSummary,
   SchoolClassroomSummary,
+  SchoolBillingSummary,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -1169,4 +1170,29 @@ export const schoolsApi = {
   /** List a school's classrooms (read-only rollup). */
   listClassrooms: (schoolId: string) =>
     request<{ classrooms: SchoolClassroomSummary[] }>(`/schools/${schoolId}/classrooms`),
+};
+
+/* ── School Billing API ─────────────────────────────────────────── */
+
+/** Billing endpoints for school subscription management. */
+export const schoolBillingApi = {
+  /** Super-admin: billing summary for any school. */
+  get: (schoolId: string) => request<SchoolBillingSummary>(`/school-billing/${schoolId}`),
+
+  /** Super-admin: set up a per-seat subscription. */
+  setUp: (schoolId: string, body: { billingEmail: string; trialDays?: number }) =>
+    request<SchoolBillingSummary>(`/school-billing/${schoolId}/subscription`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  /** School-admin: billing summary for the caller's own school. */
+  getOwn: () => request<SchoolBillingSummary>('/school-billing/me'),
+
+  /** School-admin: Customer Portal link for the caller's own school. */
+  portal: (returnUrl: string) =>
+    request<{ url: string }>('/school-billing/portal', {
+      method: 'POST',
+      body: JSON.stringify({ returnUrl }),
+    }),
 };
