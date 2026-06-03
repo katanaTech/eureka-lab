@@ -10,6 +10,7 @@ import type { School, SchoolSummary, SchoolAdminSummary } from '@eureka-lab/shar
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 import { UsersRepository } from '../users/users.repository';
 import { ContentModerationService } from '../ai/content-moderation.service';
+import { StripeService } from '../../infrastructure/stripe/stripe.service';
 import { SchoolsRepository } from './schools.repository';
 import { CreateSchoolDto } from './dto/create-school.dto';
 import { CreateSchoolAdminDto } from './dto/create-school-admin.dto';
@@ -37,6 +38,7 @@ export class SchoolsService {
     private readonly firebase: FirebaseService,
     private readonly usersRepository: UsersRepository,
     private readonly moderation: ContentModerationService,
+    private readonly stripe: StripeService,
   ) {}
 
   /**
@@ -139,19 +141,43 @@ export class SchoolsService {
 
   /**
    * Update a school's mutable fields (status and/or seatLimit).
+   * When seatLimit changes on a school with an active Stripe subscription,
+   * prorates the subscription quantity and persists the synced fields.
    * @param id - School id.
    * @param dto - Partial update.
    * @returns The updated school.
    * @throws NotFoundException when missing.
+   * @throws Error when the Stripe proration call fails (propagates; the
+   *   Firestore write is then skipped, so the school doc stays unchanged).
    */
   async updateSchool(id: string, dto: UpdateSchoolDto): Promise<School> {
     const school = await this.repo.findById(id);
     if (!school) {
       throw new NotFoundException({ message: 'School not found', code: 'SCHOOL_NOT_FOUND' });
     }
-    const partial: Partial<Pick<School, 'status' | 'seatLimit'>> = {};
+
+    const partial: Partial<Pick<School, 'status' | 'seatLimit' | 'subscription'>> = {};
     if (dto.status !== undefined) partial.status = dto.status;
-    if (dto.seatLimit !== undefined) partial.seatLimit = dto.seatLimit;
+
+    const newSeatLimit = dto.seatLimit;
+    if (newSeatLimit !== undefined) partial.seatLimit = newSeatLimit;
+
+    /* When seats change on a subscribed school, prorate the Stripe quantity. */
+    const seatsChanged = newSeatLimit !== undefined && newSeatLimit !== school.seatLimit;
+    const subscriptionId = school.subscription.stripeSubscriptionId;
+    if (seatsChanged && subscriptionId) {
+      const synced = await this.stripe.updateSubscriptionQuantity(subscriptionId, newSeatLimit);
+      /* Logged before the Firestore write so a Stripe-succeeds/Firestore-fails
+         split is traceable (Stripe is the source of truth for billing). */
+      this.logger.log({ event: 'stripe_quantity_synced', schoolId: id, seatQuantity: synced.seatQuantity });
+      partial.subscription = {
+        ...school.subscription,
+        status: synced.status,
+        periodEnd: synced.currentPeriodEnd,
+        seatQuantity: synced.seatQuantity,
+      };
+    }
+
     await this.repo.updateSchool(id, partial);
     this.logger.log({ event: 'school_updated', schoolId: id, fields: Object.keys(partial) });
     return { ...school, ...partial };
