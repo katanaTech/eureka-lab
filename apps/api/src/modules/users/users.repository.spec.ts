@@ -7,7 +7,11 @@ const mockUpdate = jest.fn();
 const mockGet = jest.fn();
 const mockDocRef = { get: jest.fn(), set: mockSet, update: mockUpdate };
 
-const whereChain = { where: jest.fn(), get: mockGet };
+const whereChain: { where: jest.Mock; get: jest.Mock; count: jest.Mock } = {
+  where: jest.fn(),
+  get: mockGet,
+  count: jest.fn(),
+};
 whereChain.where.mockReturnValue(whereChain);
 
 const mockCollectionRef = {
@@ -26,6 +30,8 @@ describe('UsersRepository', () => {
     whereChain.where.mockReturnValue(whereChain);
     mockCollectionRef.where.mockReturnValue(whereChain);
     mockCollectionRef.doc.mockReturnValue(mockDocRef);
+    /* count() resolves through the shared get mock; reset here so no test leaks. */
+    whereChain.count.mockReturnValue({ get: mockGet });
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         UsersRepository,
@@ -89,6 +95,27 @@ describe('UsersRepository', () => {
       expect(mockCollectionRef.where).toHaveBeenCalledWith('role', '==', 'child');
       expect(whereChain.where).toHaveBeenCalledWith('schoolId', '==', 'school-1');
       expect(result).toEqual([{ uid: 's-1', role: 'child', schoolId: 'school-1', username: 'jsmith' }]);
+    });
+  });
+
+  describe('school analytics counts', () => {
+    it('countTeachersBySchool counts role=teacher + schoolId', async () => {
+      mockGet.mockResolvedValue({ data: () => ({ count: 3 }) });
+      const result = await repo.countTeachersBySchool('s1');
+      expect(result).toBe(3);
+      expect(mockCollectionRef.where).toHaveBeenCalledWith('role', '==', 'teacher');
+      expect(whereChain.where).toHaveBeenCalledWith('schoolId', '==', 's1');
+      expect(whereChain.count).toHaveBeenCalled();
+    });
+
+    it('countActiveStudents filters child + schoolId + lastActiveDate>=cutoff', async () => {
+      mockGet.mockResolvedValue({ data: () => ({ count: 5 }) });
+      const result = await repo.countActiveStudents('s1', '2026-05-04');
+      expect(result).toBe(5);
+      expect(mockCollectionRef.where).toHaveBeenCalledWith('schoolId', '==', 's1');
+      expect(whereChain.where).toHaveBeenCalledWith('role', '==', 'child');
+      expect(whereChain.where).toHaveBeenCalledWith('lastActiveDate', '>=', '2026-05-04');
+      expect(whereChain.count).toHaveBeenCalled();
     });
   });
 });

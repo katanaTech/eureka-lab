@@ -22,6 +22,8 @@ export interface UserDoc {
   children?: string[];
   subscription?: SubscriptionData;
   character?: FantasyCharacter;
+  /** Last gamified-activity date (`YYYY-MM-DD`), maintained by the streak service; absent until first activity. */
+  lastActiveDate?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -149,6 +151,41 @@ export class UsersRepository {
       .where('schoolId', '==', schoolId)
       .get();
     return snapshot.docs.map((d) => d.data() as UserDoc);
+  }
+
+  /**
+   * Count teacher user docs in a school.
+   * @param schoolId - School tenant id.
+   * @returns Teacher count.
+   */
+  async countTeachersBySchool(schoolId: string): Promise<number> {
+    const snapshot = await this.firebase.firestore
+      .collection(this.collection)
+      .where('role', '==', 'teacher')
+      .where('schoolId', '==', schoolId)
+      .count()
+      .get();
+    return snapshot.data().count;
+  }
+
+  /**
+   * Count active students in a school (child users whose lastActiveDate is
+   * on or after the cutoff). Requires the `users` composite index in
+   * firestore.indexes.json (schoolId+role+lastActiveDate); the query errors
+   * until that index is deployed (tracked with DEPLOY-001).
+   * @param schoolId - School tenant id.
+   * @param sinceDate - Inclusive cutoff as a YYYY-MM-DD string.
+   * @returns Active-student count.
+   */
+  async countActiveStudents(schoolId: string, sinceDate: string): Promise<number> {
+    const snapshot = await this.firebase.firestore
+      .collection(this.collection)
+      .where('schoolId', '==', schoolId)
+      .where('role', '==', 'child')
+      .where('lastActiveDate', '>=', sinceDate)
+      .count()
+      .get();
+    return snapshot.data().count;
   }
 
   /**
