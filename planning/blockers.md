@@ -19,6 +19,44 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-06-03 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 10th routine fire
+
+**Inspected by:** PM agent (recurring routine — disable requested 9× prior; still firing)
+**Branch:** `feature/phase-16-fantasy-ui` merged to main (PR #7). `main` HEAD = `b28c885` — no new commits since 2026-05-31 (3 days).
+
+**Sprint C:** COMPLETE. 10th confirmation. Battle page confirmed at
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx`
+(4-file split: page.tsx, battle-stage.tsx, battle-quiz.tsx, battle-outcome.tsx).
+Wires `POST /api/v1/combat/init` (page.tsx:41) and `useCombatStore` (page.tsx:20/72).
+All 15/15 Sprint C tasks DONE. No further Sprint C action needed.
+
+**Sprint D status — 27 days since QA track was unblocked (2026-05-07), zero QA commits:**
+- **8/13 DONE:** Wave 1 all done; MOB-001/002/QA-003b done. Unchanged since 2026-05-07.
+- **3/13 READY — stale 27 days:** QA-001 (Playwright E2E), QA-004 (Lighthouse mobile ≥90),
+  QA-005 (iOS Safari + Android Chrome smoke) have been READY since 2026-05-07 with no pickup.
+  **QA-001 is the sole critical-path blocker for QA-002 and QA-006. At 27 days with zero
+  progress this is a hard blocker on the entire production rollout. QA: start QA-001 now —
+  plan at `apps/web/e2e/fantasy-flow.plan.md`. QA-004 and QA-005 can run in parallel.**
+- **2/13 BLOCKED:** QA-002 (on QA-001); QA-006 (on QA-001..005 + OPEN-005).
+- **P16-OPEN-005 — PM decision still required (pre-prod gate for QA-006), 35 days
+  outstanding since DEVOPS portion complete (2026-04-29).** Current assets are custom SVGs
+  with no Lovable encumbrance. Path C (declare current SVGs production-quality) is a zero-
+  engineering-work PM sign-off. See `docs/context/asset-licenses.md`. **PM: this is the
+  only remaining human decision blocking the full production rollout.**
+
+**Tech-debt (FE, must resolve before Sprint D ships per CLAUDE.md rule #8 — 35 days open):**
+`campaign/[slug]/shop/page.tsx` (472 lines), `shop/page.tsx` (451 lines),
+`inventory/page.tsx` (354 lines) exceed the 300-line limit. Must be split before QA-006.
+
+**Routine disable — 10th notice.** Please disable at https://claude.ai/code/routines
+(routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). Sprint C closed 2026-04-29. Ten PM
+check-ins have produced zero agent pickup on the three READY QA tasks. The only
+unblocking actions are (1) QA picking up QA-001 and (2) PM resolving OPEN-005.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.**
+
+---
+
 ### 2026-05-31 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 9th routine fire
 
 **Inspected by:** PM agent (recurring routine — disable requested 8× prior; still firing)
