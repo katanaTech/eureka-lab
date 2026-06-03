@@ -3,6 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
 import { StripeService } from '../../infrastructure/stripe/stripe.service';
+import { SchoolBillingService } from '../school-billing/school-billing.service';
 import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import type { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
@@ -25,6 +26,11 @@ describe('PaymentsController', () => {
     constructWebhookEvent: jest.fn(),
   };
 
+  const mockSchoolBilling = {
+    matchesSchoolEvent: jest.fn(),
+    handleWebhookEvent: jest.fn(),
+  };
+
   /** Mock authenticated parent user */
   const mockUser: AuthenticatedUser = {
     uid: 'parent-1',
@@ -43,6 +49,7 @@ describe('PaymentsController', () => {
       providers: [
         { provide: PaymentsService, useValue: mockPaymentsService },
         { provide: StripeService, useValue: mockStripeService },
+        { provide: SchoolBillingService, useValue: mockSchoolBilling },
       ],
     })
       .overrideGuard(FirebaseAuthGuard)
@@ -54,6 +61,8 @@ describe('PaymentsController', () => {
     controller = module.get<PaymentsController>(PaymentsController);
 
     mockPaymentsService.handleWebhookEvent.mockResolvedValue(undefined);
+    mockSchoolBilling.matchesSchoolEvent.mockResolvedValue(false);
+    mockSchoolBilling.handleWebhookEvent.mockResolvedValue(undefined);
   });
 
   describe('createCheckout', () => {
@@ -171,6 +180,40 @@ describe('PaymentsController', () => {
       await expect(
         controller.handleWebhook(req as never, 'sig_invalid', res as never),
       ).rejects.toThrow(BadRequestException);
+    });
+
+    it('routes a school event to SchoolBillingService', async () => {
+      const event = { id: 'evt_1', type: 'customer.subscription.updated', data: { object: { metadata: { schoolId: 's1' } } } };
+      mockStripeService.constructWebhookEvent.mockReturnValue(event);
+      mockSchoolBilling.matchesSchoolEvent.mockResolvedValue(true);
+      await controller.handleWebhook(buildReq('{}', 'sig') as never, 'sig', buildRes() as never);
+      expect(mockSchoolBilling.handleWebhookEvent).toHaveBeenCalledWith(event.type, event.data.object);
+      expect(mockPaymentsService.handleWebhookEvent).not.toHaveBeenCalled();
+    });
+
+    it('routes a consumer event to PaymentsService', async () => {
+      // Distinct event type underscores that routing is decided by
+      // matchesSchoolEvent (mocked), not by the Stripe event type.
+      const event = { id: 'evt_2', type: 'invoice.paid', data: { object: { customer: 'cus_consumer' } } };
+      mockStripeService.constructWebhookEvent.mockReturnValue(event);
+      mockSchoolBilling.matchesSchoolEvent.mockResolvedValue(false);
+      await controller.handleWebhook(buildReq('{}', 'sig') as never, 'sig', buildRes() as never);
+      expect(mockPaymentsService.handleWebhookEvent).toHaveBeenCalledWith(event.type, event.data.object);
+      expect(mockSchoolBilling.handleWebhookEvent).not.toHaveBeenCalled();
+    });
+
+    it('propagates a routing failure so Stripe retries (does not ack 200)', async () => {
+      // A Firestore failure in matchesSchoolEvent must throw → 500 → Stripe
+      // retries with backoff. Swallowing it and acking 200 would drop the
+      // event. Handlers are idempotent, so retries are safe.
+      const event = { id: 'evt_3', type: 'invoice.paid', data: { object: { customer: 'cus_1' } } };
+      mockStripeService.constructWebhookEvent.mockReturnValue(event);
+      mockSchoolBilling.matchesSchoolEvent.mockRejectedValue(new Error('firestore down'));
+      await expect(
+        controller.handleWebhook(buildReq('{}', 'sig') as never, 'sig', buildRes() as never),
+      ).rejects.toThrow('firestore down');
+      expect(mockPaymentsService.handleWebhookEvent).not.toHaveBeenCalled();
+      expect(mockSchoolBilling.handleWebhookEvent).not.toHaveBeenCalled();
     });
   });
 });

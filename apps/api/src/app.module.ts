@@ -20,6 +20,7 @@ import { CombatModule } from './modules/combat/combat.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { CoppaModule } from './modules/coppa/coppa.module';
 import { AcademyProgressModule } from './modules/academy-progress/academy-progress.module';
+import { SchoolBillingModule } from './modules/school-billing/school-billing.module';
 
 /**
  * Root application module.
@@ -45,6 +46,7 @@ import { AcademyProgressModule } from './modules/academy-progress/academy-progre
     PaymentsModule,
     ClassroomsModule,
     SchoolsModule,
+    SchoolBillingModule,
     NotificationsModule,
     CombatModule,
     InventoryModule,

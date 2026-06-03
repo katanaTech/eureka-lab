@@ -9,6 +9,7 @@ import { GameButton } from '@/components/game/GameButton';
 import { SchoolStatusBadge } from '@/components/features/admin/SchoolStatusBadge';
 import { CreateSchoolAdminDialog } from '@/components/features/admin/CreateSchoolAdminDialog';
 import { EditSeatLimitDialog } from '@/components/features/admin/EditSeatLimitDialog';
+import { BillingPanel } from '@/components/features/admin/BillingPanel';
 import { schoolsApi } from '@/lib/api-client';
 import type { School, SchoolAdminSummary } from '@eureka-lab/shared-types';
 
@@ -135,6 +136,8 @@ function SchoolDetailInner({ id }: { id: string }) {
           </ul>
         )}
       </div>
+
+      <BillingPanel schoolId={id} />
 
       <CreateSchoolAdminDialog open={adminOpen} onClose={() => setAdminOpen(false)} onSubmit={handleCreateAdmin} />
       <EditSeatLimitDialog open={seatOpen} current={school.seatLimit} onClose={() => setSeatOpen(false)} onSubmit={handleSeatLimit} />

@@ -117,7 +117,7 @@ Originally listed in the (now-deleted) `planning/sprint-01.md` "Next Up — Afte
 
 | ID | Item | Priority |
 |---|---|---|
-| STRIPE-001 | Stripe webhook handler for `subscription.updated` + `payment_failed`. Subscription lifecycle is broken without it. | Critical |
+| STRIPE-001 | Stripe webhook handler for `subscription.updated` + `payment_failed`. **Update 2026-06-03:** the consumer handlers + signature verification are **code-complete and tested** (`apps/api/src/modules/payments/`; confirmed during B2B 5a, which rides the same webhook). The real remainder is **prod webhook-secret verification** (`STRIPE_WEBHOOK_SECRET` in the live env) — folds into `DEPLOY-001`, not a code blocker. | Critical |
 | COPPA-001 | Compliance review for new data paths (classrooms, notifications, game progress). Plan 3b's P3-16 covers a slice; broader audit unowned. | Critical |
 | DEPLOY-001 | Production env var setup (Stripe / FCM / Sentry keys not confirmed in Railway/Vercel prod) | Critical |
 | QA-001 | Test coverage to 80%+ for Phases 6-15 modules (payments, classrooms, agents, projects, combat) | High |
@@ -169,7 +169,8 @@ A multi-tenant B2B layer on top of the existing B2C model: a platform **super-ad
 | 3 | School-admin console (manage teachers: create / list / deactivate-reactivate; TenantGuard's first live route) | **DONE** (`feat/school-admin-console`, 2026-05-30) | [console](docs/superpowers/specs/2026-05-30-school-tenancy-schooladmin-console-design.md) · [plan](docs/superpowers/plans/2026-05-30-school-tenancy-schooladmin-console-plan.md) |
 | 4a | School student enrollment + seat enforcement + school-consent COPPA (username/synthetic-email login, transactional seats, per-student under-13 audit) | **DONE** (`feat/school-student-enrollment`, 2026-05-31; api 35 suites/339 tests, schools module ~93% cov) | [enrollment](docs/superpowers/specs/2026-05-31-school-tenancy-student-enrollment-design.md) · [plan](docs/superpowers/plans/2026-05-31-school-tenancy-student-enrollment-plan.md) |
 | 4b | Classroom→school rollup (read-only school-admin tab) + teacher roster assignment + roster source + same-school join hardening; classroom `schoolId` stamping (super-admin usage views deferred to 5) | **DONE** (`feat/school-classroom-rollup`, 2026-06-02; api 37 suites/363 tests, classrooms ~95% / schools ~92% cov) | [rollup](docs/superpowers/specs/2026-05-31-school-tenancy-classroom-rollup-design.md) · [plan](docs/superpowers/plans/2026-05-31-school-tenancy-classroom-rollup-plan.md) |
-| 5 | B2B subscriptions / billing / key rotation (intersects `STRIPE-001`) | NOT WRITTEN | — |
+| 5a | B2B subscriptions / billing — per-seat on `seatLimit`, super-admin invoice-collected setup + school-admin Customer Portal, seatLimit-change proration, webhook status sync (status tracked, never auto-locks). **Key rotation + super-admin usage analytics deferred to a future 5b.** | **DONE** (`feat/school-b2b-billing`, 2026-06-03; api 40 suites/409 tests, school-billing service ~93% cov) | [billing](docs/superpowers/specs/2026-06-02-school-tenancy-billing-design.md) · [plan](docs/superpowers/plans/2026-06-02-school-tenancy-billing-plan.md) |
+| 5b | B2B secret-key rotation + super-admin usage-over-time analytics (deferred from 5a; revisit when a feature consumes school keys) | NOT WRITTEN | — |
 
 ---
 

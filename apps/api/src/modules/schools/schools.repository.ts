@@ -41,13 +41,13 @@ export class SchoolsRepository {
   }
 
   /**
-   * Update mutable school fields (status / seatLimit).
+   * Update mutable school fields (status / seatLimit / subscription / billingEmail).
    * @param id - School id.
    * @param partial - Subset of mutable fields to write.
    */
   async updateSchool(
     id: string,
-    partial: Partial<Pick<School, 'status' | 'seatLimit'>>,
+    partial: Partial<Pick<School, 'status' | 'seatLimit' | 'subscription' | 'billingEmail'>>,
   ): Promise<void> {
     await this.firebase.firestore.collection(this.collection).doc(id).update(partial);
   }
@@ -60,6 +60,34 @@ export class SchoolsRepository {
   async findById(id: string): Promise<School | null> {
     const doc = await this.firebase.firestore.collection(this.collection).doc(id).get();
     return doc.exists ? (doc.data() as School) : null;
+  }
+
+  /**
+   * Find a school by its Stripe subscription id (webhook subscription events).
+   * @param subscriptionId - Stripe subscription id (sub_...).
+   * @returns The school or null.
+   */
+  async findByStripeSubscriptionId(subscriptionId: string): Promise<School | null> {
+    const snapshot = await this.firebase.firestore
+      .collection(this.collection)
+      .where('subscription.stripeSubscriptionId', '==', subscriptionId)
+      .limit(1)
+      .get();
+    return snapshot.empty ? null : (snapshot.docs[0].data() as School);
+  }
+
+  /**
+   * Find a school by its Stripe customer id (webhook invoice events).
+   * @param customerId - Stripe customer id (cus_...).
+   * @returns The school or null.
+   */
+  async findByStripeCustomerId(customerId: string): Promise<School | null> {
+    const snapshot = await this.firebase.firestore
+      .collection(this.collection)
+      .where('subscription.stripeCustomerId', '==', customerId)
+      .limit(1)
+      .get();
+    return snapshot.empty ? null : (snapshot.docs[0].data() as School);
   }
 
   /**

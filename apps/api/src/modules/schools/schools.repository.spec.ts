@@ -80,6 +80,45 @@ describe('SchoolsRepository', () => {
     expect(mockUpdate).toHaveBeenCalledWith({ status: 'suspended', seatLimit: 25 });
   });
 
+  describe('stripe lookups', () => {
+    it('findByStripeSubscriptionId returns the matching school', async () => {
+      mockWhereLimitGet.mockResolvedValueOnce({ empty: false, docs: [{ data: () => school }] });
+      const res = await repo.findByStripeSubscriptionId('sub_1');
+      expect(res).toEqual(school);
+      expect(mockCollectionRef.where).toHaveBeenCalledWith(
+        'subscription.stripeSubscriptionId',
+        '==',
+        'sub_1',
+      );
+    });
+
+    it('findByStripeCustomerId returns null when empty', async () => {
+      mockWhereLimitGet.mockResolvedValueOnce({ empty: true, docs: [] });
+      expect(await repo.findByStripeCustomerId('cus_x')).toBeNull();
+      expect(mockCollectionRef.where).toHaveBeenCalledWith(
+        'subscription.stripeCustomerId',
+        '==',
+        'cus_x',
+      );
+    });
+
+    it('findByStripeCustomerId returns the matching school', async () => {
+      mockWhereLimitGet.mockResolvedValueOnce({ empty: false, docs: [{ data: () => school }] });
+      const res = await repo.findByStripeCustomerId('cus_1');
+      expect(res).toEqual(school);
+      expect(mockCollectionRef.where).toHaveBeenCalledWith(
+        'subscription.stripeCustomerId',
+        '==',
+        'cus_1',
+      );
+    });
+
+    it('findByStripeSubscriptionId returns null when empty', async () => {
+      mockWhereLimitGet.mockResolvedValueOnce({ empty: true, docs: [] });
+      expect(await repo.findByStripeSubscriptionId('sub_x')).toBeNull();
+    });
+  });
+
   describe('generateUniqueLoginCode', () => {
     it('returns a 6-char code that is not already used', async () => {
       // arrange: the uniqueness query returns an empty result (code unused)

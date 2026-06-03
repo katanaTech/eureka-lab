@@ -10,6 +10,7 @@ import { TeachersTable } from '@/components/features/school/TeachersTable';
 import { CreateTeacherDialog } from '@/components/features/school/CreateTeacherDialog';
 import { StudentsPanel } from '@/components/features/school/StudentsPanel';
 import { ClassroomsPanel } from '@/components/features/school/ClassroomsPanel';
+import { BillingStatusCard } from '@/components/features/school/BillingStatusCard';
 import { schoolsApi } from '@/lib/api-client';
 import type { SchoolTeacherSummary } from '@eureka-lab/shared-types';
 
@@ -84,6 +85,8 @@ function SchoolAdminInner() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+      <BillingStatusCard />
+
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="font-display text-3xl text-glow-primary">{tab === 'teachers' ? t('title') : tab === 'students' ? ts('title') : tc('title')}</h1>
         {tab === 'teachers' && (

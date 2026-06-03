@@ -5,6 +5,7 @@ import { SchoolsRepository } from './schools.repository';
 import { FirebaseService } from '../../infrastructure/firebase/firebase.service';
 import { UsersRepository } from '../users/users.repository';
 import { ContentModerationService } from '../ai/content-moderation.service';
+import { StripeService } from '../../infrastructure/stripe/stripe.service';
 
 const mockRepo = {
   newId: jest.fn().mockReturnValue('school-1'),
@@ -19,6 +20,7 @@ const mockSetClaims = jest.fn().mockResolvedValue(undefined);
 const mockFirebase = { auth: { createUser: mockCreateUser, setCustomUserClaims: mockSetClaims } };
 const mockUsersRepo = { create: jest.fn().mockResolvedValue(undefined), findByUid: jest.fn() };
 const mockModeration = { moderateInput: jest.fn().mockReturnValue({ passed: true }) };
+const mockStripe = { updateSubscriptionQuantity: jest.fn() };
 
 describe('SchoolsService', () => {
   let service: SchoolsService;
@@ -33,6 +35,7 @@ describe('SchoolsService', () => {
         { provide: FirebaseService, useValue: mockFirebase },
         { provide: UsersRepository, useValue: mockUsersRepo },
         { provide: ContentModerationService, useValue: mockModeration },
+        { provide: StripeService, useValue: mockStripe },
       ],
     }).compile();
     service = moduleRef.get(SchoolsService);
@@ -131,6 +134,51 @@ describe('SchoolsService', () => {
       expect(mockRepo.updateSchool).toHaveBeenCalledWith('school-1', { seatLimit: 25 });
       expect(result.seatLimit).toBe(25);
       expect(result.status).toBe('active');
+    });
+
+    it('prorates Stripe when seatLimit changes on a subscribed school', async () => {
+      mockRepo.findById.mockResolvedValueOnce({
+        id: 's1', name: 'A', status: 'active', seatLimit: 30, seatsUsed: 2, adminUids: [],
+        subscription: { tier: 'standard', status: 'active', stripeSubscriptionId: 'sub_1', stripeCustomerId: 'cus_1' },
+        secretKeys: { enrollmentSecret: 'sek_x' }, createdAt: 1, createdBy: 'sa',
+      });
+      mockStripe.updateSubscriptionQuantity.mockResolvedValueOnce({ status: 'active', currentPeriodEnd: 500, seatQuantity: 50 });
+      await service.updateSchool('s1', { seatLimit: 50 });
+      expect(mockStripe.updateSubscriptionQuantity).toHaveBeenCalledWith('sub_1', 50);
+      const arg = mockRepo.updateSchool.mock.calls.at(-1)![1];
+      expect(arg.seatLimit).toBe(50);
+      expect(arg.subscription).toEqual(expect.objectContaining({ seatQuantity: 50, periodEnd: 500, status: 'active' }));
+    });
+
+    it('does NOT call Stripe when the school has no subscription', async () => {
+      mockRepo.findById.mockResolvedValueOnce({
+        id: 's1', name: 'A', status: 'active', seatLimit: 30, seatsUsed: 2, adminUids: [],
+        subscription: { tier: 'trial', status: 'none' },
+        secretKeys: { enrollmentSecret: 'sek_x' }, createdAt: 1, createdBy: 'sa',
+      });
+      await service.updateSchool('s1', { seatLimit: 50 });
+      expect(mockStripe.updateSubscriptionQuantity).not.toHaveBeenCalled();
+    });
+
+    it('does NOT call Stripe when seatLimit is unchanged (status-only edit)', async () => {
+      mockRepo.findById.mockResolvedValueOnce({
+        id: 's1', name: 'A', status: 'active', seatLimit: 30, seatsUsed: 2, adminUids: [],
+        subscription: { tier: 'standard', status: 'active', stripeSubscriptionId: 'sub_1' },
+        secretKeys: { enrollmentSecret: 'sek_x' }, createdAt: 1, createdBy: 'sa',
+      });
+      await service.updateSchool('s1', { status: 'suspended' });
+      expect(mockStripe.updateSubscriptionQuantity).not.toHaveBeenCalled();
+    });
+
+    it('skips the Firestore write when the Stripe proration fails', async () => {
+      mockRepo.findById.mockResolvedValueOnce({
+        id: 's1', name: 'A', status: 'active', seatLimit: 30, seatsUsed: 2, adminUids: [],
+        subscription: { tier: 'standard', status: 'active', stripeSubscriptionId: 'sub_1' },
+        secretKeys: { enrollmentSecret: 'sek_x' }, createdAt: 1, createdBy: 'sa',
+      });
+      mockStripe.updateSubscriptionQuantity.mockRejectedValueOnce(new Error('stripe down'));
+      await expect(service.updateSchool('s1', { seatLimit: 50 })).rejects.toThrow('stripe down');
+      expect(mockRepo.updateSchool).not.toHaveBeenCalled();
     });
   });
 
