@@ -21,6 +21,7 @@ import {
 } from '../../common/decorators/current-user.decorator';
 import { StripeService } from '../../infrastructure/stripe/stripe.service';
 import { PaymentsService } from './payments.service';
+import { SchoolBillingService } from '../school-billing/school-billing.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { PortalSessionDto } from './dto/portal-session.dto';
 
@@ -39,6 +40,7 @@ export class PaymentsController {
   constructor(
     private readonly paymentsService: PaymentsService,
     private readonly stripeService: StripeService,
+    private readonly schoolBilling: SchoolBillingService,
   ) {}
 
   /**
@@ -128,10 +130,17 @@ export class PaymentsController {
       eventId: event.id,
     });
 
-    await this.paymentsService.handleWebhookEvent(
-      event.type,
-      event.data.object as unknown as Record<string, unknown>,
-    );
+    const eventObject = event.data.object as unknown as Record<string, unknown>;
+    const isSchoolEvent = await this.schoolBilling.matchesSchoolEvent({
+      type: event.type,
+      data: { object: eventObject },
+    });
+
+    if (isSchoolEvent) {
+      await this.schoolBilling.handleWebhookEvent(event.type, eventObject);
+    } else {
+      await this.paymentsService.handleWebhookEvent(event.type, eventObject);
+    }
 
     await res.status(HttpStatus.OK).send({ received: true });
   }
