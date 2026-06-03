@@ -118,6 +118,13 @@ describe('SchoolBillingService', () => {
       expect(s).toEqual(expect.objectContaining({ schoolId: 's1', tier: 'standard', status: 'past_due', seatLimit: 30, seatsUsed: 2, hasSubscription: true }));
     });
 
+    it('reports status none for a school with no subscription (even if doc says active)', async () => {
+      mockRepo.findById.mockResolvedValue({ ...baseSchool, subscription: { tier: 'trial', status: 'active' } });
+      const s = await service.getBillingSummary('s1');
+      expect(s.status).toBe('none');
+      expect(s.hasSubscription).toBe(false);
+    });
+
     it('throws NotFound when the school is missing', async () => {
       mockRepo.findById.mockResolvedValue(null);
       await expect(service.getBillingSummary('s1')).rejects.toBeInstanceOf(NotFoundException);
@@ -137,9 +144,10 @@ describe('SchoolBillingService', () => {
   });
 
   describe('handleWebhookEvent', () => {
-    it('subscription.updated syncs status/periodEnd/qty', async () => {
+    it('subscription.updated syncs status/periodEnd/qty (v20 item shape)', async () => {
       mockRepo.findByStripeSubscriptionId.mockResolvedValue(baseSchool);
-      await service.handleWebhookEvent('customer.subscription.updated', { id: 'sub_1', status: 'active', current_period_end: 200, items: { data: [{ quantity: 40 }] } });
+      // Stripe SDK v20: current_period_end lives on the subscription item.
+      await service.handleWebhookEvent('customer.subscription.updated', { id: 'sub_1', status: 'active', items: { data: [{ quantity: 40, current_period_end: 200 }] } });
       expect(mockRepo.updateSchool).toHaveBeenCalledWith('s1', expect.objectContaining({ subscription: expect.objectContaining({ status: 'active', periodEnd: 200, seatQuantity: 40 }) }));
     });
     it('invoice.payment_failed marks past_due via customer lookup', async () => {

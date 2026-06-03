@@ -197,9 +197,14 @@ export class SchoolBillingService {
       this.logger.warn({ event: 'school_webhook_no_match', subscriptionId });
       return;
     }
-    const periodEnd = data['current_period_end'] as number | undefined;
-    const items = data['items'] as { data?: Array<{ quantity?: number }> } | undefined;
-    const qty = items?.data?.[0]?.quantity;
+    /* Stripe SDK v20 moved current_period_end onto the subscription item;
+       fall back to the (legacy) top-level field for resilience. */
+    const items = data['items'] as
+      | { data?: Array<{ quantity?: number; current_period_end?: number }> }
+      | undefined;
+    const firstItem = items?.data?.[0];
+    const periodEnd = firstItem?.current_period_end ?? (data['current_period_end'] as number | undefined);
+    const qty = firstItem?.quantity;
     const subscription: SchoolSubscription = {
       ...school.subscription,
       status: override.status,
@@ -249,15 +254,19 @@ export class SchoolBillingService {
    */
   private toSummary(school: School, latestInvoiceUrl?: string): SchoolBillingSummary {
     const sub = school.subscription;
+    const hasSubscription = Boolean(sub.stripeSubscriptionId);
     return {
       schoolId: school.id,
       tier: sub.tier,
-      status: sub.status,
+      /* Report 'none' until a subscription exists so the console doesn't show a
+         misleading 'active' badge next to the set-up form (the doc's default
+         status is 'active' from createSchool, which predates billing). */
+      status: hasSubscription ? sub.status : 'none',
       seatLimit: school.seatLimit,
       seatsUsed: school.seatsUsed,
       seatQuantity: sub.seatQuantity,
       periodEnd: sub.periodEnd,
-      hasSubscription: Boolean(sub.stripeSubscriptionId),
+      hasSubscription,
       latestInvoiceUrl,
     };
   }
