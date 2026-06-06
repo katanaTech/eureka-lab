@@ -798,6 +798,24 @@
     "tryAgain": "حاول مجدداً",
     "returnToAcademy": "العودة إلى الأكاديمية"
   },
+  "SchoolAnalytics": {
+    "overviewTitle": "نظرة عامة على استخدام المنصة",
+    "totalSchools": "إجمالي المدارس",
+    "active": "نشط",
+    "suspended": "موقوف",
+    "seats": "المقاعد",
+    "utilization": "الاستخدام",
+    "students": "الطلاب",
+    "activeStudents": "نشطون",
+    "billingMix": "توزيع الفوترة",
+    "loading": "جارٍ التحميل…",
+    "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "colUtilization": "الاستخدام",
+    "colStudents": "الطلاب",
+    "colActive": "% النشطين",
+    "colBilling": "الفوترة",
+    "notAvailable": "غير متوفر"
+  },
   "SchoolBilling": {
     "title": "الفوترة",
     "status": "الحالة",

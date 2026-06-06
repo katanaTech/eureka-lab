@@ -44,6 +44,8 @@ import type {
   SchoolStudentSummary,
   SchoolClassroomSummary,
   SchoolBillingSummary,
+  PlatformUsageOverview,
+  SchoolUsageRow,
 } from '@eureka-lab/shared-types';
 import { auth } from './firebase';
 
@@ -1099,6 +1101,8 @@ export type {
   ShopCatalog,
   FantasyCharacter,
   FantasyClass,
+  PlatformUsageOverview,
+  SchoolUsageRow,
 };
 
 /* ── Schools API (super-admin console) ─────────────────────────── */
@@ -1195,4 +1199,14 @@ export const schoolBillingApi = {
       method: 'POST',
       body: JSON.stringify({ returnUrl }),
     }),
+};
+
+/* ── School Analytics API (super-admin usage dashboard) ─────────── */
+
+/** Super-admin platform-usage analytics endpoints. */
+export const schoolAnalyticsApi = {
+  /** Super-admin: platform usage overview. */
+  overview: () => request<PlatformUsageOverview>('/school-analytics/overview'),
+  /** Super-admin: per-school usage rows. */
+  schools: () => request<{ schools: SchoolUsageRow[] }>('/school-analytics/schools'),
 };
