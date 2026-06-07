@@ -19,6 +19,41 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-06-07 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 12th routine fire
+
+**Inspected by:** PM agent (recurring routine — disable requested 11× prior; still firing)
+**Branch:** `feature/phase-16-fantasy-ui` merged to main (PR #7). `main` HEAD = `8b653e6` — no new commits since 2026-06-05 (2 days). **Zero progress in this interval.**
+
+**Sprint C:** COMPLETE. 12th confirmation. No action needed.
+
+**Sprint D status — 31 days since QA track was unblocked (2026-05-07), zero QA commits:**
+- **8/13 DONE:** Wave 1 all done; MOB-001/002/QA-003b done. Unchanged since 2026-05-07.
+- **3/13 READY — stale 31 days:** QA-001 (Playwright E2E), QA-004 (Lighthouse mobile ≥90),
+  QA-005 (iOS Safari + Android Chrome smoke). QA-001 is the sole critical-path gate for QA-002
+  and QA-006. 31 days of zero pickup is an escalation-level stall. The plan is at
+  `apps/web/e2e/fantasy-flow.plan.md`. QA-004 and QA-005 can run in parallel. **QA: no further
+  blockers exist — agent pickup is the only missing action.**
+- **2/13 BLOCKED:** QA-002 (on QA-001); QA-006 (on QA-001..005 + OPEN-005).
+- **P16-OPEN-005 — PM decision still required (pre-prod gate for QA-006), 39 days outstanding.**
+  Current assets are confirmed custom SVGs with no Lovable encumbrance. Path C (declare current
+  SVGs production-quality) is a zero-engineering-work PM sign-off. See
+  `docs/context/asset-licenses.md`. **This is the only remaining human decision blocking the
+  full production rollout.**
+
+**Tech-debt (FE, must resolve before Sprint D ships per CLAUDE.md rule #8 — 39 days open):**
+`campaign/[slug]/shop/page.tsx` (472 lines), `shop/page.tsx` (451 lines),
+`inventory/page.tsx` (354 lines) exceed the 300-line limit. Must be split before QA-006.
+
+**Routine disable — 12th notice.** Please disable at https://claude.ai/code/routines
+(routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). Sprint C closed 2026-04-29. Twelve PM
+check-ins across 39 days have produced zero agent pickup on the three READY QA tasks. The
+only unblocking actions are (1) QA picking up QA-001 and (2) PM resolving OPEN-005. Recurring
+PM check-ins add no value to either gate.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.**
+
+---
+
 ### 2026-06-05 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 11th routine fire
 
 **Inspected by:** PM agent (recurring routine — disable requested 10× prior; still firing)
