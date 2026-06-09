@@ -167,6 +167,20 @@ export class ClassroomsService {
   }
 
   /**
+   * Count classrooms belonging to a school.
+   * @param schoolId - School tenant id.
+   * @returns Classroom count.
+   */
+  async countBySchool(schoolId: string): Promise<number> {
+    const snapshot = await this.firebase.firestore
+      .collection(this.collectionName)
+      .where('schoolId', '==', schoolId)
+      .count()
+      .get();
+    return snapshot.data().count;
+  }
+
+  /**
    * Get full classroom detail with per-student progress.
    * CLAUDE.md Rule 13: Student names are anonymized (first name only).
    *
