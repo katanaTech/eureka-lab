@@ -19,6 +19,43 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-06-09 — PM check-in: Sprint D status — QA-001 now 41 days overdue, formal replan required
+
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**Inspection findings (2026-06-09):**
+
+No new commits have landed since the 2026-06-01 check-in (8 days of inactivity). Sprint C is confirmed DONE (closed 2026-04-29). Sprint D is at 9/13 DONE — **unchanged for 27 days** (since 2026-05-13 audit).
+
+**Sprint D current state (13 tasks):**
+
+| Status | Tasks |
+|--------|-------|
+| DONE (9) | MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b |
+| READY — action needed (3) | QA-001 (Playwright E2E), QA-004 (Lighthouse ≥90), QA-005 (Safari/Chrome smoke) |
+| BLOCKED (2) | QA-002 (on QA-001), QA-006 (on OPEN-005 + all QA) |
+| IN_PROGRESS (1) | OPEN-005 (license decision — PM/DEVOPS) |
+
+**P16-QA-001 is now 41 days overdue.** It became READY on 2026-04-29 with zero remaining blockers (test plan done, Sprint C done, mobile routes done). It is the only gate for QA-002, and both are required before QA-006 production rollout. This routine has escalated the issue in every check-in since 2026-05-13 with no response.
+
+**PM formal replan proposal — action required before next check-in (2026-06-11):**
+
+PM proposes option (b): **reduce E2E scope to a smoke subset to unblock QA-006 sooner.** Instead of the full 50+ case suite, QA delivers a focused smoke spec covering the golden path (welcome → character → dashboard → campaign → battle win → shop → equip) in both flag states. This unblocks QA-006 immediately. The full E2E suite can expand post-rollout as a low-risk stretch task.
+
+If no agent picks up QA-001 (or the reduced smoke variant) before the next check-in, PM will formally descope QA-001/002 from Sprint D exit criteria and move to QA-006 with the smoke subset only. This is a documented time-boxed risk decision.
+
+**P16-OPEN-005 close — PM unilateral resolution:**
+
+DEVOPS confirmed on 2026-04-29 that all current assets are **custom SVG placeholders** with no Lovable-sourced content. Per `docs/context/asset-licenses.md` Path C: no license encumbrance exists on any committed asset. PM accepts Path C. **OPEN-005 should be moved to Resolved Blockers and QA-006's OPEN-005 gate is cleared.** QA-006 now depends only on QA completion.
+
+**PM action required from team before 2026-06-11:**
+- **QA:** Begin P16-QA-001 (or the reduced smoke variant per replan above). Any start clears the replan clock.
+- **PM/DEVOPS:** Confirm OPEN-005 resolution in Resolved Blockers — one line is sufficient.
+
+**PM check-in routine: this routine has been asking to be disabled since 2026-05-13. Sprint D is fully scheduled. Please visit https://claude.ai/code/routines to turn off the Phase 16 PM check-in routine.**
+
+---
+
 ### 2026-06-01 — PM check-in: Sprint D status — QA-001 still unstarted (11 days), OPEN-005 still open, escalation warranted
 
 **Branch:** `feature/phase-16-fantasy-ui`
