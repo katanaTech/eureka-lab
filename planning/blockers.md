@@ -19,6 +19,46 @@ replacement art. Track in Sprint D of sprint-p16.md.
 
 ## Inter-Agent Notifications
 
+### 2026-06-17 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 16th routine fire
+
+**Inspected by:** PM agent (recurring routine — disable requested 15× prior; still firing)
+**Branch:** `feature/phase-16-fantasy-ui` merged to main (PR #7). `main` HEAD = `f6ffe1e` (2026-06-03) — **no new commits in 14 days.** Note: 5 check-in commits (2026-06-05 through 2026-06-15) were made to an orphaned detached HEAD and never pushed; those entries exist only in session history, not in the repo.
+
+**Sprint C:** COMPLETE. 16th confirmation. Battle page at
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx`
+(4-file split: page.tsx, battle-stage.tsx, battle-quiz.tsx, battle-outcome.tsx).
+Wires `POST /api/v1/combat/init` (page.tsx:41) and `useCombatStore` (page.tsx:20/72).
+All 15/15 Sprint C tasks DONE since 2026-04-29. No action needed.
+
+**Sprint D status — 41 days since QA track was unblocked (2026-05-07), zero QA commits:**
+- **8/13 DONE:** Wave 1 all done; MOB-001/002/QA-003b done. Frozen since 2026-05-07.
+- **3/13 READY — stale 41 days:** QA-001 (Playwright E2E), QA-004 (Lighthouse mobile ≥90),
+  QA-005 (iOS Safari + Android Chrome smoke) have been READY since 2026-05-07.
+  **QA-001 is the sole critical-path gate for QA-002 and QA-006 (production rollout).
+  41 days with zero pickup is a project-level delivery failure. QA: start QA-001 now —
+  plan at `apps/web/e2e/fantasy-flow.plan.md`. QA-004 and QA-005 can run in parallel.**
+- **2/13 BLOCKED:** QA-002 (on QA-001); QA-006 (on QA-001..005 + OPEN-005).
+- **P16-OPEN-005 — PM decision pending 49 days (since DEVOPS portion complete 2026-04-29).**
+  Current assets are custom SVGs with no Lovable encumbrance. Path C (declare current SVGs
+  production-quality) is a zero-engineering-work PM sign-off. See `docs/context/asset-licenses.md`.
+  **This is the only remaining human decision blocking the full production rollout. PM: act now.**
+
+**Tech-debt (FE, pre-ship gate per CLAUDE.md rule #8 — 49 days open):**
+`campaign/[slug]/shop/page.tsx` (472 lines), `shop/page.tsx` (451 lines),
+`inventory/page.tsx` (354 lines) exceed the 300-line limit. Must be split before QA-006.
+
+**Git hygiene note:** Previous PM sessions committed check-ins to a detached HEAD
+(not on `main`). Those commits are orphaned. All future PM commits must be on a
+checked-out branch, not detached HEAD.
+
+**Routine disable — 16th notice.** Please disable at https://claude.ai/code/routines
+(routine ID: `trig_01MTn9VXjqAg3mVvQCekuaK4`). The two open gates — QA picking up
+QA-001 and PM resolving OPEN-005 — are not accelerated by recurring PM check-ins.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.**
+
+---
+
 ### 2026-06-15 — PM Sprint D check-in (Phase 16 / fantasy-UI) — 15th routine fire
 
 **Inspected by:** PM agent (recurring routine — disable requested 14× prior; still firing)
