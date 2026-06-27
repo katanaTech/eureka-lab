@@ -276,7 +276,7 @@
 > **Branch:** `feature/phase-16-fantasy-ui`
 > **Status:** IN PROGRESS — Sprint C DONE (2026-04-29); Sprint D in progress.
 > **Sprint C progress:** 15/15 DONE.
-> **Sprint D progress:** 9/13 DONE (MOB-001/002, AST-001/002, MOB-003, QA-PLAN, QA-003a, QA-003b, QA-OPEN-005 in-progress) · 4 remaining (QA-001/002/004/005) READY · QA-006 BLOCKED on OPEN-005 + QA.
+> **Sprint D progress:** 10/13 DONE (MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b, OPEN-005 closed 2026-06-27) · 3 READY (QA-001/004/005) · BLOCKED (QA-002 on QA-001, QA-006 on QA completion) · QA-006 OPEN-005 gate cleared.
 
 ### Part A — Foundation (Design Tokens, Flag, Shared Types)
 
@@ -398,7 +398,7 @@
 | P16-OPEN-002 | Confirm realm slugs `whispers/echoes/glitches/wraiths/void` (ADR-005 §1) | DONE | Product owner accepted 2026-04-26 — locked in ADR-005 |
 | P16-OPEN-003 | Confirm "Babble" boss naming | DONE | Product owner accepted 2026-04-26 — locked in ADR-005 |
 | P16-OPEN-004 | KP earn/spend tuning values (initial seed) | DONE | PM resolved 2026-04-26 — see sprint-p16.md §KP Tuning Values |
-| P16-OPEN-005 | Lovable-asset license / replacement plan | IN_PROGRESS | DEVOPS documented 2026-04-29 in docs/context/asset-licenses.md — 3 resolution paths outlined. PM decision pending. Pre-prod gate |
+| P16-OPEN-005 | Lovable-asset license / replacement plan | DONE | PM Path C accepted 2026-06-27 — all assets are custom SVGs, no Lovable content, no encumbrance. QA-006 gate cleared. |
 
 ---
 
@@ -417,4 +417,4 @@
 
 ---
 
-*Last updated: 2026-05-13 (PM audit) | Phases 1–14 complete. Phase 15 backend done, frontend deferred. Phase 16 Sprints A+B+C DONE. Sprint D: MOB-001/002 + all AST + QA-003a/003b DONE. Remaining: QA-001/002 (READY), QA-004/005 (READY), QA-006 (BLOCKED on OPEN-005 + QA completion), OPEN-005 (IN_PROGRESS).*
+*Last updated: 2026-06-27 (PM audit) | Phases 1–14 complete. Phase 15 backend done, frontend deferred. Phase 16 Sprints A+B+C DONE. Sprint D: 10/13 DONE (MOB + AST + QA-003a/003b + OPEN-005 closed). Remaining: QA-001/002/004/005 (QA-001/004/005 READY, QA-002 BLOCKED on QA-001). QA-006 OPEN-005 gate cleared; blocked on QA completion only.*

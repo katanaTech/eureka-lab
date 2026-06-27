@@ -273,7 +273,7 @@ DONE (FE mobile mirror + QA Playwright impl + DEVOPS rollout).
 | P16-AST-001 | Import 6 Lovable assets to `apps/web/public/assets/game/` (world-map, island-1..4, zombie, hero-warrior/mage/rogue/engineer, logo) | DEVOPS | — | S | **DONE** (2026-04-29) — 13 SVG placeholders + game-assets.ts + Logo.tsx→.svg |
 | P16-AST-002 | Generate 4 zone-specific zombie variants (color-tinted base zombie) | DEVOPS | AST-001 | S | **DONE** (2026-04-29) — scripts/generate-zombie-variants.sh |
 | P16-MOB-003 | Asset script: generate 768×1024 mobile crops from desktop backgrounds; commit to `scripts/generate-mobile-crops.{ts,sh}` | DEVOPS | AST-001 | S | **DONE** (2026-04-29) — scripts/generate-mobile-crops.sh |
-| P16-OPEN-005 | Lovable asset license / replacement decision (commercial-use confirmation OR commission replacement) | PM+DEVOPS | — | — | **IN_PROGRESS** — docs/context/asset-licenses.md written; PM decision pending |
+| P16-OPEN-005 | Lovable asset license / replacement decision (commercial-use confirmation OR commission replacement) | PM+DEVOPS | — | — | **DONE** (2026-06-27) — Path C: all assets are custom SVGs, no Lovable content, no encumbrance. PM accepted. QA-006 gate cleared. |
 | P16-QA-PLAN | Draft Playwright test plan for QA-001/QA-002 (test cases, fixtures, mock auth strategy); commit to `apps/web/e2e/fantasy-flow.plan.md` | QA | — | S | **DONE** (2026-04-29) — 13 test suites, 50+ cases, mock auth strategy, flag matrix |
 | P16-QA-003a | i18n string extraction pass 1: extract strings from already-landed Sprint B+C pages (welcome, character, dashboard, campaign, settings, prepare, prep, shop, inventory, victory, not-found) into `en.json`; stub `fr.json`/`ar.json` with TODO markers | FE+QA | — | M | **READY** — battle page strings deferred to QA-003b |
 
@@ -291,7 +291,7 @@ DONE (FE mobile mirror + QA Playwright impl + DEVOPS rollout).
 | P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | DEVOPS | All Wave 1+2 done, OPEN-005 resolved | — | BLOCKED (pending OPEN-005 decision + QA-001/002/004/005) |
 
 **Sprint D exit criteria:**
-- [ ] All 6 Lovable assets imported (or replacements commissioned per OPEN-005) — current SVG placeholders in place; license decision pending
+- [x] All assets resolved per OPEN-005 — custom SVG placeholders confirmed clean; Path C accepted by PM 2026-06-27
 - [x] Mobile crop script runs cleanly and outputs 768×1024 variants (MOB-003, scripts/generate-mobile-crops.sh)
 - [x] All 11 mobile routes functional; bottom-tab nav works (MOB-001/002 DONE 2026-05-06)
 - [ ] Playwright passes in both flag states (fantasyUi=true/false) — QA-001/002 READY, not yet implemented

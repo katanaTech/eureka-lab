@@ -6,18 +6,54 @@
 
 ## Active Blockers
 
-### P16-OPEN-005 — Lovable asset license (PM → DEVOPS)
-
-**Severity:** Pre-prod gate (does NOT block dev/staging work)
-**Owner:** DEVOPS with PM oversight
-**Action needed:** Before any B2B client or public production rollout of `featureFlags.fantasyUi`,
-DEVOPS must either (a) confirm Lovable.dev asset license permits commercial use, or (b) commission
-replacement art. Track in Sprint D of sprint-p16.md.
-**Deadline:** Before P16-QA-006 (production flag enablement).
+*(No active blockers — OPEN-005 resolved below; QA-001/004/005 are READY tasks awaiting agent pickup, not blockers.)*
 
 ---
 
 ## Inter-Agent Notifications
+
+### 2026-06-27 — PM check-in: Sprint D status — QA-001 now 59 days READY, OPEN-005 formally closed, branch routing note
+
+**Inspected by:** PM agent (recurring routine — disable requested 20+ times; still firing)
+**Branch:** `feature/phase-16-fantasy-ui`
+**Note on branch routing:** Prior PM check-ins from 2026-06-11 through 2026-06-25 were committed to
+`main` instead of this feature branch. That was a navigation error by the PM routine. Those entries
+exist on `main`; the authoritative sprint tracking branch is this one (`feature/phase-16-fantasy-ui`).
+This entry is committed here to restore correctness.
+
+**Sprint C:** CONFIRMED DONE (closed 2026-04-29, 15/15 tasks). No further action needed.
+Battle page at `apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` verified:
+wires `POST /api/v1/combat/init`, uses `useCombatStore`. All acceptance criteria met.
+
+**Sprint D — status unchanged since 2026-05-13 (45 days of stasis on QA track):**
+
+| Status | Count | Tasks |
+|--------|-------|-------|
+| DONE | 9 | MOB-001, MOB-002, MOB-003, AST-001, AST-002, QA-PLAN, QA-003a, QA-003b, OPEN-005 (resolved below) |
+| READY — 59 days unstarted | 3 | **QA-001** (critical path), QA-004, QA-005 |
+| BLOCKED | 2 | QA-002 (on QA-001), QA-006 (on QA-001..005) |
+
+**P16-OPEN-005 — PM formally closes (Path C):** All current assets are custom SVG placeholders.
+DEVOPS confirmed on 2026-04-29: no Lovable-sourced content in repo; no license encumbrance.
+PM declared Path C on 2026-06-09. Formally moving to Resolved Blockers this run.
+**QA-006's OPEN-005 gate is cleared. QA-006 now depends only on QA-001/002/004/005.**
+
+**QA-001 critical path:** Playwright E2E suite. Test plan at `apps/web/e2e/fantasy-flow.plan.md`.
+Sprint C done. Mobile routes done. All blockers cleared. **Zero implementation in 59 days.**
+This is the single gate for QA-002 and QA-006 (production rollout). If no QA agent picks this
+up, the PM replan proposal (reduced smoke subset from 2026-06-09) stands and PM will formally
+descope QA-001/002 to a smoke spec on the next check-in.
+
+**Pre-ship tech-debt (CLAUDE.md rule #8 — FE to address before QA-006):**
+`campaign/[slug]/shop/page.tsx` (472 lines), `shop/page.tsx` (451 lines),
+`inventory/page.tsx` (354 lines) all exceed the 300-line limit.
+
+**Routine disable — 21st notice.** Sprint D fully scheduled. All remaining work has clear owners.
+Please disable this routine at https://claude.ai/code/routines
+(routine `trig_01MTn9VXjqAg3mVvQCekuaK4`). **PM check-in routine: Sprint D scheduled, please
+disable this routine.**
+
+---
 
 ### 2026-06-09 — PM check-in: Sprint D status — QA-001 now 41 days overdue, formal replan required
 
@@ -504,6 +540,17 @@ ARCH stands down on Phase 16 implementation — re-engage on:
 ---
 
 ## Resolved Blockers
+
+### 2026-06-27 — P16-OPEN-005: Lovable asset license
+
+**Resolved by:** PM (unilateral, Path C)
+**Resolution:** All current game assets in `apps/web/public/assets/game/` are custom SVG
+placeholders authored by DEVOPS (P16-AST-001/002). No Lovable-sourced assets were ever
+committed. DEVOPS documented this on 2026-04-29 (`docs/context/asset-licenses.md`). PM
+accepts Path C — current SVGs are clean; no license review or replacement required.
+QA-006 production rollout is cleared of the OPEN-005 gate.
+
+---
 
 ### 2026-04-26 — P16-OPEN-004: KP earn/spend tuning values
 
