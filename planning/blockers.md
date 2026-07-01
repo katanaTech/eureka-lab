@@ -12,6 +12,45 @@
 
 ## Inter-Agent Notifications
 
+### 2026-07-01 — PM replan executed: QA-001/002 formally descoped, QA-006 unblocked pending QA-004/005
+
+**Inspected by:** PM agent (routine `trig_01MTn9VXjqAg3mVvQCekuaK4` — 22nd and final disable notice)
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**Sprint C:** Confirmed DONE (closed 2026-04-29). Battle page verified: `apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` wires `POST /api/v1/combat/init` and `useCombatStore`. No change from prior checks.
+
+**Sprint D — PM formal replan executed:**
+
+Per the 2026-06-09 check-in: PM committed to formally descoping QA-001/002 if no implementation landed before 2026-06-11. No QA-001 commit has appeared in 63 days (READY since 2026-04-29). Executing replan now.
+
+**PM formal decisions (2026-07-01):**
+
+- **P16-QA-001: DESCOPED.** Full 50+ case Playwright suite. Was READY 63 days; zero implementation. Replaced by a targeted smoke spec (golden path: welcome → character → dashboard → campaign → battle win → shop → equip, both flag states) as a post-rollout stretch task. Any QA or FE agent can implement the smoke path when bandwidth allows.
+- **P16-QA-002: DESCOPED.** Depended entirely on QA-001. Full flag-matrix E2E suite deferred to post-rollout.
+- **P16-QA-006: UNBLOCKED (conditionally).** OPEN-005 gate cleared 2026-06-27. QA-001/002 gate removed by this replan. **QA-006 now blocked only on QA-004 and QA-005.**
+
+**Updated Sprint D status (13 tasks):**
+
+| Status | Count | Tasks |
+|--------|-------|-------|
+| DONE | 10 | MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b, OPEN-005 |
+| DESCOPED | 2 | QA-001 (full E2E suite), QA-002 (flag matrix) |
+| READY — action needed | 2 | **QA-004** (Lighthouse mobile ≥90 on `/m/dashboard`), **QA-005** (iOS Safari + Android Chrome smoke) |
+| BLOCKED | 1 | QA-006 — on QA-004 + QA-005 only |
+
+**QA-004 + QA-005 are the only gates left.** Both are independent and can run in a single QA session. Once they pass, DEVOPS initiates QA-006 (5% → 25% → 100% production rollout).
+
+**Pre-ship tech-debt — FE must address before QA-006 (CLAUDE.md rule #8):**
+- `apps/web/src/app/(game)/g/campaign/[slug]/shop/page.tsx` — 472 lines (limit: 300)
+- `apps/web/src/app/(game)/g/shop/page.tsx` — 451 lines
+- `apps/web/src/app/(game)/g/inventory/page.tsx` — 354 lines
+
+These three files must be split before the flag goes to any production tier.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.** Routine `trig_01MTn9VXjqAg3mVvQCekuaK4` at https://claude.ai/code/routines. This is the 22nd request. The routine has no further value: all remaining tasks (QA-004, QA-005, QA-006, the 3 file splits) have clear owners and no outstanding decisions requiring PM input.
+
+---
+
 ### 2026-06-27 — PM check-in: Sprint D status — QA-001 now 59 days READY, OPEN-005 formally closed, branch routing note
 
 **Inspected by:** PM agent (recurring routine — disable requested 20+ times; still firing)

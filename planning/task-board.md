@@ -276,7 +276,7 @@
 > **Branch:** `feature/phase-16-fantasy-ui`
 > **Status:** IN PROGRESS — Sprint C DONE (2026-04-29); Sprint D in progress.
 > **Sprint C progress:** 15/15 DONE.
-> **Sprint D progress:** 10/13 DONE (MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b, OPEN-005 closed 2026-06-27) · 3 READY (QA-001/004/005) · BLOCKED (QA-002 on QA-001, QA-006 on QA completion) · QA-006 OPEN-005 gate cleared.
+> **Sprint D progress:** 10/13 DONE · 2 DEFERRED (QA-001/002, PM replan 2026-07-01) · 2 READY (QA-004/005) · 1 BLOCKED (QA-006 on QA-004+005 only — OPEN-005 cleared, QA-001/002 descoped).
 
 ### Part A — Foundation (Design Tokens, Flag, Shared Types)
 
@@ -382,13 +382,13 @@
 | ID | Task | Status | Notes |
 |----|------|--------|-------|
 | P16-QA-PLAN | Draft Playwright test plan (cases, fixtures, mock auth) into `apps/web/e2e/fantasy-flow.plan.md` | DONE | QA 2026-04-29 — 13 suites, 50+ test cases, mock auth + API strategy, flag matrix for QA-002 |
-| P16-QA-001 | Playwright suite: fantasy-mode end-to-end (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | READY | QA — Sprint C DONE + QA-PLAN done + MOB-001 done; all blockers cleared. No implementation yet (only smoke.spec.ts exists). |
-| P16-QA-002 | Playwright matrix: same flow runs with `featureFlags.fantasyUi` true and false | BLOCKED | QA — blocked on QA-001 |
+| P16-QA-001 | Playwright suite: fantasy-mode end-to-end (welcome → character → dashboard → campaign → battle win/lose → shop → equip → battle reuse) | DEFERRED | PM 2026-07-01 — 63 days READY with no pickup; descoped to post-rollout smoke-spec stretch task |
+| P16-QA-002 | Playwright matrix: same flow runs with `featureFlags.fantasyUi` true and false | DEFERRED | PM 2026-07-01 — depended on QA-001; deferred to post-rollout |
 | P16-QA-003a | i18n extraction pass 1 (Sprint B+C pages already on disk) | DONE | FE+QA 2026-05-04 — 4 commits: 06aac4a, a577f83, cb1bc31, afb1896. 12 Phase16 namespaces in en/fr/ar.json. All 13 Sprint B+C pages wired. |
 | P16-QA-003b | i18n extraction pass 2 (battle page strings) | DONE | QA 2026-05-06 — Phase16Battle namespace added to en/fr/ar.json, 6 files wired with useTranslations |
 | P16-QA-004 | Lighthouse mobile ≥90 perf for `/m/dashboard` | READY | QA — MOB-001 now DONE; Lighthouse not yet run |
 | P16-QA-005 | iOS Safari + Android Chrome smoke tests before flag enablement | READY | QA — MOB-001 now DONE; smoke not yet executed |
-| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | BLOCKED | DEVOPS — blocked on all Wave 1+2 done & OPEN-005 resolved |
+| P16-QA-006 | Production rollout via flag: 5% → 25% → 100% over 2 weeks | BLOCKED | DEVOPS — blocked on QA-004 + QA-005 only (OPEN-005 cleared, QA-001/002 descoped) |
 
 ### Part K — Open Decisions Awaiting Confirmation
 
@@ -417,4 +417,4 @@
 
 ---
 
-*Last updated: 2026-06-27 (PM audit) | Phases 1–14 complete. Phase 15 backend done, frontend deferred. Phase 16 Sprints A+B+C DONE. Sprint D: 10/13 DONE (MOB + AST + QA-003a/003b + OPEN-005 closed). Remaining: QA-001/002/004/005 (QA-001/004/005 READY, QA-002 BLOCKED on QA-001). QA-006 OPEN-005 gate cleared; blocked on QA completion only.*
+*Last updated: 2026-07-01 (PM replan) | Phases 1–14 complete. Phase 15 backend done, frontend deferred. Phase 16 Sprints A+B+C DONE. Sprint D: 10/13 DONE; QA-001/002 formally DEFERRED (PM 2026-07-01 — 63 days READY, no pickup); QA-004/005 READY; QA-006 BLOCKED on QA-004+005 only.*
