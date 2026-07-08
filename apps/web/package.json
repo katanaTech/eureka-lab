@@ -54,6 +54,7 @@
     "rimraf": "^6.0.0",
     "typescript": "^5.6.0",
     "vitest": "^4.0.18",
-    "webpack": "^5.105.3"
+    "webpack": "^5.105.3",
+    "@playwright/test": "^1.48.0"
   }
 }

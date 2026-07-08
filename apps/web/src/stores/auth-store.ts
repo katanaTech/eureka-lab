@@ -10,6 +10,8 @@ interface AuthState {
   setUser: (user: UserProfile | null) => void;
   /** Clear auth state on logout */
   clearUser: () => void;
+  /** Mark loading as done without touching user (used on network errors) */
+  setLoaded: () => void;
   /** Get the user's current subscription data (convenience accessor) */
   getSubscription: () => SubscriptionData | null;
   /** Get the user's current plan type */
@@ -26,6 +28,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: true,
   setUser: (user) => set({ user, isLoading: false }),
   clearUser: () => set({ user: null, isLoading: false }),
+  setLoaded: () => set({ isLoading: false }),
   getSubscription: () => get().user?.subscription ?? null,
   getPlan: () => get().user?.plan ?? 'free',
 }));

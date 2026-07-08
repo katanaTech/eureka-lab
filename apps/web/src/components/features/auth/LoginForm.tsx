@@ -6,6 +6,7 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 
 import { auth } from '@/lib/firebase';
 import { authApi } from '@/lib/api-client';
 import { useAuthStore } from '@/stores/auth-store';
+import { homeForRole } from '@/lib/auth-redirects';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
@@ -42,7 +43,7 @@ export const LoginForm: FC = () => {
       const idToken = await credential.user.getIdToken();
       const profile = await authApi.login(idToken);
       setUser({ ...profile, streak: 0 });
-      router.push('/learn');
+      router.push(homeForRole(profile.role));
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Login failed';
       setError(message);
@@ -68,7 +69,7 @@ export const LoginForm: FC = () => {
       const idToken = await credential.user.getIdToken();
       const profile = await authApi.login(idToken);
       setUser({ ...profile, streak: 0 });
-      router.push('/learn');
+      router.push(homeForRole(profile.role));
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Google login failed';
       setError(message);

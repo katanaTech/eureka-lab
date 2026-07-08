@@ -17,14 +17,17 @@ import { BadgeUnlockToast } from '@/components/features/gamification/BadgeUnlock
  * Anonymous users bounce to `/` (welcome) — not `/login`, per spec §5.5.
  * Gamification profile hydrates on auth (achievements page depends on it).
  */
+/** Roles that have gamification data — matches the backend @Roles guard on /gamification/*. */
+const GAMIFICATION_ROLES = new Set(['child', 'parent', 'admin']);
+
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const refreshProfile = useGamificationStore((s) => s.refreshProfile);
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated) refreshProfile();
-  }, [isAuthenticated, refreshProfile]);
+    if (isAuthenticated && user && GAMIFICATION_ROLES.has(user.role)) refreshProfile();
+  }, [isAuthenticated, user, refreshProfile]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace('/');
