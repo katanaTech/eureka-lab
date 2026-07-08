@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import { RoleGate } from '@/components/auth/RoleGate';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { SchoolsTable } from '@/components/features/admin/SchoolsTable';
+import { UsageOverview } from '@/components/features/admin/UsageOverview';
 import { CreateSchoolDialog } from '@/components/features/admin/CreateSchoolDialog';
 import { schoolsApi } from '@/lib/api-client';
 import type { SchoolSummary } from '@eureka-lab/shared-types';
@@ -53,6 +54,8 @@ function AdminSchoolsInner() {
           {t('newSchool')}
         </GameButton>
       </div>
+
+      <UsageOverview />
 
       {error && (
         <div className="panel border-destructive/60 p-4 text-sm text-destructive" role="alert">{error}</div>

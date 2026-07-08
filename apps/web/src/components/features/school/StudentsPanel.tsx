@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, type FC } from 'react';
 import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { StudentsTable } from './StudentsTable';
 import { AddStudentDialog } from './AddStudentDialog';
 import { schoolsApi } from '@/lib/api-client';

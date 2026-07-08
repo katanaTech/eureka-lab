@@ -20,7 +20,7 @@ import { useAuthStore } from '@/stores/auth-store';
  * @returns Auth state and actions
  */
 export function useAuth() {
-  const { user, isLoading, setUser, clearUser } = useAuthStore();
+  const { user, isLoading, setUser, clearUser, setLoaded } = useAuthStore();
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -41,13 +41,19 @@ export function useAuth() {
           setUser(profile);
         } catch (err) {
           if (!mountedRef.current) return;
-          clearUser();
-          // Orphan Firebase session (auth user exists but Firestore profile
-          // doesn't): sign out so subsequent reloads don't replay the 404.
-          // Network errors leave the session intact so a transient blip
-          // doesn't log a legitimate user out.
-          if (err instanceof ApiError && err.statusCode === 404 && auth) {
-            await signOut(auth).catch(() => {});
+          if (err instanceof ApiError) {
+            // Server responded — clear the session.
+            // 404 means orphan Firebase session (user exists in Firebase but
+            // has no Firestore profile): sign out so reloads don't replay it.
+            clearUser();
+            if (err.statusCode === 404 && auth) {
+              await signOut(auth).catch(() => {});
+            }
+          } else {
+            // Network error (ERR_CONNECTION_REFUSED, fetch failed, etc.) —
+            // mark loading done without wiping the user. A transient blip
+            // must not log out a user who just signed in via LoginForm.
+            setLoaded();
           }
         }
       } else {
@@ -60,7 +66,7 @@ export function useAuth() {
       mountedRef.current = false;
       unsubscribe();
     };
-  }, [setUser, clearUser]);
+  }, [setUser, clearUser, setLoaded]);
 
   /**
    * Sign out from both Firebase and the backend.

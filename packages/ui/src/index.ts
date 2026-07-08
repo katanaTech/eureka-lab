@@ -3,4 +3,6 @@
  * Extends shadcn/ui components with platform-specific variants.
  */
 
-export {};
+export { GameButton, type GameButtonProps } from './components/GameButton';
+export { Logo } from './components/Logo';
+export { cn } from './lib/cn';

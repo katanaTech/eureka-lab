@@ -3,8 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Package, Sword, Sparkles, CheckCircle2, Shield } from 'lucide-react';
 import { Scene } from '@/components/game/Scene';
-import { Logo } from '@/components/game/Logo';
-import { GameButton } from '@/components/game/GameButton';
+import { Logo, GameButton } from '@eureka-lab/ui';
 import { KpBadge } from '@/components/game/KpBadge';
 import { SHOP_ABILITIES, SHOP_WEAPONS } from '@/data/academy';
 import { useGame } from '@/state/game-context';

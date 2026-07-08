@@ -3,10 +3,8 @@
  * All components are client components (require 'use client' in their modules).
  */
 
+export { Logo, GameButton, type GameButtonProps } from '@eureka-lab/ui';
 export { Scene } from './Scene';
-export { Logo } from './Logo';
-export { GameButton } from './GameButton';
-export type { GameButtonProps } from './GameButton';
 export { KpBadge } from './KpBadge';
 export { AiTutorChat } from './AiTutorChat';
 export { NavLink } from './NavLink';

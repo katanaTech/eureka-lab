@@ -798,6 +798,24 @@
     "tryAgain": "Try Again",
     "returnToAcademy": "Return to Academy"
   },
+  "SchoolAnalytics": {
+    "overviewTitle": "Platform Usage Overview",
+    "totalSchools": "Total Schools",
+    "active": "active",
+    "suspended": "suspended",
+    "seats": "Seats",
+    "utilization": "Utilization",
+    "students": "Students",
+    "activeStudents": "active",
+    "billingMix": "Billing Mix",
+    "loading": "Loading…",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "colUtilization": "Utilization",
+    "colStudents": "Students",
+    "colActive": "Active %",
+    "colBilling": "Billing",
+    "notAvailable": "Not available"
+  },
   "SchoolBilling": {
     "title": "Billing",
     "status": "Status",

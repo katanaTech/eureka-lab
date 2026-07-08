@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { useAuthStore } from '@/stores/auth-store';
 import { authApi } from '@/lib/api-client';
 

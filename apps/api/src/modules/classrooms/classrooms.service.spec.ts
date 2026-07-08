@@ -618,6 +618,25 @@ describe('ClassroomsService', () => {
     });
   });
 
+  /* ── countBySchool ───────────────────────────────────────────────── */
+  describe('countBySchool', () => {
+    it('counts classrooms with schoolId', async () => {
+      const mockCountGetLocal = jest.fn().mockResolvedValue({ data: () => ({ count: 4 }) });
+      const mockCountLocal = jest.fn().mockReturnValue({ get: mockCountGetLocal });
+      mockWhere.mockReturnValueOnce({
+        count: mockCountLocal,
+        limit: mockLimit,
+        orderBy: mockOrderBy,
+        get: jest.fn().mockResolvedValue({ empty: true, docs: [] }),
+      });
+
+      expect(await service.countBySchool('s1')).toBe(4);
+
+      expect(mockWhere).toHaveBeenCalledWith('schoolId', '==', 's1');
+      expect(mockCountLocal).toHaveBeenCalledTimes(1);
+    });
+  });
+
   /* ── getSchoolRoster ─────────────────────────────────────────────── */
   describe('getSchoolRoster', () => {
     it('returns the school active students as summaries', async () => {

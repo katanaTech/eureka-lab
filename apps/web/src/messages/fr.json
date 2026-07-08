@@ -798,6 +798,24 @@
     "tryAgain": "R\u00e9essayer",
     "returnToAcademy": "Retour \u00e0 l'Acad\u00e9mie"
   },
+  "SchoolAnalytics": {
+    "overviewTitle": "Aperçu d'utilisation de la plateforme",
+    "totalSchools": "Total des établissements",
+    "active": "actif",
+    "suspended": "suspendu",
+    "seats": "Places",
+    "utilization": "Utilisation",
+    "students": "Élèves",
+    "activeStudents": "actifs",
+    "billingMix": "Répartition facturation",
+    "loading": "Chargement…",
+    "errorGeneric": "Une erreur s'est produite. Veuillez réessayer.",
+    "colUtilization": "Utilisation",
+    "colStudents": "Élèves",
+    "colActive": "Actifs %",
+    "colBilling": "Facturation",
+    "notAvailable": "Non disponible"
+  },
   "SchoolBilling": {
     "title": "Facturation",
     "status": "Statut",

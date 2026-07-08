@@ -88,6 +88,38 @@ export interface SchoolBillingSummary {
   latestInvoiceUrl?: string;
 }
 
+/** Per-school usage row for the enriched super-admin table (5b). */
+export interface SchoolUsageRow {
+  schoolId: string;
+  name: string;
+  status: SchoolStatus;
+  seatLimit: number;
+  seatsUsed: number;
+  /** seatsUsed / seatLimit (0 when seatLimit is 0). */
+  utilization: number;
+  teacherCount: number;
+  classroomCount: number;
+  activeStudents: number;
+  /** activeStudents / seatsUsed (0 when seatsUsed is 0). */
+  activeRate: number;
+  /** subscription.status from 5a (active|trialing|past_due|canceled|none). */
+  billingStatus: string;
+}
+
+/** Platform-wide usage aggregate for the super-admin overview (5b). */
+export interface PlatformUsageOverview {
+  totalSchools: number;
+  schoolsByStatus: { active: number; suspended: number };
+  totalSeatLimit: number;
+  totalSeatsUsed: number;
+  /** totalSeatsUsed / totalSeatLimit (0 when no seats). */
+  seatUtilization: number;
+  totalStudents: number;
+  totalActiveStudents: number;
+  /** Count of schools per subscription status. */
+  billingStatusMix: Record<string, number>;
+}
+
 /** Resolved school-admin row for the console (no secrets) */
 export interface SchoolAdminSummary {
   uid: string;

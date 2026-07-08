@@ -15,6 +15,7 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@eureka-lab/shared-types": "workspace:*",
+    "@eureka-lab/ui": "workspace:*",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-slot": "^1.2.4",
     "@react-three/drei": "~9.115.0",
@@ -54,6 +55,7 @@
     "rimraf": "^6.0.0",
     "typescript": "^5.6.0",
     "vitest": "^4.0.18",
-    "webpack": "^5.105.3"
+    "webpack": "^5.105.3",
+    "@playwright/test": "^1.48.0"
   }
 }

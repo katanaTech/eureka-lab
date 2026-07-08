@@ -1,7 +1,7 @@
 'use client';
 
 import { Crown, Heart, Trophy } from 'lucide-react';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 
 interface BattleOutcomeProps {
   outcome: 'win' | 'lose';

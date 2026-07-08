@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, RefreshCw, Trash2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { JoinCodeDisplay } from '@/components/features/teacher/JoinCodeDisplay';
 import { StudentProgressTable } from '@/components/features/teacher/StudentProgressTable';
 import { classroomsApi } from '@/lib/api-client';

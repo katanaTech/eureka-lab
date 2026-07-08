@@ -21,7 +21,7 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { MessageSquare, X, Send, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { GameButton } from './GameButton';
+import { GameButton } from '@eureka-lab/ui';
 
 interface Message {
   id: string;

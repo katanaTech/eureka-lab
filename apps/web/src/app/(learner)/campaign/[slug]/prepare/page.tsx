@@ -8,8 +8,7 @@ import {
   Brain, Zap, Shield, Sparkles, CheckCircle2, Swords,
 } from 'lucide-react';
 import { Scene } from '@/components/game/Scene';
-import { Logo } from '@/components/game/Logo';
-import { GameButton } from '@/components/game/GameButton';
+import { Logo, GameButton } from '@eureka-lab/ui';
 import { KpBadge } from '@/components/game/KpBadge';
 import { AiTutorChat } from '@/components/game/AiTutorChat';
 import { CAMPAIGNS } from '@/data/game';
