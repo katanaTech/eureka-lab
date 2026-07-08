@@ -68,7 +68,7 @@ export default function BattlePage() {
     xpAwarded, badgesUnlocked, sparkCharges, battleType,
     loadBattle, startFight, submitAnswer, advanceAfterAnimation,
     setBattleReward, setCertificateUrl, setReturnPath,
-    useSparkCharge, resetCombat,
+    spendSparkCharge, resetCombat,
   } = useCombatStore();
 
   const { addKp, setInventory } = useInventoryStore();
@@ -163,9 +163,9 @@ export default function BattlePage() {
   }, [resetCombat, initBattle]);
 
   const handleSparkCharge = useCallback(() => {
-    useSparkCharge();
+    spendSparkCharge();
     toast.success(t('sparkChargeToast'));
-  }, [useSparkCharge]);
+  }, [spendSparkCharge]);
 
   if (!zoneId) return null;
 

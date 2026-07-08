@@ -131,7 +131,7 @@ export interface CombatState {
   /**
    * Consume one spark charge. No-op if the current count is already 0.
    */
-  useSparkCharge: () => void;
+  spendSparkCharge: () => void;
 
   /**
    * Reset all combat state. Called on victory/defeat dismiss or logout.
@@ -256,7 +256,7 @@ export const useCombatStore = create<CombatState>()((set, get) => ({
 
   setSparkCharges: (charges) => set({ sparkCharges: charges }),
 
-  useSparkCharge: () => set({ sparkCharges: Math.max(0, get().sparkCharges - 1) }),
+  spendSparkCharge: () => set({ sparkCharges: Math.max(0, get().sparkCharges - 1) }),
 
   resetCombat: () => set(initialState),
 }));
