@@ -1613,8 +1613,61 @@ git commit -m "fix(landing): address build/verification issues"
 
 ---
 
+## Task 10: Compare the running app against the Lovable reference design and reconcile differences
+
+**Why:** Task 9 only confirms the ported page builds and renders without errors — it doesn't confirm it *looks* right against the source. The Lovable project (`C:\Eureka-lab-app\Dev\ai-adventure-island-new`) is the canonical visual reference; this task is the explicit side-by-side check the user asked for before moving on to i18n/test-coverage work.
+
+**Files:** whatever Task 8 files need adjustment based on findings (no new files expected).
+
+- [ ] **Step 1: Run both apps side by side**
+
+```bash
+# Terminal 1 — the ported landing app
+pnpm --filter @eureka-lab/landing dev
+# Terminal 2 — the original Lovable reference (separate project, not a workspace member)
+cd C:\Eureka-lab-app\Dev\ai-adventure-island-new
+npm install   # first run only
+npm run dev   # Vite default: http://localhost:5173, routed to /landing or / depending on its router — check terminal output for the exact URL
+```
+
+- [ ] **Step 2: Compare section by section, both at desktop (1440px) and mobile (390px) widths**
+
+Check each of these against the reference and note any mismatch:
+- **Hero** — world-map parallax depth/speed, title glow intensity, CTA button visibility and contrast (this was the exact "transparent button" bug reported earlier for the Lovable project during this session — confirm `GameButton`'s `primary` variant is NOT reproducing that bug here).
+- **HorizontalIslands** — scroll-jacked horizontal reveal speed/distance, island card sizing, gradient overlay legibility of text over images.
+- **Heroes** — stagger timing/delay on scroll-into-view, card hover scale.
+- **Academy** — KP progress bar fill behavior tied to scroll position (spring physics feel).
+- **Battle** — zombie parallax scale/rotation range, glow pulse.
+- **Footer** — spacing, logo placement.
+- **Fonts** — Cinzel on headings/display text, Inter on body, glow text-shadow rendering (this is the biggest risk point: confirm `packages/ui/theme.css`'s `@theme inline` block — which defines `--animate-*` tokens and the `.text-glow-*`/`.bg-gradient-*`/`.panel`/`.rune-ring`/`.scanlines` utility classes — is actually reachable from `apps/landing/src/app/globals.css` via `@import "@eureka-lab/ui/theme.css"` across the workspace package boundary; a broken import here would silently fall back to unstyled text/backgrounds rather than erroring).
+
+- [ ] **Step 3: Log findings**
+
+For each discrepancy found, note: section, what's different, and whether it's a missed CSS class, a wrong Tailwind v4 token, an animation timing/easing difference, or an asset difference. Keep the list inline in your task report — no separate file needed unless the list is long enough that a future session would benefit from it (if so, add a short section to this plan doc under this task, not a new file).
+
+- [ ] **Step 4: Fix each discrepancy**
+
+Edit the relevant file(s) from Task 8 (or `packages/ui/src/theme.css` from Task 1 if the issue is a missing/broken shared utility class). Re-run Step 1–2 after each fix to confirm.
+
+- [ ] **Step 5: Re-run the full verification and commit**
+
+```bash
+pnpm --filter @eureka-lab/landing lint
+pnpm --filter @eureka-lab/landing build
+```
+Expected: clean. Then commit:
+```bash
+git add -A
+git commit -m "fix(landing): reconcile visual differences against Lovable reference"
+```
+(Only if Step 4 made changes — if the comparison found nothing to fix, skip the commit and say so.)
+
+---
+
 ## Self-Review Notes
 
+- **Branch correction (2026-07-08):** This plan was written and validated against `feat/school-b2b-usage-analytics` (confirmed: `apps/web/src/components/game/{GameButton,Logo}.tsx` and `apps/web/src/app/globals.css` match the content embedded in Tasks 1–3 exactly, and the JPG/PNG assets referenced in Task 7 are present at `apps/web/public/assets/game/`). The execution worktree must branch from this branch's HEAD, **not** from `main` — `main` is a separate, effectively abandoned line (see the 2026-07-08 conversation record: PR #7's "Phase 16 fantasy UI" was merged to `main` and then reverted on the line that became this branch; `main` kept building on the reverted architecture independently and has no bearing on this work).
 - **Spec coverage:** All decisions from `docs/superpowers/specs/2026-07-07-landing-app-scaffold-design.md` are covered (Next.js App Router + Tailwind v4, `NEXT_PUBLIC_APP_URL` cross-link, `vercel.json`, i18n scaffolding) plus the two decisions made after that spec was written (share via `packages/ui`; port `3012` after discovering `apps/api` already uses `3011`).
 - **i18n scope correction:** The original spec assumed a `src/app/[locale]/` + `middleware.ts` structure. Investigation during planning found `apps/web` doesn't actually do URL-based locale routing anywhere yet — `getRequestConfig` hardcodes `'en'`. This plan matches that real, existing pattern instead of building a heavier structure nothing else in the repo uses.
+- **Task 10 added (2026-07-08):** Per explicit user request — run the ported app and the Lovable reference side by side and reconcile any visual differences before moving on to i18n/test-coverage/commit-hygiene work.
 - **`/about` nav link:** Dropped rather than left dangling — noted inline in Task 8.
