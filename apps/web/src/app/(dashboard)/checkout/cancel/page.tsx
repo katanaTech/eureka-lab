@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 import { useTranslations } from 'next-intl';
 import { XCircle } from 'lucide-react';
 import Link from 'next/link';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 
 /**
  * Checkout cancel page component.

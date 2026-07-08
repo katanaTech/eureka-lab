@@ -1,6 +1,6 @@
 import { LoginForm } from '@/components/features/auth/LoginForm';
 import { Scene } from '@/components/game/Scene';
-import { Logo } from '@/components/game/Logo';
+import { Logo } from '@eureka-lab/ui';
 import Link from 'next/link';
 
 /** Force dynamic rendering — Firebase client SDK needs runtime env vars */

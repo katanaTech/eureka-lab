@@ -2,7 +2,7 @@
 
 > **Single canonical view of where we are and what's next.** Updated whenever a phase / plan changes state. If anything in this doc disagrees with what's in code, code wins — file an update.
 >
-> **Last updated:** 2026-05-29
+> **Last updated:** 2026-07-08
 > **Next review:** weekly (every Wednesday)
 > **Maintainer:** whoever last touched a major plan
 
@@ -12,15 +12,16 @@ For product context (mission, 4-level curriculum, hardcoded rules), see [CLAUDE.
 
 ## TL;DR
 
-Eureka Lab is an AI-literacy SaaS for kids 8-16. The product shipped through Phase 14 on `main`; Phase 15 (3D combat) backend is done but frontend was reverted and parked. The current branch (`redesign/v2-from-reference`, PR #8, 65 commits ahead of `main`) is **redesigning the whole app's visual language and learner flow** to match the `ai-adventure-island` reference project. Three sub-plans of redesign work:
+Eureka Lab is an AI-literacy SaaS for kids 8-16. The product shipped through Phase 14 on `main`; Phase 15 (3D combat) backend is done but frontend was reverted and parked. Starting from a reference-project redesign (Stream 2, now DONE) the current branch (`feat/school-b2b-usage-analytics`, PR #16, 202 commits ahead of `main`) went on to deliver the full B2B school-tenancy epic (Stream 6, sub-projects 1–5b, **DONE 2026-06-06**). A 2026-07-08 audit confirmed both the B2C learner product and the B2B school product are code-complete, tested, and building cleanly — **see "Current branch state" below**.
 
+Redesign sub-plans (Stream 2):
 - **Plan 1** (foundation + learner shell): **DONE**
 - **Plan 2** (campaign + combat + inventory + shop + victory): **DONE**
-- **Plan 3a** (adult-page re-skin): **DONE today (2026-05-15)**
+- **Plan 3a** (adult-page re-skin): **DONE** (2026-05-15)
 - **Plan 3b** (backend persistence + R5 COPPA follow-ups): **DONE** (2026-05-29)
-- **Plan 3c** (i18n + RTL + E2E + polish): **NOT WRITTEN**
+- **Plan 3c** (i18n + RTL + E2E + polish): **NOT WRITTEN** — folded into the post-landing sequence below
 
-Plus a backlog of 8 HIGH-priority ship-blockers (Stripe webhooks, COPPA review, prod env vars, tests, i18n, security, a11y, perf) carried from `main` 2026-03-07 — **none addressed by the redesign branch yet**.
+**Not shipping yet.** Decided sequence as of 2026-07-08 (see Stream 7): (1) marketing landing app (own workspace app, ported from the `ai-adventure-island` reference) → (2) i18n translation update (fr/ar) → (3) test coverage → (4) commit hygiene. The 8 HIGH-priority ship-blockers (Stream 3: Stripe webhooks, COPPA review, prod env vars, tests, i18n, security, a11y, perf) are **deliberately pushed forward** until after this sequence.
 
 ---
 
@@ -28,18 +29,17 @@ Plus a backlog of 8 HIGH-priority ship-blockers (Stripe webhooks, COPPA review, 
 
 | Item | Value |
 |---|---|
-| Branch | `redesign/v2-from-reference` |
-| PR | [#8](https://github.com/katanaTech/eureka-lab/pull/8) (draft, OPEN) |
-| Commits ahead of `main` | 92 |
-| HEAD | `2a00a92` |
-| Latest plan landed | Plan 3b (R5 + persistence) — **DONE 2026-05-29** (smoke passed) |
-| Next plan | Plan 3c (polish) — **not written** |
-| Last push | 2026-05-28 (Plan 3b commits unpushed pending approval) |
-| TypeScript | web: 24 pre-existing test-file errors only / api: 0 errors |
-| Lint | web: ✅ clean / api: untracked |
-| Tests | api: 260 passing (24 suites), incl. 12 new Plan 3b unit tests |
-| Open smoke | None — Plan 3b smoke passed 2026-05-29 |
-| Known open bugs | none blocking; **app-wide Sonner toast failure** (Stream 4 — auth path covered by inline alert); **missing teacher signup UI** (Stream 4) |
+| Branch | `feat/school-b2b-usage-analytics` (this is the real production line — see note below) |
+| PR | [#16](https://github.com/katanaTech/eureka-lab/pull/16) (OPEN, checks passing) |
+| Commits ahead of `main` | 202 |
+| HEAD | `3b0e87c` |
+| Latest plan landed | B2B 5b (super-admin usage analytics) — **DONE 2026-06-06**, epic delivered |
+| Next up | Marketing landing app (Stream 7, NEW) → i18n update → test coverage → commit hygiene. Ship-blockers (Stream 3) deliberately pushed forward — **not shipping yet**. |
+| Full audit | 2026-07-08 — backend 42/42 suites (419/419 tests), web unit 12/12 files (88/88 tests), e2e auth-flows 21/21 runnable (6 skipped, need creds), full `pnpm build` 5/5 tasks clean. B2C + B2B both confirmed code-complete and working. |
+| TypeScript / Lint | web: ✅ clean / api: ✅ (see audit above) |
+| Known open bugs | none blocking; **app-wide Sonner toast failure** (Stream 4 — auth path covered by inline alert); a `.gitignore` bug means `apps/web/public/{sw.js,fallback-*.js}` dirty on every build (PWA patterns are anchored to a repo-root `public/` that doesn't exist — real one is `apps/web/public/`) |
+
+**`main` vs this branch (resolved 2026-07-08):** PR #7 "Phase 16 fantasy UI" merged into `main`, then was reverted almost immediately on the line that became this branch, which built an independent redesign (Stream 2) + the B2B epic (Stream 6) instead. `main` kept building on the *reverted* architecture independently (still received "Phase 16 Sprint C" commits through 2026-07-07) and has no bearing on this work — treat it as a separate, abandoned line for all purposes on this branch.
 
 ---
 
@@ -173,6 +173,21 @@ A multi-tenant B2B layer on top of the existing B2C model: a platform **super-ad
 | 5b | Super-admin usage analytics — platform overview tiles + enriched schools table (seat utilization, roster counts, billing-status mix, active students); current-state, on-demand `count()` aggregation, no time-series. **Secret-key rotation deferred again** (still no feature consumes a school key). | **DONE** (`feat/school-b2b-usage-analytics`, 2026-06-06; api 42 suites/419 tests, school-analytics service 100% cov) | [analytics](docs/superpowers/specs/2026-06-03-school-tenancy-usage-analytics-design.md) · [plan](docs/superpowers/plans/2026-06-03-school-tenancy-usage-analytics-plan.md) |
 
 **B2B epic delivered (2026-06-06).** Sub-projects 1–5b are DONE. The only parked item is **secret-key rotation**, awaiting a feature that actually consumes a school key (e.g. coded student self-enroll or an SSO/roster-sync API) — revisit then.
+
+---
+
+## Stream 7 — Post-B2B sequence: Landing app → i18n → test coverage → commit hygiene (NEW 2026-07-08)
+
+With B2C and B2B both confirmed working (2026-07-08 audit — see "Current branch state"), work continues in this explicit order before touching the Stream 3 ship-blockers. **Not shipping yet** — this is polish/completeness work, decided directly with the user.
+
+| # | Item | Status | Plan / spec |
+|---|---|---|---|
+| 1 | Marketing landing app (`apps/landing`, new workspace app) — imports `Landing.tsx` from the `ai-adventure-island-new` reference (separate repo, not a workspace member), promotes `GameButton`/`Logo`/theme tokens from `apps/web` into `packages/ui` so both apps share one design system, CTAs link to `apps/web` via `NEXT_PUBLIC_APP_URL`. Includes an explicit run-and-compare pass against the Lovable reference before calling it done. | **IN PROGRESS** (worktree `.worktrees/landing-app`, branch `feat/landing-app`, subagent-driven execution) | [design](docs/superpowers/specs/2026-07-07-landing-app-scaffold-design.md) · [plan](docs/superpowers/plans/2026-07-07-landing-app-scaffold-and-import.md) |
+| 2 | i18n translation update — French + Arabic coverage (overlaps Stream 3 I18N-001 and Stream 2 Plan 3c P3-08/09) | **NOT STARTED** — plan when we get here | — |
+| 3 | Test coverage — Phases 6–15 modules toward 80%+ (Stream 3 QA-001), broader E2E beyond the auth-flows slice added 2026-07-08 | **NOT STARTED** — plan when we get here | — |
+| 4 | Commit hygiene — fix the `.gitignore` PWA-path bug (see "Current branch state"), review `planning/api-contracts.md` staleness (Stream 5) | **NOT STARTED** — plan when we get here | — |
+
+**After this sequence:** return to Stream 3 (ship-blockers) before any production release.
 
 ---
 

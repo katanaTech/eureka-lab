@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, type FC, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { schoolBillingApi } from '@/lib/api-client';
 import type { SchoolBillingSummary } from '@eureka-lab/shared-types';
 import { statusClasses, dotClass, statusLabel } from '../billing/billingStatus';

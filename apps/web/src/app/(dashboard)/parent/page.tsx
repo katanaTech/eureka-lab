@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useAuth';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { LevelBadge } from '@/components/features/gamification/LevelBadge';
 
 /** Force dynamic rendering — uses Firebase auth */

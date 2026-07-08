@@ -53,3 +53,6 @@ smoke-*.png
 
 # Vercel CLI link state
 .vercel
+
+# Git worktrees (superpowers:using-git-worktrees)
+.worktrees/

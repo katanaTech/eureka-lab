@@ -6,8 +6,7 @@ import { ArrowLeft, Brain, Wand2, Sparkles, ShieldAlert, Shield, Swords, Zap } f
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Scene } from '@/components/game/Scene';
-import { Logo } from '@/components/game/Logo';
-import { GameButton } from '@/components/game/GameButton';
+import { Logo, GameButton } from '@eureka-lab/ui';
 import { KpBadge } from '@/components/game/KpBadge';
 import { CAMPAIGNS, CLASSES } from '@/data/game';
 import { pickQuestion, type QuizQuestion } from '@/data/quiz';

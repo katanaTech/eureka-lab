@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Scene } from '@/components/game/Scene';
-import { Logo } from '@/components/game/Logo';
-import { GameButton } from '@/components/game/GameButton';
+import { Logo, GameButton } from '@eureka-lab/ui';
 import { coppaApi } from '@/lib/api-client';
 
 /** Force dynamic — token is per-request and the page calls a public POST. */

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { ClassroomCard } from '@/components/features/teacher/ClassroomCard';
 import { CreateClassroomDialog } from '@/components/features/teacher/CreateClassroomDialog';
 import { classroomsApi } from '@/lib/api-client';

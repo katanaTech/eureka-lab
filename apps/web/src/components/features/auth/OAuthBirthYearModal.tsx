@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
