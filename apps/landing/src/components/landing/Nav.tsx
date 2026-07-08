@@ -15,9 +15,9 @@ export function Nav() {
           <a href="#academy" className="hover:text-primary transition-colors">Academy</a>
           <a href="#battle" className="hover:text-primary transition-colors">Battle</a>
         </nav>
-        <a href={LOGIN_URL}>
-          <GameButton size="sm">Enter the Realm</GameButton>
-        </a>
+        <GameButton size="sm" onClick={() => { window.location.href = LOGIN_URL; }}>
+          Enter the Realm
+        </GameButton>
       </div>
     </header>
   );

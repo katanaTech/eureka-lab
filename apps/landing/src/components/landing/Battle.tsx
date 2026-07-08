@@ -27,6 +27,7 @@ export function Battle() {
         <motion.img
           src={zombie}
           alt="Babble Zombie"
+          loading="lazy"
           style={{ scale: zScale, rotate: zRot }}
           className="absolute h-[80vh] object-contain drop-shadow-[0_0_60px_hsl(var(--destructive)/0.6)]"
         />
@@ -41,9 +42,9 @@ export function Battle() {
             Every spent KP is a stat. Outsmart the swarm and reclaim the realm.
           </p>
           <div className="mt-10">
-            <a href={LOGIN_URL}>
-              <GameButton size="lg">Begin Your Quest</GameButton>
-            </a>
+            <GameButton size="lg" onClick={() => { window.location.href = LOGIN_URL; }}>
+              Begin Your Quest
+            </GameButton>
           </div>
         </div>
       </div>

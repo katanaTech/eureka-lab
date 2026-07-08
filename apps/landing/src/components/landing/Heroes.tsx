@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 const HEROES = [
@@ -31,11 +32,13 @@ export function Heroes() {
               transition={{ duration: 0.6, delay: i * 0.1 }}
               className="panel rune-ring p-4 group"
             >
-              <div className="aspect-[3/4] overflow-hidden rounded-xl">
-                <img
+              <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
+                <Image
                   src={h.img}
                   alt={h.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               </div>
               <div className="pt-4 text-center">

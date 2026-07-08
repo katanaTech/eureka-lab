@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const ISLANDS = [
@@ -26,7 +27,13 @@ export function HorizontalIslands() {
         <motion.div style={{ x }} className="flex gap-8 pl-[10vw] pr-[10vw]">
           {ISLANDS.map((isle, i) => (
             <div key={isle.name} className="relative w-[80vw] sm:w-[60vw] h-[70vh] flex-shrink-0 panel overflow-hidden group">
-              <img src={isle.img} alt={isle.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <Image
+                src={isle.img}
+                alt={isle.name}
+                fill
+                sizes="(max-width: 640px) 80vw, 60vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8 sm:p-12">
                 <p className="text-[10px] tracking-[0.5em] text-primary/70">ISLE {String(i + 1).padStart(2, '0')}</p>

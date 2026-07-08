@@ -42,9 +42,9 @@ export function Hero({ progress }: { progress: MotionValue<number> }) {
             Four islands. Four trials. Master the AI arts and drive the Babble Zombies back into the void.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <a href={LOGIN_URL}>
-              <GameButton size="lg">Begin Your Quest</GameButton>
-            </a>
+            <GameButton size="lg" onClick={() => { window.location.href = LOGIN_URL; }}>
+              Begin Your Quest
+            </GameButton>
             <a
               href="#world"
               className="text-[11px] font-display tracking-[0.4em] uppercase text-primary/70 hover:text-primary transition-colors"
