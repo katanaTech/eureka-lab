@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useGamificationStore } from '@/stores/gamification-store';
 import { Scene } from '@/components/game/Scene';
-import { Logo } from '@/components/game/Logo';
+import { Logo } from '@eureka-lab/ui';
 import { UserMenu } from '@/components/game/UserMenu';
 import { BadgeUnlockToast } from '@/components/features/gamification/BadgeUnlockToast';
 

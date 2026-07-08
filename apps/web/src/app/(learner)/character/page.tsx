@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ChevronLeft, ChevronRight, Sparkles, Sword } from 'lucide-react';
 import { Scene } from '@/components/game/Scene';
-import { Logo } from '@/components/game/Logo';
-import { GameButton } from '@/components/game/GameButton';
+import { Logo, GameButton } from '@eureka-lab/ui';
 import { CLASSES } from '@/data/game';
 import { useGame } from '@/state/game-context';
 

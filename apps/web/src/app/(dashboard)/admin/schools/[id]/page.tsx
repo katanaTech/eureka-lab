@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { RoleGate } from '@/components/auth/RoleGate';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { SchoolStatusBadge } from '@/components/features/admin/SchoolStatusBadge';
 import { CreateSchoolAdminDialog } from '@/components/features/admin/CreateSchoolAdminDialog';
 import { EditSeatLimitDialog } from '@/components/features/admin/EditSeatLimitDialog';

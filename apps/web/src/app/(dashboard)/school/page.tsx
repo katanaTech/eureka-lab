@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Plus } from 'lucide-react';
 import { RoleGate } from '@/components/auth/RoleGate';
 import { useAuth } from '@/hooks/useAuth';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { TeachersTable } from '@/components/features/school/TeachersTable';
 import { CreateTeacherDialog } from '@/components/features/school/CreateTeacherDialog';
 import { StudentsPanel } from '@/components/features/school/StudentsPanel';
