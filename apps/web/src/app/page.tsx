@@ -10,7 +10,7 @@ import {
 import { toast } from 'sonner';
 import { Scene } from '@/components/game/Scene';
 import { Logo } from '@/components/game/Logo';
-import { GameButton } from '@/components/game/GameButton';
+import { GameButton } from '@eureka-lab/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { auth } from '@/lib/firebase';
 import { authApi, coppaApi } from '@/lib/api-client';
