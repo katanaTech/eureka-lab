@@ -712,6 +712,112 @@ git commit -m "refactor(ui): promote Logo to packages/ui"
 
 ---
 
+## Task 3b: Fix remaining `GameButton`/`Logo` import sites (gap found during Task 4)
+
+**Why this task exists:** Tasks 2 and 3 only updated `apps/web/src/app/page.tsx`'s imports when deleting the local `GameButton.tsx`/`Logo.tsx` files — that was the only usage checked when the plan was written. Task 4's build-verification step discovered 27 more files import these components from the now-deleted local paths, plus the barrel file `apps/web/src/components/game/index.ts` itself still re-exports from the deleted files. This task fixes all of them before Task 4 can pass its build-verification step.
+
+**Files to modify** (28 total — run the grep in Step 1 to get the authoritative list, this is what it returned as of this writing):
+- `apps/web/src/components/game/index.ts` (barrel file)
+- `apps/web/src/components/features/school/StudentsPanel.tsx`
+- `apps/web/src/components/features/school/BillingStatusCard.tsx`
+- `apps/web/src/components/features/auth/OAuthBirthYearModal.tsx`
+- `apps/web/src/components/features/admin/BillingPanel.tsx`
+- `apps/web/src/app/not-found.tsx`
+- `apps/web/src/app/(learner)/victory/page.tsx`
+- `apps/web/src/app/(learner)/shop/page.tsx`
+- `apps/web/src/app/(learner)/inventory/page.tsx`
+- `apps/web/src/app/(learner)/dashboard/page.tsx`
+- `apps/web/src/app/(learner)/character/page.tsx`
+- `apps/web/src/app/(learner)/campaign/[slug]/prepare/page.tsx`
+- `apps/web/src/app/(learner)/campaign/[slug]/page.tsx`
+- `apps/web/src/app/(learner)/campaign/[slug]/mission/[missionId]/prep/page.tsx`
+- `apps/web/src/app/(learner)/campaign/[slug]/battle/[missionId]/page.tsx`
+- `apps/web/src/app/(learner)/campaign/[slug]/battle/[missionId]/_battle-outcome.tsx`
+- `apps/web/src/app/(dashboard)/teacher/page.tsx`
+- `apps/web/src/app/(dashboard)/teacher/[classroomId]/page.tsx`
+- `apps/web/src/app/(dashboard)/school/page.tsx`
+- `apps/web/src/app/(dashboard)/parent/page.tsx`
+- `apps/web/src/app/(dashboard)/layout.tsx`
+- `apps/web/src/app/(dashboard)/checkout/success/page.tsx`
+- `apps/web/src/app/(dashboard)/checkout/cancel/page.tsx`
+- `apps/web/src/app/(dashboard)/admin/schools/[id]/page.tsx`
+- `apps/web/src/app/(dashboard)/admin/page.tsx`
+- `apps/web/src/app/(auth)/signup/page.tsx`
+- `apps/web/src/app/(auth)/login/page.tsx`
+- `apps/web/src/app/(auth)/confirm-parent/[token]/page.tsx`
+
+- [ ] **Step 1: Get the authoritative current list of affected files**
+
+```bash
+grep -rl "from '@/components/game/\(GameButton\|Logo\)'" apps/web/src
+```
+Use this list, not the one above, if they differ — the one above is a snapshot and the codebase may have moved since this plan section was written.
+
+- [ ] **Step 2: Fix the barrel file `apps/web/src/components/game/index.ts`**
+
+Current content:
+```ts
+/**
+ * Barrel export for the Phase 16 fantasy UI component library.
+ * All components are client components (require 'use client' in their modules).
+ */
+
+export { Scene } from './Scene';
+export { Logo } from './Logo';
+export { GameButton } from './GameButton';
+export type { GameButtonProps } from './GameButton';
+export { KpBadge } from './KpBadge';
+export { AiTutorChat } from './AiTutorChat';
+export { NavLink } from './NavLink';
+export { HpBar } from './HpBar';
+```
+Replace the `Logo`/`GameButton` lines so it re-exports those two from `@eureka-lab/ui` instead, leaving the other five exports (`Scene`, `KpBadge`, `AiTutorChat`, `NavLink`, `HpBar`) untouched since those components were never promoted and still live locally:
+```ts
+/**
+ * Barrel export for the Phase 16 fantasy UI component library.
+ * All components are client components (require 'use client' in their modules).
+ */
+
+export { Logo, GameButton, type GameButtonProps } from '@eureka-lab/ui';
+export { Scene } from './Scene';
+export { KpBadge } from './KpBadge';
+export { AiTutorChat } from './AiTutorChat';
+export { NavLink } from './NavLink';
+export { HpBar } from './HpBar';
+```
+
+- [ ] **Step 3: Fix each of the other 27 files**
+
+For each file, find its import line(s) for `GameButton` and/or `Logo` from `@/components/game/GameButton` or `@/components/game/Logo` and repoint them at `@eureka-lab/ui`, following the exact pattern already used in Tasks 2/3 for `apps/web/src/app/page.tsx`:
+- If a file imports only `GameButton` from `@/components/game/GameButton`, change the import source to `@eureka-lab/ui` (keep it a separate line unless Step 4 below says to merge).
+- If a file imports only `Logo` from `@/components/game/Logo`, same.
+- If a file imports both `GameButton` and `Logo` (from two separate lines, since they were always two separate files), merge them into one `import { Logo, GameButton } from '@eureka-lab/ui';` line (matching the merge already done in Task 3 for `page.tsx`).
+- If a file ALSO already imports something else from `@eureka-lab/ui` (unlikely at this point in the plan, but check), merge into that existing import statement instead of creating a second one.
+- Do not change the import order/style of anything else in these files. Do not reformat unrelated code. This is a mechanical import-source fix, nothing else.
+
+- [ ] **Step 4: Verify no references remain**
+
+```bash
+grep -r "from '@/components/game/\(GameButton\|Logo\)'" apps/web/src
+```
+Expected: no output (zero matches).
+
+- [ ] **Step 5: Typecheck before committing**
+
+```bash
+pnpm --filter @eureka-lab/web lint
+```
+Fix anything it flags that's in scope for this task (an import-order/formatting nit introduced by your edits). Don't chase pre-existing warnings unrelated to your changes.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add apps/web/src
+git commit -m "fix(web): repoint remaining GameButton/Logo imports at @eureka-lab/ui"
+```
+
+---
+
 ## Task 4: Wire `packages/ui` exports/package.json and verify `apps/web` still builds
 
 **Files:**
@@ -1670,4 +1776,5 @@ git commit -m "fix(landing): reconcile visual differences against Lovable refere
 - **Spec coverage:** All decisions from `docs/superpowers/specs/2026-07-07-landing-app-scaffold-design.md` are covered (Next.js App Router + Tailwind v4, `NEXT_PUBLIC_APP_URL` cross-link, `vercel.json`, i18n scaffolding) plus the two decisions made after that spec was written (share via `packages/ui`; port `3012` after discovering `apps/api` already uses `3011`).
 - **i18n scope correction:** The original spec assumed a `src/app/[locale]/` + `middleware.ts` structure. Investigation during planning found `apps/web` doesn't actually do URL-based locale routing anywhere yet — `getRequestConfig` hardcodes `'en'`. This plan matches that real, existing pattern instead of building a heavier structure nothing else in the repo uses.
 - **Task 10 added (2026-07-08):** Per explicit user request — run the ported app and the Lovable reference side by side and reconcile any visual differences before moving on to i18n/test-coverage/commit-hygiene work.
+- **Known follow-up from Task 8 review (2026-07-08, not blocking):** The `LOGIN_URL` CTAs in `Nav.tsx`/`Hero.tsx`/`Battle.tsx` were fixed from invalid `<a><button></button></a>` nesting to `<GameButton onClick={() => window.location.href = LOGIN_URL}>`, which resolves the HTML-validity/screen-reader bug but loses native link affordances (open-in-new-tab, right-click copy-link, no-JS fallback) and reports as `button` role instead of `link` role. The code reviewer explicitly signed off to proceed rather than block on this. A cleaner fix would give `@eureka-lab/ui`'s `GameButton` an `asChild`/`as="a"` option so these can be real anchors again — worth doing as a small fast-follow, not part of this plan's scope.
 - **`/about` nav link:** Dropped rather than left dangling — noted inline in Task 8.
