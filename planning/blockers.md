@@ -12,6 +12,51 @@
 
 ## Inter-Agent Notifications
 
+### 2026-07-09 — PM check-in: Sprint D stasis — QA-004/005 now 64 days READY, no execution
+
+**Inspected by:** PM agent (recurring routine — disable requested 23 times; still firing)
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**Sprint C:** CONFIRMED DONE (closed 2026-04-29, 15/15 tasks). Battle page
+`apps/web/src/app/(game)/g/campaign/[slug]/battle/[missionId]/page.tsx` verified:
+wires `POST /api/v1/combat/init`, uses `useCombatStore`. No change from prior checks.
+
+**Sprint D — 8 days of stasis since 2026-07-01 replan:**
+
+| Status | Count | Tasks |
+|--------|-------|-------|
+| DONE | 10 | MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b, OPEN-005 |
+| DESCOPED | 2 | QA-001 (full E2E — PM 2026-07-01), QA-002 (flag matrix — PM 2026-07-01) |
+| READY — **64 days unstarted** | 2 | **QA-004** (Lighthouse mobile ≥90 on `/m/dashboard`), **QA-005** (iOS Safari + Android Chrome smoke) |
+| BLOCKED | 1 | QA-006 — on QA-004 + QA-005 only |
+
+**No new commits have landed since 2026-07-01 (d649560).** QA-004 and QA-005 became
+READY on 2026-05-06 (when MOB-001 landed). They are now **64 days unstarted**.
+These are the **only two remaining gates** before DEVOPS can initiate the QA-006
+production rollout (5% → 25% → 100%).
+
+**Pre-ship tech debt — still unresolved (CLAUDE.md rule #8):**
+- `apps/web/src/app/(game)/g/campaign/[slug]/shop/page.tsx` — 472 lines
+- `apps/web/src/app/(game)/g/shop/page.tsx` — 451 lines
+- `apps/web/src/app/(game)/g/inventory/page.tsx` — 354 lines
+
+FE must split these three files before QA-006 gates can be cleared for production.
+
+**QA — action required:**
+- **QA-004:** Run Playwright Lighthouse CI against `/m/dashboard`. Target ≥90 mobile perf.
+  Fix any regressions; commit results.
+- **QA-005:** Execute iOS Safari + Android Chrome smoke tests for the `/m/*` routes.
+  Pass/fail documented; commit evidence.
+- Both are independent and can run in a single QA session. Once both pass, notify
+  DEVOPS to initiate QA-006.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.** Routine
+`trig_01MTn9VXjqAg3mVvQCekuaK4` at https://claude.ai/code/routines. This is the 23rd
+request. All remaining work (QA-004, QA-005, QA-006, 3 file splits) has clear owners
+and no outstanding PM decisions.
+
+---
+
 ### 2026-07-01 — PM replan executed: QA-001/002 formally descoped, QA-006 unblocked pending QA-004/005
 
 **Inspected by:** PM agent (routine `trig_01MTn9VXjqAg3mVvQCekuaK4` — 22nd and final disable notice)
