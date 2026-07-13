@@ -39,6 +39,25 @@ _(none)_
 
 ---
 
+---
+
+### 2026-07-13 — PM check-in: Phase 16 Sprint C/D routine fired again — still needs disabling
+
+**From:** PM agent (automated routine)
+**To:** User / whoever manages Claude Code routines
+**Re:** Second consecutive stale run — `feature/phase-16-fantasy-ui` Sprint C → Sprint D transition check
+
+**Summary:** Same finding as 2026-07-11. The branch `feature/phase-16-fantasy-ui` does not exist (local or remote). `planning/sprint-p16.md` and `planning/task-board.md` do not exist. The project is now on `main` at Stream 7 (marketing landing app done; i18n → test coverage → commit hygiene are next). There is no Phase-16 Sprint C or Sprint D work in flight.
+
+**No new blockers or state changes.** The 2026-07-11 entry captured everything relevant.
+
+**Action required — please disable this routine:**
+`https://claude.ai/code/routines`
+
+This routine will keep firing every ~2 days until manually disabled. No useful work can be done on Phase-16 Sprint C/D tracking — the sprint and branch no longer exist.
+
+---
+
 ## Resolved / Historical
 
 _(none yet)_
