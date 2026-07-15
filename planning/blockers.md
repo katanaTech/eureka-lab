@@ -39,8 +39,6 @@ _(none)_
 
 ---
 
----
-
 ### 2026-07-13 — PM check-in: Phase 16 Sprint C/D routine fired again — still needs disabling
 
 **From:** PM agent (automated routine)
@@ -55,6 +53,30 @@ _(none)_
 `https://claude.ai/code/routines`
 
 This routine will keep firing every ~2 days until manually disabled. No useful work can be done on Phase-16 Sprint C/D tracking — the sprint and branch no longer exist.
+
+---
+
+### 2026-07-15 — PM check-in: Phase 16 Sprint C/D routine fired a third time — ESCALATING
+
+**From:** PM agent (automated routine)
+**To:** User / whoever manages Claude Code routines
+**Re:** Third consecutive stale run — routine must be disabled
+
+**Summary:** Identical finding to 2026-07-11 and 2026-07-13. No new state to report.
+
+- `feature/phase-16-fantasy-ui` — does not exist (local or remote)
+- `planning/sprint-p16.md` — does not exist
+- `planning/task-board.md` — does not exist
+- Current `main` is at Stream 7 (marketing landing app merged via PR #17, 2026-07-08). Next work: i18n → test coverage → commit hygiene.
+
+**Additional note:** Previous PM check-in commits (2026-07-11, 2026-07-13) were committed in detached HEAD state but appear to have reached the remote independently. This is the first entry committed on `main` branch directly.
+
+This is the **third consecutive no-op run**. The Phase-16 Sprint C/D tracking task is obsolete. The routine is wasting a scheduled slot every ~2 days with nothing actionable to do.
+
+**URGENT — please disable this routine now:**
+`https://claude.ai/code/routines`
+
+PM check-in routine: Sprint D never started (Phase 16 archived). Please disable this routine.
 
 ---
 
