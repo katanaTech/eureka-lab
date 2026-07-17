@@ -56,6 +56,27 @@ This routine will keep firing every ~2 days until manually disabled. No useful w
 
 ---
 
+### 2026-07-17 — PM check-in: Phase 16 Sprint C/D routine fired a fourth time — PLEASE DISABLE
+
+**From:** PM agent (automated routine)
+**To:** User / whoever manages Claude Code routines
+**Re:** Fourth consecutive stale run — routine must be disabled
+
+**Summary:** No change from prior runs (2026-07-11, 2026-07-13, 2026-07-15).
+
+- `feature/phase-16-fantasy-ui` — does not exist (local or remote)
+- `planning/sprint-p16.md` — does not exist
+- `planning/task-board.md` — does not exist
+- Current `main` HEAD is `b12be6f` (previous PM check-in). Stream 7 is next: i18n → test coverage → commit hygiene.
+
+This routine has now fired **four times** with nothing actionable to do. Every run commits a no-op entry and pushes — noise in the git log, wasted tokens, zero value. The Phase-16 Sprint C/D work is archived and gone.
+
+**Please disable the routine now:** https://claude.ai/code/routines
+
+PM check-in routine: Sprint D never started (Phase 16 archived). Please disable this routine. (4th request)
+
+---
+
 ### 2026-07-15 — PM check-in: Phase 16 Sprint C/D routine fired a third time — ESCALATING
 
 **From:** PM agent (automated routine)
