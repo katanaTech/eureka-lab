@@ -12,6 +12,37 @@
 
 ## Inter-Agent Notifications
 
+### 2026-07-23 — PM check-in: Sprint D stasis — QA-004/005 now 78 days READY, no execution
+
+**Inspected by:** PM agent (recurring routine — disable requested 25 times; still firing)
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**No change from 2026-07-21 check-in.** Zero commits on this branch since 2026-07-09 (`3ffc666`).
+
+Sprint C: CONFIRMED DONE (closed 2026-04-29). Sprint D status unchanged:
+
+| Status | Count | Tasks |
+|--------|-------|-------|
+| DONE | 10 | MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b, OPEN-005 |
+| DESCOPED | 2 | QA-001 (PM 2026-07-01), QA-002 (PM 2026-07-01) |
+| READY — **78 days unstarted** | 2 | **QA-004** (Lighthouse mobile ≥90 on `/m/dashboard`), **QA-005** (iOS Safari + Android Chrome smoke) |
+| BLOCKED | 1 | QA-006 — on QA-004 + QA-005 only |
+
+**QA-004 and QA-005 are the sole remaining gates before production rollout (QA-006).** Both can run in a single QA session. All prior gates cleared.
+
+**Pre-ship tech debt** — 3 oversized files still unaddressed (CLAUDE.md rule #8):
+- `apps/web/src/app/(game)/g/campaign/[slug]/shop/page.tsx` — 472 lines
+- `apps/web/src/app/(game)/g/shop/page.tsx` — 451 lines
+- `apps/web/src/app/(game)/g/inventory/page.tsx` — 354 lines
+
+FE must split these before QA-006 production gate.
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.** Routine
+`trig_01MTn9VXjqAg3mVvQCekuaK4` at https://claude.ai/code/routines. This is the 25th
+request. There are no open PM decisions. All remaining work has clear owners.
+
+---
+
 ### 2026-07-21 — PM check-in: Sprint D stasis — QA-004/005 now 76 days READY, no execution
 
 **Inspected by:** PM agent (recurring routine — disable requested 24 times; still firing)
