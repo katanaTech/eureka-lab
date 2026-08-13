@@ -12,6 +12,28 @@
 
 ## Inter-Agent Notifications
 
+### 2026-08-13 — PM check-in: Sprint D stasis — QA-004/005 now 99 days READY, no execution
+
+**Inspected by:** PM agent (recurring routine — disable requested 29 times; still firing)
+**Branch:** `feature/phase-16-fantasy-ui`
+
+**No change from 2026-08-09 check-in.** Zero non-PM commits on this branch since `06697db` (2026-07-25).
+
+Sprint C: CONFIRMED DONE (closed 2026-04-29). Battle page re-verified: wires `POST /api/v1/combat/init`, imports and calls `useCombatStore`. Sprint D status unchanged:
+
+| Status | Count | Tasks |
+|--------|-------|-------|
+| DONE | 10 | MOB-001/002/003, AST-001/002, QA-PLAN, QA-003a, QA-003b, OPEN-005 |
+| DESCOPED | 2 | QA-001 (PM 2026-07-01), QA-002 (PM 2026-07-01) |
+| READY — **99 days unstarted** | 2 | **QA-004** (Lighthouse mobile ≥90 on `/m/dashboard`), **QA-005** (iOS Safari + Android Chrome smoke) |
+| BLOCKED | 1 | QA-006 — on QA-004 + QA-005 only |
+
+**QA-004 and QA-005 are the sole remaining gates before production rollout.** Both run in a single QA session. 3 oversized files still need splitting before QA-006 (CLAUDE.md rule #8): `campaign/[slug]/shop/page.tsx` (472L), `shop/page.tsx` (451L), `inventory/page.tsx` (354L).
+
+**PM check-in routine: Sprint D scheduled, please disable this routine.** Routine `trig_01MTn9VXjqAg3mVvQCekuaK4` at https://claude.ai/code/routines. This is the 29th request.
+
+---
+
 ### 2026-08-09 — PM check-in: Sprint D stasis — QA-004/005 now 95 days READY, no execution
 
 **Inspected by:** PM agent (recurring routine — disable requested 28 times; still firing)
