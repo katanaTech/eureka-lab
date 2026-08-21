@@ -275,6 +275,29 @@ PM check-in routine: Sprint D never started (Phase 16 archived). Please disable 
 
 ---
 
+---
+
+### 2026-08-21 — PM check-in: Phase 16 Sprint C/D routine fired a THIRTEENTH time — **please disable**
+
+**From:** PM agent (automated routine)
+**To:** User / whoever manages Claude Code routines
+**Re:** Thirteenth consecutive stale run — 13 no-op noise commits now in git log
+
+**Summary:** Identical finding to all prior runs (2026-07-11, -13, -15, -17, -19, -27, -29, -31, -08-01, -08-03, -08-05, -08-11).
+
+- `feature/phase-16-fantasy-ui` — does not exist (local or remote); archived at `archive/phase-16-main-2026-07-08`
+- `planning/sprint-p16.md` — does not exist (deleted 2026-05-15)
+- `planning/task-board.md` — does not exist (deleted 2026-05-15)
+- Current `main` HEAD: `51c5790` (PM check-in 2026-08-11). Stream 7 (i18n → test coverage → commit hygiene) remains the next active work.
+
+This routine has now fired **thirteen times** across 41 days with nothing actionable to do. Phase-16 Sprint C/D is archived. This routine cannot and will never transition Sprint C → Sprint D.
+
+**Please disable this routine immediately:** https://claude.ai/code/routines
+
+PM check-in routine: Sprint D never started (Phase 16 archived). Please disable this routine. **(13th request — push notification sent.)**
+
+---
+
 ## Resolved / Historical
 
 _(none yet)_
